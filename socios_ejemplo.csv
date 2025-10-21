@@ -1,0 +1,9 @@
+numero_socio,nombre,apellidos,email,telefono,foraneo,direccion,id_sistema_entradas
+3,Carlos,Ramírez López,carlos.ramirez@example.com,555-2345,false,Avenida Central 789,ENT-003
+4,Laura,González Martínez,laura.gonzalez@example.com,555-3456,true,Colonia Norte 101,ENT-004
+5,Roberto,Sánchez Torres,roberto.sanchez@example.com,555-4567,false,Calle Secundaria 202,ENT-005
+6,Elena,Vega Morales,elena.vega@example.com,555-5678,true,Plaza Principal 303,ENT-006
+7,José,Luna Castillo,jose.luna@example.com,555-6789,false,Boulevard Este 404,ENT-007
+8,Patricia,Ortiz Ríos,patricia.ortiz@example.com,555-7890,true,Residencial Sur 505,ENT-008
+9,Miguel,Navarro Domínguez,miguel.navarro@example.com,555-8901,false,Calle Comercial 606,ENT-009
+10,Sofía,Flores Benítez,sofia.flores@example.com,555-9012,true,Privada Colonial 707,ENT-010
