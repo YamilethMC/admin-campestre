@@ -3,7 +3,7 @@ import './shared/styles/output.css';
 import { AppProvider, AppContext } from './shared/context/AppContext';
 import Login from './features/auth/Login';
 import Navigation from './navigation/Navigation';
-import IndividualMemberForm from './features/individual-members/IndividualMemberForm';
+import IndividualMemberForm from './features/individual-members';
 import BulkMemberUpload from './features/bulk-upload/BulkMemberUpload';
 import AccountStatementUpload from './features/accounting/AccountStatementUpload';
 import MemberList from './features/members/MemberList';
