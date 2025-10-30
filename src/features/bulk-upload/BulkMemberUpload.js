@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import Papa from 'papaparse';
-import { AppContext } from './AppContext';
+import { AppContext } from '../../shared/context/AppContext';
 
 const BulkMemberUpload = () => {
   const { members, setMembers, addLog, addToast } = useContext(AppContext);

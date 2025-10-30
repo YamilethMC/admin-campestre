@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { AppContext } from './AppContext';
+import { AppContext } from '../../shared/context/AppContext';
 
 const MemberList = () => {
   const { members } = useContext(AppContext);

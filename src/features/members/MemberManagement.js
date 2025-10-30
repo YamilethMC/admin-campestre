@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import IndividualMemberForm from './IndividualMemberForm';
-import BulkMemberUpload from './BulkMemberUpload';
-import AccountStatementUpload from './AccountStatementUpload';
+import IndividualMemberForm from '../../IndividualMemberForm';
+import BulkMemberUpload from '../bulk-upload/BulkMemberUpload';
+import AccountStatementUpload from '../accounting/AccountStatementUpload';
 import MemberList from './MemberList';
 import LogPanel from './LogPanel';
 

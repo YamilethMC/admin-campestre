@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
-import { AppContext } from './AppContext';
-import { UserIcon, LockIcon } from './icons';
+import { AppContext } from '../../shared/context/AppContext';
+import { UserIcon, LockIcon } from '../../shared/components/icons/icons';
 
 const Login = () => {
   const [username, setUsername] = useState('');

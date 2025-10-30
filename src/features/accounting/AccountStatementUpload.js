@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { AppContext } from './AppContext';
+import { AppContext } from '../../shared/context/AppContext';
 
 const AccountStatementUpload = () => {
   const { members, addLog, addToast } = useContext(AppContext);

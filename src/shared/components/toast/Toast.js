@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { XIcon, CheckIcon, WarningIcon, InfoIcon } from './icons';
+import { XIcon, CheckIcon, WarningIcon, InfoIcon } from '../icons/icons';
 
 const Toast = ({ message, type, onClose, duration = 5000 }) => {
   useEffect(() => {

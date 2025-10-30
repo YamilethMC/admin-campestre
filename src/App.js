@@ -1,14 +1,14 @@
 import React, { useState, useContext } from 'react';
-import './output.css';
-import { AppProvider, AppContext } from './AppContext';
-import Login from './Login';
-import Navigation from './Navigation';
-import IndividualMemberForm from './IndividualMemberForm';
-import BulkMemberUpload from './BulkMemberUpload';
-import AccountStatementUpload from './AccountStatementUpload';
-import MemberList from './MemberList';
-import LogPanel from './LogPanel';
-import Toast from './Toast';
+import './shared/styles/output.css';
+import { AppProvider, AppContext } from './shared/context/AppContext';
+import Login from './features/auth/Login';
+import Navigation from './shared/components/navigation/Navigation';
+import IndividualMemberForm from './features/individual-members/IndividualMemberForm';
+import BulkMemberUpload from './features/bulk-upload/BulkMemberUpload';
+import AccountStatementUpload from './features/accounting/AccountStatementUpload';
+import MemberList from './features/members/MemberList';
+import LogPanel from './shared/components/log-panel/LogPanel';
+import Toast from './shared/components/toast/Toast';
 
 function App() {
   return (
