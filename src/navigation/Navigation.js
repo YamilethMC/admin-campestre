@@ -9,7 +9,8 @@ import {
   SurveysIcon,
   LogIcon, 
   LogoutIcon,
-  HomeIcon
+  HomeIcon,
+  FileUploadIcon
 } from '../shared/components/icons/icons';
 
 const Navigation = ({ activeView, setActiveView }) => {
@@ -22,6 +23,7 @@ const Navigation = ({ activeView, setActiveView }) => {
     { id: 'accountStatements', label: 'Estados de cuenta (ZIP)', icon: AccountStatementIcon },
     { id: 'memberList', label: 'Lista de socios', icon: MemberListIcon },
     { id: 'surveys', label: 'Encuestas', icon: SurveysIcon },
+    { id: 'filesUpload', label: 'Carga de archivos', icon: FileUploadIcon },
     // { id: 'logs', label: 'Panel de Logs', icon: LogIcon } // Comentado temporalmente
   ];
 

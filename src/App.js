@@ -10,6 +10,7 @@ import MemberList from './features/members/MemberList';
 import LogPanel from './shared/components/log-panel/LogPanel';
 import Toast from './shared/components/toast/Toast';
 import SurveysContainer from './features/surveys';
+import FileUploadContainer from './features/files-upload';
 
 function App() {
   return (
@@ -78,6 +79,7 @@ function MainApplication() {
           {activeView === 'accountStatements' && <AccountStatementUpload />}
           {activeView === 'memberList' && <MemberList />}
           {activeView === 'surveys' && <SurveysContainer />}
+          {activeView === 'filesUpload' && <FileUploadContainer />}
           {activeView === 'logs' && <LogPanel />}
         </main>
       </div>

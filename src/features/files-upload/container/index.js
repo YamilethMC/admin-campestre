@@ -1,10 +1,15 @@
+import React from 'react';
+import FileUploadForm from '../components/FileUploadForm';
+import FileUploadHeader from '../components/FileUploadHeader';
 
-const FilesUploadContainer = () => {
+const FileUploadContainer = () => {
   return (
-    <div>
-        hola
+    <div className="max-w-2xl mx-auto">
+      <FileUploadHeader />
+      
+      <FileUploadForm />
     </div>
   );
 };
 
-export default FilesUploadContainer;
+export default FileUploadContainer;
