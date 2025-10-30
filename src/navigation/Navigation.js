@@ -1,15 +1,16 @@
 import React, { useContext } from 'react';
-import { AppContext } from '../../context/AppContext';
+import { AppContext } from '../shared/context/AppContext';
 import { 
   DashboardIcon, 
   AddMemberIcon, 
   BulkUploadIcon, 
   AccountStatementIcon, 
   MemberListIcon, 
+  SurveysIcon,
   LogIcon, 
   LogoutIcon,
   HomeIcon
-} from '../icons/icons';
+} from '../shared/components/icons/icons';
 
 const Navigation = ({ activeView, setActiveView }) => {
   const { logout } = useContext(AppContext);
@@ -19,7 +20,8 @@ const Navigation = ({ activeView, setActiveView }) => {
     { id: 'addMember', label: 'Agregar socio', icon: AddMemberIcon },
     { id: 'bulkMembers', label: 'Carga masiva socios', icon: BulkUploadIcon },
     { id: 'accountStatements', label: 'Estados de cuenta (ZIP)', icon: AccountStatementIcon },
-    { id: 'memberList', label: 'Lista de socios', icon: MemberListIcon }
+    { id: 'memberList', label: 'Lista de socios', icon: MemberListIcon },
+    { id: 'surveys', label: 'Encuestas', icon: SurveysIcon },
     // { id: 'logs', label: 'Panel de Logs', icon: LogIcon } // Comentado temporalmente
   ];
 

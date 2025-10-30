@@ -2,13 +2,14 @@ import React, { useState, useContext } from 'react';
 import './shared/styles/output.css';
 import { AppProvider, AppContext } from './shared/context/AppContext';
 import Login from './features/auth/Login';
-import Navigation from './shared/components/navigation/Navigation';
+import Navigation from './navigation/Navigation';
 import IndividualMemberForm from './features/individual-members/IndividualMemberForm';
 import BulkMemberUpload from './features/bulk-upload/BulkMemberUpload';
 import AccountStatementUpload from './features/accounting/AccountStatementUpload';
 import MemberList from './features/members/MemberList';
 import LogPanel from './shared/components/log-panel/LogPanel';
 import Toast from './shared/components/toast/Toast';
+import SurveysContainer from './features/surveys';
 
 function App() {
   return (
@@ -76,6 +77,7 @@ function MainApplication() {
           {activeView === 'bulkMembers' && <BulkMemberUpload />}
           {activeView === 'accountStatements' && <AccountStatementUpload />}
           {activeView === 'memberList' && <MemberList />}
+          {activeView === 'surveys' && <SurveysContainer />}
           {activeView === 'logs' && <LogPanel />}
         </main>
       </div>
