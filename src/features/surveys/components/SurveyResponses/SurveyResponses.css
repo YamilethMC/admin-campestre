@@ -1,0 +1,64 @@
+/* Print styles for survey responses */
+@media print {
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  /* Hide all navigation and non-content elements */
+  body * {
+    visibility: hidden;
+  }
+  
+  /* Show only the survey responses content */
+  .print-container, .print-container * {
+    visibility: visible;
+  }
+  
+  .print-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    display: block !important;
+  }
+  
+  button, .no-print {
+    display: none !important;
+  }
+  
+  /* Ensure elements are properly formatted for printing */
+  .bg-white {
+    background-color: white !important;
+  }
+  
+  .shadow {
+    box-shadow: none !important;
+  }
+  
+  .border {
+    border: 1px solid #e5e7eb !important;
+  }
+  
+  /* Make sure text is readable */
+  .text-gray-800 {
+    color: #1f2937 !important;
+  }
+  
+  .text-gray-600 {
+    color: #4b5563 !important;
+  }
+  
+  /* Control page breaks */
+  .page-break-before {
+    page-break-before: always;
+  }
+  
+  .page-break-after {
+    page-break-after: always;
+  }
+  
+  .page-break-inside-avoid {
+    page-break-inside: avoid;
+  }
+}
