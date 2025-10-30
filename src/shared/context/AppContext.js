@@ -19,7 +19,6 @@ export const AppProvider = ({ children }) => {
       telefono: '555-1234',
       foraneo: false,
       direccion: 'Calle Falsa 123',
-      id_sistema_entradas: 'ENT-001'
     },
     {
       id: 2,
@@ -30,7 +29,6 @@ export const AppProvider = ({ children }) => {
       telefono: '555-5678',
       foraneo: true,
       direccion: 'Avenida Siempre Viva 456',
-      id_sistema_entradas: 'ENT-002'
     }
   ]);
   

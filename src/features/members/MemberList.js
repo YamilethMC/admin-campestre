@@ -22,7 +22,6 @@ const MemberList = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teléfono</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Foráneo</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dirección</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Entradas</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -37,7 +36,6 @@ const MemberList = () => {
                     {member.foraneo ? 'Sí' : 'No'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{member.direccion}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{member.id_sistema_entradas}</td>
                 </tr>
               ))}
             </tbody>
