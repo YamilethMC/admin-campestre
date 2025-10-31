@@ -1,7 +1,41 @@
 import React from 'react';
 import SurveyCard from '../SurveyCard';
 
-const SurveyList = ({ surveys, filters, onEdit, onViewResponses, onToggleStatus, onDelete, onAddSurvey }) => {
+const SurveyList = ({ surveys, filters, loading, onEdit, onViewResponses, onToggleStatus, onDelete, onAddSurvey }) => {
+  if (loading && surveys.length === 0) {
+    // Show a skeleton loading state when loading and no surveys are displayed yet
+    return (
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold text-gray-800">Lista de Encuestas</h2>
+          <button
+            onClick={onAddSurvey}
+            className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md flex items-center transition-colors"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Agregar Encuesta
+          </button>
+        </div>
+        <div className="space-y-4">
+          {/* Skeleton loading cards */}
+          {[...Array(3)].map((_, index) => (
+            <div key={index} className="bg-white rounded-lg shadow-md p-6 animate-pulse">
+              <div className="h-6 bg-gray-200 rounded w-3/4 mb-3"></div>
+              <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-2/3 mb-4"></div>
+              <div className="flex justify-between items-center">
+                <div className="h-8 bg-gray-200 rounded w-1/5"></div>
+                <div className="h-8 bg-gray-200 rounded w-1/5"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
