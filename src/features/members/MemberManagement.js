@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import IndividualMemberForm from '../../IndividualMemberForm';
-import BulkMemberUpload from '../bulk-upload/BulkMemberUpload';
+import BulkMemberUpload from '../bulk-upload';
 import AccountStatementUpload from '../accounting';
 import MemberList from './MemberList';
 import LogPanel from './LogPanel';

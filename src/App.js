@@ -1,10 +1,10 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import './shared/styles/output.css';
 import { AppProvider, AppContext } from './shared/context/AppContext';
-import Login from './features/auth/Login';
+import Login from './features/auth';
 import Navigation from './navigation/Navigation';
 import IndividualMemberForm from './features/individual-members';
-import BulkMemberUpload from './features/bulk-upload/BulkMemberUpload';
+import BulkMemberUpload from './features/bulk-upload';
 import AccountStatementUpload from './features/accounting';
 import MemberList from './features/members/MemberList';
 import LogPanel from './shared/components/log-panel/LogPanel';

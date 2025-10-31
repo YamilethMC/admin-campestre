@@ -1,16 +1,17 @@
-import React, { useState, useContext } from 'react';
-import { AppContext } from '../../shared/context/AppContext';
-import { UserIcon, LockIcon } from '../../shared/components/icons/icons';
+import React from 'react';
+import { useAuth } from '../../hooks/useAuth';
+import { UserIcon, LockIcon } from '../../../../shared/components/icons/icons';
 
-const Login = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const { login } = useContext(AppContext);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    login(username, password);
-  };
+const LoginForm = () => {
+  const {
+    username,
+    setUsername,
+    password,
+    setPassword,
+    loading,
+    error,
+    handleSubmit
+  } = useAuth();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -70,12 +71,23 @@ const Login = () => {
             </div>
           </div>
 
+          {error && (
+            <div className="text-red-600 text-sm text-center py-2">
+              {error}
+            </div>
+          )}
+
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              disabled={loading}
+              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
+                loading 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-primary hover:bg-primary-dark'
+              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary`}
             >
-              Iniciar sesión
+              {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
             </button>
           </div>
 
@@ -91,4 +103,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LoginForm;
