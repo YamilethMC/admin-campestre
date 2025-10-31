@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import IndividualMemberForm from '../../IndividualMemberForm';
-import BulkMemberUpload from '../bulk-upload';
-import AccountStatementUpload from '../accounting';
-import MemberList from './MemberList';
+import BulkMemberUpload from './bulk-upload';
+import AccountStatementUpload from './accounting';
+import MemberList from './members/MemberList';
 import LogPanel from './LogPanel';
 
 const MemberManagement = () => {

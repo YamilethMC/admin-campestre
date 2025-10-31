@@ -6,7 +6,7 @@ import Navigation from './navigation/Navigation';
 import IndividualMemberForm from './features/individual-members';
 import BulkMemberUpload from './features/bulk-upload';
 import AccountStatementUpload from './features/accounting';
-import MemberList from './features/members/MemberList';
+import MembersContainer from './features/members';
 import LogPanel from './shared/components/log-panel/LogPanel';
 import Toast from './shared/components/toast/Toast';
 import SurveysContainer from './features/surveys';
@@ -128,7 +128,7 @@ function MainApplication() {
           {activeView === 'addMember' && <IndividualMemberForm />}
           {activeView === 'bulkMembers' && <BulkMemberUpload />}
           {activeView === 'accountStatements' && <AccountStatementUpload />}
-          {activeView === 'memberList' && <MemberList />}
+          {activeView === 'memberList' && <MembersContainer />}
           {activeView === 'surveys' && <SurveysContainer />}
           {activeView === 'filesUpload' && <FileUploadContainer />}
           {activeView === 'logs' && <LogPanel />}
