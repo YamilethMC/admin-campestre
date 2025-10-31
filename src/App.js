@@ -5,7 +5,7 @@ import Login from './features/auth/Login';
 import Navigation from './navigation/Navigation';
 import IndividualMemberForm from './features/individual-members';
 import BulkMemberUpload from './features/bulk-upload/BulkMemberUpload';
-import AccountStatementUpload from './features/accounting/AccountStatementUpload';
+import AccountStatementUpload from './features/accounting';
 import MemberList from './features/members/MemberList';
 import LogPanel from './shared/components/log-panel/LogPanel';
 import Toast from './shared/components/toast/Toast';
