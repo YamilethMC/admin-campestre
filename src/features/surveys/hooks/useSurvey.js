@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { surveyService } from '../services';
 
 export const useSurvey = () => {
-  const [surveys, setSurveys] = useState([]);
+  const [allSurveys, setAllSurveys] = useState([]); // Store all surveys
+  const [filteredSurveys, setFilteredSurveys] = useState([]); // Store filtered surveys
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [stats, setStats] = useState({ active: 0, inactive: 0 });
@@ -11,12 +12,13 @@ export const useSurvey = () => {
     status: 'todas'
   });
 
-  // Load surveys and stats
-  const loadSurveys = async () => {
+  // Load all surveys and stats
+  const loadAllSurveys = async () => {
     try {
       setLoading(true);
-      const surveysData = await surveyService.getSurveys(filters);
-      setSurveys(surveysData);
+      // Load unfiltered surveys
+      const surveysData = await surveyService.getSurveys(); // No filters - get all
+      setAllSurveys(surveysData);
       
       const statsData = await surveyService.getSurveyStats();
       setStats(statsData);
@@ -27,17 +29,45 @@ export const useSurvey = () => {
     }
   };
 
+  // Apply filters to all surveys
+  const applyFilters = () => {
+    let result = [...allSurveys];
+    
+    // Apply category filter
+    if (filters.category && filters.category !== 'Todas') {
+      result = result.filter(survey => survey.category === filters.category);
+    }
+    
+    // Apply status filter
+    if (filters.status) {
+      if (filters.status === 'activas') {
+        result = result.filter(survey => survey.isActive);
+      } else if (filters.status === 'inactivas') {
+        result = result.filter(survey => !survey.isActive);
+      }
+      // If status is 'todas', no additional filtering is needed
+    }
+    
+    setFilteredSurveys(result);
+  };
+
   // Load initial data
   useEffect(() => {
-    loadSurveys();
-  }, [filters.category, filters.status]);
+    loadAllSurveys();
+  }, []);
+
+  // Apply filters whenever filters change or all surveys change
+  useEffect(() => {
+    applyFilters();
+  }, [filters, allSurveys]);
 
   // Toggle survey status
   const toggleSurveyStatus = async (id) => {
     try {
       const updatedSurvey = await surveyService.toggleSurveyStatus(id);
       if (updatedSurvey) {
-        setSurveys(prevSurveys =>
+        // Update the all surveys list with the new status
+        setAllSurveys(prevSurveys =>
           prevSurveys.map(survey =>
             survey.id === id ? updatedSurvey : survey
           )
@@ -57,7 +87,8 @@ export const useSurvey = () => {
     try {
       setLoading(true);
       const newSurvey = await surveyService.createSurvey(surveyData);
-      loadSurveys(); // Reload all surveys to include the new one
+      // Add the new survey to all surveys
+      setAllSurveys(prev => [...prev, newSurvey]);
       return newSurvey;
     } catch (err) {
       setError(err.message);
@@ -73,7 +104,8 @@ export const useSurvey = () => {
       setLoading(true);
       const updatedSurvey = await surveyService.updateSurvey(id, surveyData);
       if (updatedSurvey) {
-        setSurveys(prevSurveys =>
+        // Update the all surveys list with the new survey data
+        setAllSurveys(prevSurveys =>
           prevSurveys.map(survey =>
             survey.id === id ? updatedSurvey : survey
           )
@@ -133,8 +165,8 @@ export const useSurvey = () => {
     try {
       const success = await surveyService.deleteSurvey(id);
       if (success) {
-        // Reload surveys to reflect the deletion
-        loadSurveys();
+        // Remove the deleted survey from all surveys
+        setAllSurveys(prev => prev.filter(survey => survey.id !== id));
         return true;
       }
       return false;
@@ -153,12 +185,12 @@ export const useSurvey = () => {
   };
 
   return {
-    surveys,
+    surveys: filteredSurveys, // Return filtered surveys
     loading,
     error,
     stats,
     filters,
-    loadSurveys,
+    loadSurveys: loadAllSurveys,
     toggleSurveyStatus,
     createSurvey,
     updateSurvey,
