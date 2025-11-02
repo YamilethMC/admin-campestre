@@ -114,16 +114,7 @@ function MainApplication() {
           <ToastContainer />
           {activeView === 'dashboard' && (
             <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Panel de Control</h2>
-              <p className="text-gray-600">Bienvenido al sistema de gestión de socios y estados de cuenta.</p>
-              <p className="text-gray-600 mt-2">Utiliza el menú lateral para navegar entre las diferentes funcionalidades:</p>
-              <ul className="list-disc pl-6 mt-4 space-y-2 text-gray-600">
-                <li><strong>Agregar Socio:</strong> Formulario para dar de alta socios individuales</li>
-                <li><strong>Carga Masiva de Socios:</strong> Importar socios desde archivo CSV</li>
-                <li><strong>Estados de Cuenta (ZIP):</strong> Cargar estados de cuenta desde archivo ZIP</li>
-                <li><strong>Lista de Socios:</strong> Visualizar todos los socios registrados</li>
-                {/*<li><strong>Panel de Logs:</strong> Ver historial de acciones realizadas</li>*/}
-              </ul>
+              
             </div>
           )}
           {activeView === 'addMember' && <IndividualMemberForm />}
