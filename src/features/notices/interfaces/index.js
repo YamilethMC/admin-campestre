@@ -12,13 +12,3 @@ export const NoticePriority = {
   NORMAL: 'Normal',
   LOW: 'Baja'
 };
-
-// Notice categories
-export const NoticeCategory = {
-  GENERAL: 'General',
-  SERVICES: 'Servicios',
-  EVENTS: 'Eventos',
-  MAINTENANCE: 'Mantenimiento',
-  EMERGENCY: 'Emergencia',
-  ALL: 'Todas'
-};

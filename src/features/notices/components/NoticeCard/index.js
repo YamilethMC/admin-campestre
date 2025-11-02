@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { NoticePriority, NoticeCategory } from '../../interfaces';
 import Modal from '../../../../shared/components/modal';
 import { cardStyles } from './Style';
 
@@ -27,37 +26,9 @@ const NoticeCard = ({ notice, onEdit, onToggleStatus, onDelete }) => {
     };
   }, [isMenuOpen]);
 
-  const getPriorityColor = (priority) => {
-    switch (priority) {
-      case NoticePriority.URGENT:
-        return cardStyles.priorityTag.URGENT;
-      case NoticePriority.IMPORTANT:
-        return cardStyles.priorityTag.IMPORTANT;
-      case NoticePriority.NORMAL:
-        return cardStyles.priorityTag.NORMAL;
-      case NoticePriority.LOW:
-        return cardStyles.priorityTag.LOW;
-      default:
-        return cardStyles.priorityTag.NORMAL;
-    }
-  };
 
-  const getCategoryColor = (category) => {
-    switch (category) {
-      case NoticeCategory.GENERAL:
-        return cardStyles.categoryTag.GENERAL;
-      case NoticeCategory.SERVICES:
-        return cardStyles.categoryTag.SERVICES;
-      case NoticeCategory.EVENTS:
-        return cardStyles.categoryTag.EVENTS;
-      case NoticeCategory.MAINTENANCE:
-        return cardStyles.categoryTag.MAINTENANCE;
-      case NoticeCategory.EMERGENCY:
-        return cardStyles.categoryTag.EMERGENCY;
-      default:
-        return cardStyles.categoryTag.GENERAL;
-    }
-  };
+
+
 
   const getStatusColor = (isActive) => {
     return isActive 
@@ -95,11 +66,6 @@ const NoticeCard = ({ notice, onEdit, onToggleStatus, onDelete }) => {
   return (
     <div className={cardStyles.container}>
       <div className={cardStyles.cardTop}>
-        {/* Notice image placeholder */}
-        <div className={cardStyles.imagePlaceholder}>
-          <span className={cardStyles.imagePlaceholderText}>Imagen</span>
-        </div>
-        
         <div className={cardStyles.contentContainer}>
           <h3 className={cardStyles.title}>{notice.title}</h3>
           <p className={cardStyles.description}>{notice.description}</p>
@@ -123,12 +89,6 @@ const NoticeCard = ({ notice, onEdit, onToggleStatus, onDelete }) => {
           </div>
           
           <div className={cardStyles.tagsContainer}>
-            <span className={`${cardStyles.tag} ${getPriorityColor(notice.priority)}`}>
-              {notice.priority}
-            </span>
-            <span className={`${cardStyles.tag} ${getCategoryColor(notice.category)}`}>
-              {notice.category}
-            </span>
             <span className={`${cardStyles.tag} ${getStatusColor(notice.isActive)}`}>
               {notice.isActive ? 'Activo' : 'Inactivo'}
             </span>

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { NoticeCategory, NoticePriority } from '../../interfaces';
 import Modal from '../../../../shared/components/modal';
 import { formStyles } from './Style';
 
@@ -12,11 +11,7 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
     title: notice?.title || '',
     description: notice?.description || '',
-    category: notice?.category || NoticeCategory.GENERAL,
-    priority: notice?.priority || NoticePriority.NORMAL,
     isActive: notice ? notice.isActive : true,
-    imageUrl: notice?.imageUrl || '',
-    imageFile: null, // For handling local file
   });
   
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -32,22 +27,14 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
       setOriginalData({
         title: notice.title,
         description: notice.description,
-        category: notice.category,
-        priority: notice.priority,
         isActive: notice.isActive,
-        imageUrl: notice.imageUrl,
-        imageFile: null, // No file selected initially when editing
       });
     } else {
       // For create mode
       setOriginalData({
         title: '',
         description: '',
-        category: NoticeCategory.GENERAL,
-        priority: NoticePriority.NORMAL,
         isActive: true,
-        imageUrl: '',
-        imageFile: null,
       });
     }
   }, [notice]);
@@ -68,33 +55,13 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
     }));
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Check if the file is an image
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setFormData(prev => ({
-            ...prev,
-            imageFile: file, // Store the actual file
-            imageUrl: reader.result // Store the data URL for preview
-          }));
-        };
-        reader.readAsDataURL(file);
-      } else {
-        alert('Por favor selecciona un archivo de imagen válido (JPEG, PNG, etc.)');
-      }
-    }
-  };
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // Prepare the data for submission
     const submitData = {
       ...formData,
-      // If there's an image file, use its data URL; otherwise keep the existing imageUrl
-      imageUrl: formData.imageFile ? formData.imageUrl : formData.imageUrl
     };
     setPendingSaveData(submitData);
     setShowSaveConfirmationModal(true);
@@ -170,33 +137,9 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
             />
           </div>
 
-          <div>
-            <label className={formStyles.label}>Categoría</label>
-            <select
-              value={formData.category}
-              onChange={(e) => handleInputChange('category', e.target.value)}
-              className={formStyles.select}
-            >
-              {Object.entries(NoticeCategory)
-                .filter(([key]) => key !== 'ALL') // Exclude the 'ALL' category which is only for filtering
-                .map(([key, value]) => (
-                  <option key={key} value={value}>{value}</option>
-                ))}
-            </select>
-          </div>
 
-          <div>
-            <label className={formStyles.label}>Prioridad</label>
-            <select
-              value={formData.priority}
-              onChange={(e) => handleInputChange('priority', e.target.value)}
-              className={formStyles.select}
-            >
-              {Object.entries(NoticePriority).map(([key, value]) => (
-                <option key={key} value={value}>{value}</option>
-              ))}
-            </select>
-          </div>
+
+
 
           <div className="flex items-center">
             <input
@@ -222,42 +165,7 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
             ></textarea>
           </div>
 
-          <div className="col-span-2">
-            <label className={formStyles.label}>Imagen (opcional)</label>
-            <div className={formStyles.imageContainer}>
-              <div className={formStyles.imagePreview}>
-                {formData.imageUrl ? (
-                  <img 
-                    src={formData.imageUrl} 
-                    alt="Previsualización" 
-                    className={formStyles.imagePreviewImg}
-                  />
-                ) : (
-                  <svg className={formStyles.imageIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                )}
-              </div>
-              <label className={formStyles.imageButton}>
-                Seleccionar imagen
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
-              </label>
-              {formData.imageFile && (
-                <button
-                  type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, imageFile: null, imageUrl: '' }))}
-                  className={formStyles.deleteImageButton}
-                >
-                  Eliminar
-                </button>
-              )}
-            </div>
-          </div>
+
         </div>
 
         <div className={formStyles.buttonRow}>

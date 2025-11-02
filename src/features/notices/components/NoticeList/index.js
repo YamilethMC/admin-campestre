@@ -58,7 +58,7 @@ const NoticeList = ({ notices, filters, loading, onEdit, onToggleStatus, onDelet
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h10a2 2 0 012 2v12a2 2 0 01-2 2z" />
           </svg>
           <h3 className={listStyles.noNoticesTitle}>No hay ningún aviso registrado</h3>
-          <p className={listStyles.noNoticesText}>No hay avisos disponibles con los filtros aplicados</p>
+          <p className={listStyles.noNoticesText}>No hay avisos disponibles con el filtro aplicado</p>
         </div>
       ) : (
         notices.map(notice => (

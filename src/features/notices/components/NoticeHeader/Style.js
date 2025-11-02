@@ -1,10 +1,14 @@
 
 
 export const headerStyles = {
-  container: `bg-gradient-to-r from-primary to-primary-dark text-white p-6 rounded-lg shadow-md mb-6`,
-  title: `text-2xl font-bold flex items-center mb-2`,
-  statsContainer: `flex flex-wrap gap-6 mt-4`,
-  statBox: `flex flex-col items-center`,
-  statNumber: `text-3xl font-bold`,
-  statLabel: `text-sm mt-1`,
+  container: `bg-white rounded-lg shadow-lg p-6 mb-6 border border-gray-200`,
+  headerContent: `flex flex-col md:flex-row md:items-center md:justify-between gap-4`,
+  titleSection: `flex items-center space-x-3`,
+  icon: `w-10 h-10 text-primary`,
+  title: `text-2xl font-bold text-gray-800`,
+  description: `text-gray-600 mt-1`,
+  statsContainer: `flex flex-wrap gap-6`,
+  statBox: `flex flex-col items-center bg-gray-50 rounded-lg px-4 py-3 min-w-[100px]`,
+  statNumber: `text-2xl font-bold text-primary`,
+  statLabel: `text-sm text-gray-600 mt-1`,
 };

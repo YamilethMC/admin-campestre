@@ -1,6 +1,4 @@
 import { 
-  NoticeCategory, 
-  NoticePriority, 
   NoticeStatus 
 } from '../interfaces';
 
@@ -10,8 +8,6 @@ export const mockNotices = [
     id: '1',
     title: 'Mantenimiento programado en alberca',
     description: 'Se realizará mantenimiento en la alberca principal del 15 al 17 de noviembre. Se suspenderá el servicio temporalmente.',
-    category: NoticeCategory.MAINTENANCE,
-    priority: NoticePriority.IMPORTANT,
     isActive: true,
     dateCreated: '2024-11-01',
     dateUpdated: '2024-11-01',
@@ -20,8 +16,6 @@ export const mockNotices = [
     id: '2',
     title: 'Evento familiar de fin de año',
     description: 'Se realizará un evento familiar el día 20 de diciembre. Se invitan a todos los socios y sus familias.',
-    category: NoticeCategory.EVENTS,
-    priority: NoticePriority.NORMAL,
     isActive: true,
     dateCreated: '2024-10-28',
     dateUpdated: '2024-10-28',
@@ -30,8 +24,6 @@ export const mockNotices = [
     id: '3',
     title: 'Cierre temporal del gimnasio',
     description: 'El gimnasio estará temporalmente cerrado para mejoras del 20 al 25 de noviembre.',
-    category: NoticeCategory.MAINTENANCE,
-    priority: NoticePriority.URGENT,
     isActive: true,
     dateCreated: '2024-10-15',
     dateUpdated: '2024-10-15',
@@ -40,8 +32,6 @@ export const mockNotices = [
     id: '4',
     title: 'Nuevas reglas de convivencia',
     description: 'Se han actualizado las reglas de convivencia. Favor de revisarlas en el portal de socios.',
-    category: NoticeCategory.GENERAL,
-    priority: NoticePriority.NORMAL,
     isActive: false,
     dateCreated: '2024-09-10',
     dateUpdated: '2024-09-10',
@@ -51,8 +41,6 @@ export const mockNotices = [
     id: '5',
     title: 'Emergencia - Corte de agua',
     description: 'Se presentó un corte de agua en la zona norte. Se está trabajando para resolverlo.',
-    category: NoticeCategory.EMERGENCY,
-    priority: NoticePriority.URGENT,
     isActive: true,
     dateCreated: '2024-11-02',
     dateUpdated: '2024-11-02',
@@ -68,11 +56,6 @@ export const noticeService = {
     
     let filteredNotices = [...mockNotices];
     
-    // Apply category filter
-    if (filters.category && filters.category !== NoticeCategory.ALL) {
-      filteredNotices = filteredNotices.filter(notice => notice.category === filters.category);
-    }
-    
     // Apply status filter
     if (filters.status) {
       if (filters.status === 'activas' || filters.status === NoticeStatus.ACTIVE) {
@@ -82,6 +65,9 @@ export const noticeService = {
       }
       // If status is 'todas' or 'all', no additional filtering is needed
     }
+    
+    // Sort by dateUpdated in descending order (most recently updated/created first)
+    filteredNotices.sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated));
     
     return filteredNotices;
   },
@@ -105,7 +91,7 @@ export const noticeService = {
     
     // Add the new notice to our mock data
     mockNotices.push(newNotice);
-    
+
     return newNotice;
   },
 
@@ -139,6 +125,7 @@ export const noticeService = {
     
     mockNotices[noticeIndex].isActive = !mockNotices[noticeIndex].isActive;
     mockNotices[noticeIndex].dateUpdated = new Date().toISOString().split('T')[0];
+    
     return mockNotices[noticeIndex];
   },
 

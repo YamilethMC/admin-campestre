@@ -15,12 +15,7 @@ export const formStyles = {
   buttonRow: `flex justify-end space-x-3`,
   cancelButton: `px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors`,
   saveButton: `px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md transition-colors`,
-  imageContainer: `flex items-center space-x-4`,
-  imagePreview: `flex items-center justify-center w-16 h-16 border border-gray-300 rounded-md overflow-hidden bg-gray-100`,
-  imagePreviewImg: `w-full h-full object-cover`,
-  imageIcon: `w-8 h-8 text-gray-400`,
-  imageButton: `cursor-pointer bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors`,
-  deleteImageButton: `text-red-600 hover:text-red-800`,
+
   modalFooter: `flex justify-end space-x-3`,
   modalCancelButton: `px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors`,
   modalAcceptButton: `px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md transition-colors`,

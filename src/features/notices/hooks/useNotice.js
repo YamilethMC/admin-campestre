@@ -8,7 +8,6 @@ export const useNotice = () => {
   const [error, setError] = useState(null);
   const [stats, setStats] = useState({ active: 0, inactive: 0 });
   const [filters, setFilters] = useState({
-    category: 'Todas',
     status: 'todas'
   });
 
@@ -32,11 +31,6 @@ export const useNotice = () => {
   // Apply filters to all notices
   const applyFilters = () => {
     let result = [...allNotices];
-    
-    // Apply category filter
-    if (filters.category && filters.category !== 'Todas') {
-      result = result.filter(notice => notice.category === filters.category);
-    }
     
     // Apply status filter
     if (filters.status) {
@@ -165,7 +159,6 @@ export const useNotice = () => {
   // Reset filters to default
   const resetFilters = () => {
     setFilters({
-      category: 'Todas',
       status: 'todas'
     });
   };
