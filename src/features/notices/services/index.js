@@ -66,8 +66,21 @@ export const noticeService = {
       // If status is 'todas' or 'all', no additional filtering is needed
     }
     
+    // Apply search filter
+    if (filters.search) {
+      const searchTerm = filters.search.toLowerCase();
+      filteredNotices = filteredNotices.filter(notice => 
+        notice.title.toLowerCase().includes(searchTerm) || 
+        notice.description.toLowerCase().includes(searchTerm)
+      );
+    }
+    
     // Sort by dateUpdated in descending order (most recently updated/created first)
-    filteredNotices.sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated));
+    filteredNotices.sort((a, b) => {
+      const dateB = new Date(b.dateUpdated || b.dateCreated);
+      const dateA = new Date(a.dateUpdated || a.dateCreated);
+      return dateB - dateA;
+    });
     
     return filteredNotices;
   },

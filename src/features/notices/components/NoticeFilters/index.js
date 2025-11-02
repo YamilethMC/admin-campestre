@@ -6,14 +6,18 @@ const NoticeFilters = ({ filters, onFilterChange }) => {
     onFilterChange({ status: e.target.value });
   };
 
+  const handleSearchChange = (e) => {
+    onFilterChange({ search: e.target.value });
+  };
+
   return (
     <div className={filterStyles.container}>
-      <h3 className={filterStyles.title}>Filtro</h3>
+      <h3 className={filterStyles.title}>Filtros</h3>
       <div className={filterStyles.filterRow}>
         <div className={filterStyles.filterGroup}>
           <label className={filterStyles.label}>Estado</label>
           <select
-            value={filters.status}
+            value={filters.status || 'todas'}
             onChange={handleStatusChange}
             className={filterStyles.select}
           >
@@ -21,6 +25,16 @@ const NoticeFilters = ({ filters, onFilterChange }) => {
             <option value="activas">Activas</option>
             <option value="inactivas">Inactivas</option>
           </select>
+        </div>
+        <div className={`${filterStyles.filterGroup} md:col-span-2`}>
+          <label className={filterStyles.label}>Buscar</label>
+          <input
+            type="text"
+            placeholder="Buscar por título o descripción..."
+            value={filters.search || ''}
+            onChange={handleSearchChange}
+            className={filterStyles.searchInput}
+          />
         </div>
       </div>
     </div>

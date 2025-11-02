@@ -8,7 +8,8 @@ export const useNotice = () => {
   const [error, setError] = useState(null);
   const [stats, setStats] = useState({ active: 0, inactive: 0 });
   const [filters, setFilters] = useState({
-    status: 'todas'
+    status: 'todas',
+    search: ''
   });
 
   // Load all notices and stats
@@ -40,6 +41,15 @@ export const useNotice = () => {
         result = result.filter(notice => !notice.isActive);
       }
       // If status is 'todas', no additional filtering is needed
+    }
+    
+    // Apply search filter
+    if (filters.search) {
+      const searchTerm = filters.search.toLowerCase();
+      result = result.filter(notice => 
+        notice.title.toLowerCase().includes(searchTerm) || 
+        notice.description.toLowerCase().includes(searchTerm)
+      );
     }
     
     setFilteredNotices(result);
@@ -159,7 +169,8 @@ export const useNotice = () => {
   // Reset filters to default
   const resetFilters = () => {
     setFilters({
-      status: 'todas'
+      status: 'todas',
+      search: ''
     });
   };
 
