@@ -18,7 +18,9 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [showSaveConfirmationModal, setShowSaveConfirmationModal] = useState(false);
   const [pendingNavigationCallback, setPendingNavigationCallback] = useState(null);
+  const [pendingNavigationAction, setPendingNavigationAction] = useState(null);
   const [pendingSaveData, setPendingSaveData] = useState(null);
+  const [isCreatingNew, setIsCreatingNew] = useState(!notice); // Track if creating new notice
   
   // Set original data when component mounts
   useEffect(() => {
@@ -30,7 +32,7 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
         isActive: notice.isActive,
       });
     } else {
-      // For create mode
+      // For create mode - set original data to default values
       setOriginalData({
         title: '',
         description: '',
@@ -44,6 +46,8 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
     if (originalData) {
       const isChanged = 
         JSON.stringify(originalData) !== JSON.stringify(formData);
+      // If it's a new notice (no initial notice data) and any field has been modified, 
+      // or if it's an edit and fields have changed
       setHasUnsavedChanges(isChanged);
     }
   }, [formData, originalData]);
@@ -64,21 +68,32 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
       ...formData,
     };
     setPendingSaveData(submitData);
+    setPendingNavigationAction(isEdit ? 'update' : 'create'); // Track if it's an update or create action
     setShowSaveConfirmationModal(true);
   };
 
   // Confirmation before navigating away if there are unsaved changes
-  const confirmLeave = (callback) => {
+  const confirmLeave = (callback, action) => {
     if (hasUnsavedChanges) {
+      // If there are actual changes, show confirmation
       setPendingNavigationCallback(() => callback);
+      setPendingNavigationAction(action);
       setShowConfirmationModal(true);
     } else {
-      callback(); // No changes, allow navigation directly
+      // Always show confirmation when navigating away, regardless of mode
+      // This ensures users confirm whether they're creating or editing
+      setPendingNavigationCallback(() => callback);
+      setPendingNavigationAction(action);
+      setShowConfirmationModal(true);
     }
   };
 
   const handleCancel = () => {
-    confirmLeave(onCancel);
+    confirmLeave(onCancel, 'cancel');
+  };
+
+  const handleBack = () => {
+    confirmLeave(onCancel, 'back');
   };
 
   const handleConfirmLeave = () => {
@@ -87,11 +102,13 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
       pendingNavigationCallback();
       setPendingNavigationCallback(null);
     }
+    setPendingNavigationAction(null);
   };
 
   const handleCancelLeave = () => {
     setShowConfirmationModal(false);
     setPendingNavigationCallback(null);
+    setPendingNavigationAction(null);
   };
 
   const handleConfirmSave = () => {
@@ -100,18 +117,20 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
       onSave(pendingSaveData);
       setPendingSaveData(null);
     }
+    setPendingNavigationAction(null);
   };
 
   const handleCancelSave = () => {
     setShowSaveConfirmationModal(false);
     setPendingSaveData(null);
+    setPendingNavigationAction(null);
   };
 
   return (
     <div className={formStyles.container}>
       <div className="flex items-center mb-6">
         <button
-          onClick={handleCancel}
+          onClick={handleBack}
           className={formStyles.backButton}
           aria-label="Regresar"
         >
@@ -120,7 +139,7 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
           </svg>
         </button>
         <h2 className={formStyles.title}>
-          {isEdit ? 'Editar Aviso' : 'Crear Nuevo Aviso'}
+          {isEdit ? 'Editar aviso' : 'Crear nuevo aviso'}
         </h2>
       </div>
 
@@ -180,7 +199,7 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
             type="submit"
             className={formStyles.saveButton}
           >
-            {isEdit ? 'Guardar Cambios' : 'Crear Aviso'}
+            {isEdit ? 'Guardar cambios' : 'Crear aviso'}
           </button>
         </div>
       </form>
@@ -208,12 +227,12 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
           </div>
         }
       >
-        <p>¿Está seguro que quiere salir?</p>
+        <p>¿Está seguro que quiere {pendingNavigationAction === 'back' ? 'regresar' : 'cancelar'}? Los cambios no guardados se perderán.</p>
       </Modal>
       
       <Modal
         isOpen={showSaveConfirmationModal}
-        title="Confirmar guardado"
+        title={isEdit ? 'Confirmar actualización' : 'Confirmar creación'}
         onClose={handleCancelSave}
         footer={
           <div className={formStyles.modalFooter}>
@@ -234,7 +253,7 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
           </div>
         }
       >
-        <p>{isEdit ? '¿Desea guardar los cambios?' : '¿Desea crear el aviso?'}</p>
+        <p>{pendingNavigationAction === 'create' ? '¿Desea crear el aviso?' : '¿Desea guardar los cambios?'}</p>
       </Modal>
     </div>
   );
