@@ -11,6 +11,7 @@ import LogPanel from './shared/components/log-panel/LogPanel';
 import Toast from './shared/components/toast/Toast';
 import SurveysContainer from './features/surveys';
 import FileUploadContainer from './features/files-upload';
+import NoticesContainer from './features/notices';
 
 function App() {
   return (
@@ -131,6 +132,7 @@ function MainApplication() {
           {activeView === 'memberList' && <MembersContainer />}
           {activeView === 'surveys' && <SurveysContainer />}
           {activeView === 'filesUpload' && <FileUploadContainer />}
+          {activeView === 'notices' && <NoticesContainer />}
           {activeView === 'logs' && <LogPanel />}
         </main>
       </div>
