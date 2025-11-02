@@ -25,7 +25,7 @@ const Navigation = ({ activeView, setActiveView }) => {
     { id: 'memberList', label: 'Lista de socios', icon: MemberListIcon },
     { id: 'surveys', label: 'Encuestas', icon: SurveysIcon },
     { id: 'filesUpload', label: 'Carga de archivos', icon: FileUploadIcon },
-    { id: 'notices', label: 'Noticias', icon: NoticesIcon },
+    { id: 'notices', label: 'Avisos', icon: NoticesIcon },
     // { id: 'logs', label: 'Panel de Logs', icon: LogIcon } // Comentado temporalmente
   ];
 
