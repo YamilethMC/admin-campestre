@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useRef } from 'react';
 import { bulkUploadService } from '../services';
 import { AppContext } from '../../../shared/context/AppContext';
 
@@ -7,6 +7,8 @@ export const useBulkUpload = () => {
   
   const [csvData, setCsvData] = useState([]);
   const [previewData, setPreviewData] = useState([]);
+
+  const fileInputRef = useRef(null);
 
   /**
    * Handle file upload
@@ -72,6 +74,10 @@ export const useBulkUpload = () => {
     // Reset form
     setPreviewData([]);
     setCsvData([]);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   /**
@@ -87,6 +93,7 @@ export const useBulkUpload = () => {
     previewData,
     handleFileUpload,
     handleAddMembers,
-    resetForm
+    resetForm,
+    fileInputRef
   };
 };

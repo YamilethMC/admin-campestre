@@ -1,9 +1,9 @@
-numero_socio,nombre,apellidos,email,telefono,foraneo,direccion,id_sistema_entradas
-3,Carlos,Ramírez López,carlos.ramirez@example.com,555-2345,false,Avenida Central 789,ENT-003
-4,Laura,González Martínez,laura.gonzalez@example.com,555-3456,true,Colonia Norte 101,ENT-004
-5,Roberto,Sánchez Torres,roberto.sanchez@example.com,555-4567,false,Calle Secundaria 202,ENT-005
-6,Elena,Vega Morales,elena.vega@example.com,555-5678,true,Plaza Principal 303,ENT-006
-7,José,Luna Castillo,jose.luna@example.com,555-6789,false,Boulevard Este 404,ENT-007
-8,Patricia,Ortiz Ríos,patricia.ortiz@example.com,555-7890,true,Residencial Sur 505,ENT-008
-9,Miguel,Navarro Domínguez,miguel.navarro@example.com,555-8901,false,Calle Comercial 606,ENT-009
-10,Sofía,Flores Benítez,sofia.flores@example.com,555-9012,true,Privada Colonial 707,ENT-010
+numero_socio,nombre,apellidos,sexo,rfc,fecha_nacimiento,email,foraneo,telefono_movil,alias_movil,telefono_fijo,alias_fijo,telefono_emergencia,alias_emergencia,calle,numero_exterior,numero_interior,cp,colonia,ciudad,estado,pais,titulo,profesion,metodo_pago,fecha_admision
+5,Carlos,Ramírez López,H,RALC,1990-05-01,carlos.ramirez@example.com,false,555234520,,6666666666,casa,,,Avenida Central,789,,12,Colonia Bosques,Tampico,Tamaulipas,México,Ciudadano,Amo de casa,PPD,2025-10-29
+6,Laura,González Martínez,M,GOML,1998-07-19,laura.gonzalez@example.com,true,555-3456,,,,1245879631,mamá,Calle una,101,,8732,Colonia Norte,Reynosa,Tamaulipas,México,Doctor,Derecho,PPD,2025-04-30
+7,Roberto,Sánchez Torres,H,SATR,1999-12-24,roberto.sanchez@example.com,false,555-4567,,,,,,Calle secundaria,202,,35292,Colonia domingo,Matamoros,Tamaulipas,México,Maestro en Ciencias,Psciología,PPD,2025-11-01
+8,Elena,Vega Morales,M,VEME,1992-10-29,elena.vega@example.com,true,555-5678,,,,1678951237,papá,Plaza Principal,303,,614982,Colonia Marte,Nuevo Ladero,Tamaulipas,México,Licenciado,Trabajo social,PPD,2025-09-16
+9,José,Luna Castillo,H,LUCJ,1994-07-29,jose.luna@example.com,false,555-6789,,,,,,Boulevard Este,404,,26642,Colonia santa fe,Matamoros,Tamaulipas,México,Ingeniero,Ing. Civil,PPD,2025-10-29
+10,Patricia,Ortiz Ríos,M,OIRP,1987-01-03,pati.ortiz@example.com,true,555-7890,,5487621359,oficina,4578932168,hermana,Residencial Sur,505,1,6320,Colonia Sinaloa,Reynosa,Tamaulipas,México,Arquitecto,Arquitecto,PPD,2025-10-29
+11,Miguel,Navarro Domínguez,H,NADM,1997-09-05,miguel.navarro@example.com,false,555-8901,,,,,,Calle comercial,606,,56463,Colonia norte,Tampico,Tamaulipas,México,Ciudadano,,PPD,2025-04-30
+15,Sofía,Flores Benítez,M,FOBS,1992-07-04,sofia.flores@example.com,true,555-9012,,,,,,Privada Colonial,707,,263,Colocia Oeste,Nuevo Ladero,Tamaulipas,México,Ciudadano,Ama de casa,PPD,2025-10-31

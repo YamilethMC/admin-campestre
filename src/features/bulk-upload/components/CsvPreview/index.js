@@ -11,11 +11,29 @@ const CsvPreview = ({ previewData, csvData }) => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">N° Socio</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellidos</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sexo</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">RFC</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de nacimiento</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teléfono</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Foráneo</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dirección</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Entradas</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teléfono movil</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Alias teléfono móvil</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teléfono fijo</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Alias teléfono fijo</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teléfono de emergencia</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Alias teléfono de emergencia</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Calle</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Número exterior</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Número interior</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código Postal</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Colonia</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ciudad</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">País</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profesión</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Método de pago</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de admisión</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -24,11 +42,29 @@ const CsvPreview = ({ previewData, csvData }) => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.numero_socio}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.nombre}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.apellidos}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.sexo}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.rfc}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.fecha_nacimiento}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.email}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.telefono}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.foraneo === 'true' || row.foraneo === '1' ? 'Sí' : 'No'}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.direccion}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.id_sistema_entradas}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.telefono_movil}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.alias_movil}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.telefono_fijo}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.alias_fijo}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.telefono_emergencia}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.alias_emergencia}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.calle}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.numero_exterior}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.numero_interior}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.cp}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.colonia}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.ciudad}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.estado}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.pais}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.titulo}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.profesion}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.metodo_pago}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.fecha_admision}</td>
               </tr>
             ))}
           </tbody>
