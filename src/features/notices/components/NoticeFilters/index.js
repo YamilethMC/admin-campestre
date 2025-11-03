@@ -26,16 +26,16 @@ const NoticeFilters = ({ filters, onFilterChange }) => {
             <option value="inactivas">Inactivas</option>
           </select>
         </div>
-      </div>
-      <div className={filterStyles.searchContainer}>
-        <label className={filterStyles.label}>Buscar</label>
-        <input
-          type="text"
-          placeholder="Buscar por título o descripción..."
-          value={filters.search || ''}
-          onChange={handleSearchChange}
-          className={filterStyles.searchInput}
-        />
+        <div className={`${filterStyles.filterGroup} md:col-span-2`}>
+          <label className={filterStyles.label}>Buscar</label>
+          <input
+            type="text"
+            placeholder="Buscar por título o descripción..."
+            value={filters.search || ''}
+            onChange={handleSearchChange}
+            className={filterStyles.searchInput}
+          />
+        </div>
       </div>
     </div>
   );
