@@ -9,7 +9,8 @@ export const useSurvey = () => {
   const [stats, setStats] = useState({ active: 0, inactive: 0 });
   const [filters, setFilters] = useState({
     category: 'Todas',
-    status: 'todas'
+    status: 'todas',
+    search: ''
   });
 
   // Load all surveys and stats
@@ -46,6 +47,15 @@ export const useSurvey = () => {
         result = result.filter(survey => !survey.isActive);
       }
       // If status is 'todas', no additional filtering is needed
+    }
+    
+    // Apply search filter
+    if (filters.search) {
+      const searchTerm = filters.search.toLowerCase();
+      result = result.filter(survey => 
+        survey.title.toLowerCase().includes(searchTerm) || 
+        survey.description.toLowerCase().includes(searchTerm)
+      );
     }
     
     setFilteredSurveys(result);
@@ -180,7 +190,8 @@ export const useSurvey = () => {
   const resetFilters = () => {
     setFilters({
       category: 'Todas',
-      status: 'todas'
+      status: 'todas',
+      search: ''
     });
   };
 

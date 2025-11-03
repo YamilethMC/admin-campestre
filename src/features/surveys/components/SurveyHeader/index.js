@@ -6,8 +6,8 @@ const SurveyHeader = ({ activeCount, inactiveCount }) => {
     <div className="bg-white rounded-lg shadow p-6 mb-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
         <div className="flex items-center space-x-4 mb-4 md:mb-0">
-          <div className="p-3 bg-primary rounded-lg">
-            <SurveysIcon className="w-6 h-6 text-white" />
+          <div>
+            <SurveysIcon className="text-primary" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Encuestas</h1>

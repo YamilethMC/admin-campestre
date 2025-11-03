@@ -443,6 +443,15 @@ export const surveyService = {
       // If status is 'todas' or 'all', no additional filtering is needed
     }
     
+    // Apply search filter
+    if (filters.search) {
+      const searchTerm = filters.search.toLowerCase();
+      filteredSurveys = filteredSurveys.filter(survey => 
+        survey.title.toLowerCase().includes(searchTerm) || 
+        survey.description.toLowerCase().includes(searchTerm)
+      );
+    }
+    
     return filteredSurveys;
   },
 
