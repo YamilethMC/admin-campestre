@@ -49,7 +49,7 @@ export const useIndividualMember = () => {
       [name]: type === 'checkbox' ? checked : value
     }));
 
-    if (name === "telefono_movil" || name === "telefono_fijo" || name === "telefono_emergencia") {
+    if (name === "telefono_movil" || name === "telefono_fijo" || name === "telefono_emergencia" || name === "codigo_postal" || name === "numero_exterior" || name === "numero_interior") {
       // Permite solo dígitos y corta a 10
       const soloNumeros = value.replace(/\D/g, "").slice(0, 10);
 
@@ -58,139 +58,37 @@ export const useIndividualMember = () => {
         [name]: soloNumeros,
       });
     }
+
+    if(name === "fecha_nacimiento") {
+      const fechaActual = formattedDate();
+
+      if(value >= fechaActual) {
+        addLog('Error: La fecha de nacimiento no puede ser futura');
+        addToast('Error: La fecha de nacimiento no puede ser futura', 'error');
+        setFormData(prev => ({
+          ...prev,
+          fecha_nacimiento: '',
+        }));
+      }
+    }
   };
+
+  const formattedDate = () => {
+    const fechaActual = new Date();
+    const year = fechaActual.getFullYear();
+    const month = String(fechaActual.getMonth() + 1).padStart(2, '0');
+    const day = String(fechaActual.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
     
     // Validación de campos requeridos
-    if (!formData.nombre) {
-      addLog('Error: El nombre es obligatorio');
-      addToast('Error: El nombre es obligatorio', 'error');
-      return;
-    }
-
-    if (!formData.apellidos) {
-      addLog('Error: El apellido es obligatorio');
-      addToast('Error: El apellido es obligatorio', 'error');
-      return;
-    }
-
-    if (!formData.sexo) {
-      addLog('Error: El sexo es obligatorio');
-      addToast('Error: El sexo es obligatorio', 'error');
-      return;
-    }
-
-    if (!formData.rfc) {
-      addLog('Error: El RFC es obligatorio');
-      addToast('Error: El RFC es obligatorio', 'error');
-      return;
-    }
-
-    if (!formData.fecha_nacimiento) {
-      addLog('Error: La fecha de nacimiento es obligatoria');
-      addToast('Error: La fecha de nacimiento es obligatoria', 'error');
-      return;
-    }
-
-    if (!formData.email) {
-      addLog('Error: El email es obligatorio');
-      addToast('Error: El email es obligatorio', 'error');
-      return;
-    }
-
-    if (!formData.telefono_movil) {
-      addLog('Error: El teléfono móvil es obligatorio');
-      addToast('Error: El teléfono móvil es obligatorio', 'error');
-      return;
-    }
-
-    if (!formData.calle) {
-      addLog('Error: La calle es obligatoria');
-      addToast('Error: La calle es obligatoria', 'error');
-      return;
-    }
-
-    if (!formData.numero_exterior) {
-      addLog('Error: El número exterior es obligatorio');
-      addToast('Error: El número exterior es obligatorio', 'error');
-      return;
-    }
-
-    if (!formData.codigo_postal) {
-      addLog('Error: El código postal es obligatorio');
-      addToast('Error: El código postal es obligatorio', 'error');
-      return;
-    }
-
-    if (!formData.colonia) {
-      addLog('Error: La colonia es obligatoria');
-      addToast('Error: La colonia es obligatoria', 'error');
-      return;
-    }
-
-    if (!formData.ciudad) {
-      addLog('Error: La ciudad es obligatoria');
-      addToast('Error: La ciudad es obligatoria', 'error');
-      return;
-    }
-
-    if (!formData.estado) {
-      addLog('Error: El estado es obligatorio');
-      addToast('Error: El estado es obligatorio', 'error');
-      return;
-    }
-
-    if (!formData.pais) {
-      addLog('Error: El país es obligatorio');
-      addToast('Error: El país es obligatorio', 'error');
-      return;
-    }
-
-    if (!formData.titulo) {
-      addLog('Error: El título es obligatorio');
-      addToast('Error: El título es obligatorio', 'error');
-      return;
-    }
-
-    if (!formData.metodo_pago) {
-      addLog('Error: El método de pago es obligatorio');
-      addToast('Error: El método de pago es obligatorio', 'error');
-      return;
-    }
-
-    if (!formData.fecha_admision) {
-      addLog('Error: La fecha de admisión es obligatoria');
-      addToast('Error: La fecha de admisión es obligatoria', 'error');
-      return;
-    }
-    
-    // Validar formato de email si se proporciona
-    if (formData.email && !/^\S+@\S+\.\S+$/.test(formData.email)) {
-      addLog('Error: Email inválido');
-      addToast('Error: Email inválido', 'error');
-      return;
-    }
-
-    // Validar que los teléfonos contengan solo 10 dígitos
-    if (formData.telefono_movil && !/^\d{10}$/.test(formData.telefono_movil)) {
-      addLog('Error: El teléfono móvil debe contener exactamente 10 dígitos numéricos');
-      addToast('Error: El teléfono móvil debe contener exactamente 10 dígitos numéricos', 'error');
-      return;
-    }
-
-    if (formData.telefono_fijo && !/^\d{10}$/.test(formData.telefono_fijo)) {
-      addLog('Error: El teléfono fijo debe contener exactamente 10 dígitos numéricos');
-      addToast('Error: El teléfono fijo debe contener exactamente 10 dígitos numéricos', 'error');
-      return;
-    }
-
-    if (formData.telefono_emergencia && !/^\d{10}$/.test(formData.telefono_emergencia)) {
-      addLog('Error: El teléfono de emergencia debe contener exactamente 10 dígitos numéricos');
-      addToast('Error: El teléfono de emergencia debe contener exactamente 10 dígitos numéricos', 'error');
-      return;
-    }
+      if (!validateFormData()) {
+        return;
+      }
 
     const newMember = {
       ...formData,
@@ -233,6 +131,139 @@ export const useIndividualMember = () => {
       fecha_admision: '',
     });
   };
+
+  const validateFormData = () => {
+    // Aquí puedes agregar validaciones adicionales si es necesario
+    if (!formData.nombre) {
+      addLog('Error: El nombre es obligatorio');
+      addToast('Error: El nombre es obligatorio', 'error');
+      return false;
+    }
+
+    if (!formData.apellidos) {
+      addLog('Error: El apellido es obligatorio');
+      addToast('Error: El apellido es obligatorio', 'error');
+      return false;
+    }
+
+    if (!formData.sexo) {
+      addLog('Error: El sexo es obligatorio');
+      addToast('Error: El sexo es obligatorio', 'error');
+      return false;
+    }
+
+    if (!formData.rfc) {
+      addLog('Error: El RFC es obligatorio');
+      addToast('Error: El RFC es obligatorio', 'error');
+      return false;
+    }
+
+    if (!formData.fecha_nacimiento) {
+      addLog('Error: La fecha de nacimiento es obligatoria');
+      addToast('Error: La fecha de nacimiento es obligatoria', 'error');
+      return false;
+    }
+
+    if (!formData.email) {
+      addLog('Error: El email es obligatorio');
+      addToast('Error: El email es obligatorio', 'error');
+      return false;
+    }
+
+    if (!formData.telefono_movil) {
+      addLog('Error: El teléfono móvil es obligatorio');
+      addToast('Error: El teléfono móvil es obligatorio', 'error');
+      return false;
+    }
+
+    if (!formData.calle) {
+      addLog('Error: La calle es obligatoria');
+      addToast('Error: La calle es obligatoria', 'error');
+      return false;
+    }
+
+    if (!formData.numero_exterior) {
+      addLog('Error: El número exterior es obligatorio');
+      addToast('Error: El número exterior es obligatorio', 'error');
+      return false;
+    }
+
+    if (!formData.codigo_postal) {
+      addLog('Error: El código postal es obligatorio');
+      addToast('Error: El código postal es obligatorio', 'error');
+      return false;
+    }
+
+    if (!formData.colonia) {
+      addLog('Error: La colonia es obligatoria');
+      addToast('Error: La colonia es obligatoria', 'error');
+      return false;
+    }
+
+    if (!formData.ciudad) {
+      addLog('Error: La ciudad es obligatoria');
+      addToast('Error: La ciudad es obligatoria', 'error');
+      return false;
+    }
+
+    if (!formData.estado) {
+      addLog('Error: El estado es obligatorio');
+      addToast('Error: El estado es obligatorio', 'error');
+      return false;
+    }
+
+    if (!formData.pais) {
+      addLog('Error: El país es obligatorio');
+      addToast('Error: El país es obligatorio', 'error');
+      return false;
+    }
+
+    if (!formData.titulo) {
+      addLog('Error: El título es obligatorio');
+      addToast('Error: El título es obligatorio', 'error');
+      return false;
+    }
+
+    if (!formData.metodo_pago) {
+      addLog('Error: El método de pago es obligatorio');
+      addToast('Error: El método de pago es obligatorio', 'error');
+      return false;
+    }
+
+    if (!formData.fecha_admision) {
+      addLog('Error: La fecha de admisión es obligatoria');
+      addToast('Error: La fecha de admisión es obligatoria', 'error');
+      return false;
+    }
+    
+    // Validar formato de email si se proporciona
+    if (formData.email && !/^\S+@\S+\.\S+$/.test(formData.email)) {
+      addLog('Error: Email inválido');
+      addToast('Error: Email inválido', 'error');
+      return false;
+    }
+
+    // Validar que los teléfonos contengan solo 10 dígitos
+    if (formData.telefono_movil && !/^\d{10}$/.test(formData.telefono_movil)) {
+      addLog('Error: El teléfono móvil debe contener exactamente 10 dígitos numéricos');
+      addToast('Error: El teléfono móvil debe contener exactamente 10 dígitos numéricos', 'error');
+      return false;
+    }
+
+    if (formData.telefono_fijo && !/^\d{10}$/.test(formData.telefono_fijo)) {
+      addLog('Error: El teléfono fijo debe contener exactamente 10 dígitos numéricos');
+      addToast('Error: El teléfono fijo debe contener exactamente 10 dígitos numéricos', 'error');
+      return false;
+    }
+
+    if (formData.telefono_emergencia && !/^\d{10}$/.test(formData.telefono_emergencia)) {
+      addLog('Error: El teléfono de emergencia debe contener exactamente 10 dígitos numéricos');
+      addToast('Error: El teléfono de emergencia debe contener exactamente 10 dígitos numéricos', 'error');
+      return false;
+    }
+
+    return true;
+  }
 
   // Load gender options on component mount
   useEffect(() => {
