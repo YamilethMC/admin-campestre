@@ -1,5 +1,6 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { AppContext } from '../../../shared/context/AppContext';
+import { memberService } from '../services';
 
 export const useIndividualMember = () => {
   const { members, setMembers, addLog, addToast } = useContext(AppContext);
@@ -7,10 +8,16 @@ export const useIndividualMember = () => {
   const [formData, setFormData] = useState({
     nombre: '',
     apellidos: '',
+    sexo: '',
     rfc: '',
     fecha_nacimiento: '',
     email: '',
-    telefono: '',
+    telefono_movil: '',
+    alias_movil: '',
+    telefono_fijo: '',
+    alias_fijo: '',
+    telefono_emergencia: '',
+    alias_emergencia: '',
     foraneo: false,
     calle: '',
     numero_exterior: '',
@@ -20,7 +27,20 @@ export const useIndividualMember = () => {
     ciudad: '',
     estado: '',
     pais: '',
+    titulo: '',
+    profesion: '',
+    metodo_pago: '',
+    fecha_admision: '',
   });
+  
+  const [genderOptions, setGenderOptions] = useState([]);
+  const [loadingGender, setLoadingGender] = useState(false);
+
+  const [tituloOptions, setTituloOptions] = useState([]);
+  const [loadingTitulo, setLoadingTitulo] = useState(false);
+
+  const [paymentMethodOptions, setPaymentMethodOptions] = useState([]);
+  const [loadingPaymentMethod, setLoadingPaymentMethod] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -28,6 +48,16 @@ export const useIndividualMember = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+
+    if (name === "telefono_movil" || name === "telefono_fijo" || name === "telefono_emergencia") {
+      // Permite solo dígitos y corta a 10
+      const soloNumeros = value.replace(/\D/g, "").slice(0, 10);
+
+      setFormData({
+        ...formData,
+        [name]: soloNumeros,
+      });
+    }
   };
 
   const handleSubmit = (e) => {
@@ -46,12 +76,96 @@ export const useIndividualMember = () => {
       return;
     }
 
+    if (!formData.sexo) {
+      addLog('Error: El sexo es obligatorio');
+      addToast('Error: El sexo es obligatorio', 'error');
+      return;
+    }
+
+    if (!formData.rfc) {
+      addLog('Error: El RFC es obligatorio');
+      addToast('Error: El RFC es obligatorio', 'error');
+      return;
+    }
+
+    if (!formData.fecha_nacimiento) {
+      addLog('Error: La fecha de nacimiento es obligatoria');
+      addToast('Error: La fecha de nacimiento es obligatoria', 'error');
+      return;
+    }
+
     if (!formData.email) {
       addLog('Error: El email es obligatorio');
       addToast('Error: El email es obligatorio', 'error');
       return;
     }
 
+    if (!formData.telefono_movil) {
+      addLog('Error: El teléfono móvil es obligatorio');
+      addToast('Error: El teléfono móvil es obligatorio', 'error');
+      return;
+    }
+
+    if (!formData.calle) {
+      addLog('Error: La calle es obligatoria');
+      addToast('Error: La calle es obligatoria', 'error');
+      return;
+    }
+
+    if (!formData.numero_exterior) {
+      addLog('Error: El número exterior es obligatorio');
+      addToast('Error: El número exterior es obligatorio', 'error');
+      return;
+    }
+
+    if (!formData.codigo_postal) {
+      addLog('Error: El código postal es obligatorio');
+      addToast('Error: El código postal es obligatorio', 'error');
+      return;
+    }
+
+    if (!formData.colonia) {
+      addLog('Error: La colonia es obligatoria');
+      addToast('Error: La colonia es obligatoria', 'error');
+      return;
+    }
+
+    if (!formData.ciudad) {
+      addLog('Error: La ciudad es obligatoria');
+      addToast('Error: La ciudad es obligatoria', 'error');
+      return;
+    }
+
+    if (!formData.estado) {
+      addLog('Error: El estado es obligatorio');
+      addToast('Error: El estado es obligatorio', 'error');
+      return;
+    }
+
+    if (!formData.pais) {
+      addLog('Error: El país es obligatorio');
+      addToast('Error: El país es obligatorio', 'error');
+      return;
+    }
+
+    if (!formData.titulo) {
+      addLog('Error: El título es obligatorio');
+      addToast('Error: El título es obligatorio', 'error');
+      return;
+    }
+
+    if (!formData.metodo_pago) {
+      addLog('Error: El método de pago es obligatorio');
+      addToast('Error: El método de pago es obligatorio', 'error');
+      return;
+    }
+
+    if (!formData.fecha_admision) {
+      addLog('Error: La fecha de admisión es obligatoria');
+      addToast('Error: La fecha de admisión es obligatoria', 'error');
+      return;
+    }
+    
     // Validar formato de email si se proporciona
     if (formData.email && !/^\S+@\S+\.\S+$/.test(formData.email)) {
       addLog('Error: Email inválido');
@@ -59,10 +173,31 @@ export const useIndividualMember = () => {
       return;
     }
 
+    // Validar que los teléfonos contengan solo 10 dígitos
+    if (formData.telefono_movil && !/^\d{10}$/.test(formData.telefono_movil)) {
+      addLog('Error: El teléfono móvil debe contener exactamente 10 dígitos numéricos');
+      addToast('Error: El teléfono móvil debe contener exactamente 10 dígitos numéricos', 'error');
+      return;
+    }
+
+    if (formData.telefono_fijo && !/^\d{10}$/.test(formData.telefono_fijo)) {
+      addLog('Error: El teléfono fijo debe contener exactamente 10 dígitos numéricos');
+      addToast('Error: El teléfono fijo debe contener exactamente 10 dígitos numéricos', 'error');
+      return;
+    }
+
+    if (formData.telefono_emergencia && !/^\d{10}$/.test(formData.telefono_emergencia)) {
+      addLog('Error: El teléfono de emergencia debe contener exactamente 10 dígitos numéricos');
+      addToast('Error: El teléfono de emergencia debe contener exactamente 10 dígitos numéricos', 'error');
+      return;
+    }
+
     const newMember = {
       ...formData,
       id: members.length > 0 ? Math.max(...members.map(m => m.id)) + 1 : 1,
-      numero_socio: members.length + 1 // Asegurar que sea número
+      numero_socio: members.length + 1, // Asegurar que sea número
+      fecha_nacimiento: formData.fecha_nacimiento ? new Date(formData.fecha_nacimiento).toISOString().split('T')[0] : null, // YYYY-MM-DD format
+      fecha_admision: formData.fecha_admision ? new Date(formData.fecha_admision).toISOString().split('T')[0] : null  // YYYY-MM-DD format
     };
     
     setMembers(prev => [...prev, newMember]);
@@ -73,10 +208,16 @@ export const useIndividualMember = () => {
     setFormData({
       nombre: '',
       apellidos: '',
+      sexo: '',
       rfc: '',
       fecha_nacimiento: '',
       email: '',
-      telefono: '',
+      telefono_movil: '',
+      alias_movil: '',
+      telefono_fijo: '',
+      alias_fijo: '',
+      telefono_emergencia: '',
+      alias_emergencia: '',
       foraneo: false,
       calle: '',
       numero_exterior: '',
@@ -86,14 +227,73 @@ export const useIndividualMember = () => {
       ciudad: '',
       estado: '',
       pais: '',
+      titulo: '',
+      profesion: '',
+      metodo_pago: '',
+      fecha_admision: '',
     });
   };
+
+  // Load gender options on component mount
+  useEffect(() => {
+    const loadGenderOptions = async () => {
+      try {
+        setLoadingGender(true);
+        const options = await memberService.getGenderOptions();
+        setGenderOptions(options);
+      } catch (error) {
+        console.error('Error loading gender options:', error);
+        addLog('Error al cargar las opciones de género');
+        addToast('Error al cargar las opciones de género', 'error');
+      } finally {
+        setLoadingGender(false);
+      }
+    };
+
+    const loadTituloOptions = async () => {
+      try {
+        setLoadingTitulo(true);
+        const options = await memberService.getTituloOptions();
+        setTituloOptions(options);
+      } catch (error) {
+        console.error('Error loading titulo options:', error);
+        addLog('Error al cargar las opciones de titulo');
+        addToast('Error al cargar las opciones de titulo', 'error');
+      } finally {
+        setLoadingTitulo(false);
+      }
+    };
+
+    const loadPaymentMethodOptions = async () => {
+      try {
+        setLoadingPaymentMethod(true);
+        const options = await memberService.getPaymentMethodOptions();
+        setPaymentMethodOptions(options);
+      } catch (error) {
+        console.error('Error loading payment method options:', error);
+        addLog('Error al cargar las opciones de método de pago');
+        addToast('Error al cargar las opciones de método de pago', 'error');
+      } finally {
+        setLoadingPaymentMethod(false);
+      }
+    };
+
+    loadGenderOptions();
+    loadTituloOptions();
+    loadPaymentMethodOptions();
+  }, [addLog, addToast]);
 
   return {
     members,
     addLog,
     addToast,
     formData,
+    genderOptions,
+    loadingGender,
+    tituloOptions,
+    loadingTitulo,
+    paymentMethodOptions,
+    loadingPaymentMethod,
     handleChange,
     handleSubmit
   };

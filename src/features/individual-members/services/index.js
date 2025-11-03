@@ -1,5 +1,36 @@
 // Mock service for individual member operations
 export const memberService = {
+  // Get gender options (would come from API)
+  getGenderOptions: async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    return [
+      { value: 'Hombre', label: 'Hombre' },
+      { value: 'Mujer', label: 'Mujer' }
+    ];
+  },
+
+  getTituloOptions: async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    return [
+      { value: 'C', label: 'Ciudadano' },
+      { value: 'DR', label: 'Doctor' },
+      { value: 'MC', label: 'Maestro en Ciencias' },
+      { value: 'LIC', label: 'Licenciado' },
+      { value: 'ING', label: 'Ingeniero' },
+      { value: 'ARQ', label: 'Arquitecto' },
+    ];
+  },
+
+  getPaymentMethodOptions: async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    return [
+      { value: 'PPD', label: 'PPD' },
+    ];
+  },
+  
   // Add a new member
   addMember: async (memberData) => {
     // Simulate API call delay
