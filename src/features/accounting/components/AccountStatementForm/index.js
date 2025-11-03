@@ -65,13 +65,14 @@ const AccountStatementForm = () => {
               id="file-input-account-statement"
               type="file"
               accept=".zip"
-              onChange={(e) => {
+              onChange={handleFileUpload}
+              /*onChange={(e) => {
                 // Clear the input first to ensure change event fires even if same file is selected
                 if (e.target.value) {
                   handleFileUpload(e);
                   e.target.value = null; // Reset the input value
                 }
-              }}
+              }}*/
               className="block w-full text-sm text-gray-500
                 file:mr-4 file:py-2 file:px-4
                 file:rounded-md file:border-0
@@ -79,13 +80,13 @@ const AccountStatementForm = () => {
                 file:bg-primary/10 file:text-primary
                 hover:file:bg-primary/20"
             />
-            {selectedFile ? (
+            {/*{selectedFile ? (
               <span className="ml-2 text-sm text-gray-600 truncate max-w-[150px]" title={selectedFile.name}>
                 {selectedFile.name}
               </span>
             ) : (
               <span className="ml-2 text-sm text-gray-400">Ningún archivo seleccionado</span>
-            )}
+            )}*/}
           </div>
         </div>
       </div>
