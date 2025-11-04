@@ -3,7 +3,7 @@ import MemberList from '../components/MemberList';
 
 const MembersContainer = () => {
   return (
-    <div className="w-full px-4">
+    <div className="max-w-7xl mx-auto">
       <MemberList />
     </div>
   );
