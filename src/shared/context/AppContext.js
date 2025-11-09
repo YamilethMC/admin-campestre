@@ -105,35 +105,44 @@ export const AppProvider = ({ children }) => {
     }, 5000);
   };
 
-    // User state
+  // User state
   const [currentUser, setCurrentUser] = useState(null);
+  const [authToken, setAuthToken] = useState(null);
+
+  // Initialize auth state from localStorage on mount
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    const user = localStorage.getItem('currentUser');
+    
+    if (token && user) {
+      setAuthToken(token);
+      setCurrentUser(JSON.parse(user));
+      setIsAuthenticated(true);
+    }
+  }, []);
 
   // Function to handle login
-  const login = (username, password) => {
-    // Mock authentication - hardcoded credentials
-    if (username === 'admin' && password === '123456') {
-      setIsAuthenticated(true);
-      setCurrentUser({
-        username: 'admin',
-        name: 'Juan',
-        lastName: 'Pérez'
-      });
-      addLog('Inicio de sesión exitoso');
-      //addToast('Inicio de sesión exitoso', 'success');
-      return true;
-    } else {
-      addLog('Error de autenticación: Credenciales incorrectas');
-      addToast('Credenciales incorrectas', 'error');
-      return false;
-    }
+  const login = (user, token) => {
+    setIsAuthenticated(true);
+    setCurrentUser(user);
+    setAuthToken(token);
+    
+    // Store in localStorage for persistence
+    localStorage.setItem('authToken', token);
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    
+    return true;
   };
 
   // Function to handle logout
   const logout = () => {
     setIsAuthenticated(false);
     setCurrentUser(null);
-    addLog('Sesión cerrada');
-    //addToast('Sesión cerrada', 'info');
+    setAuthToken(null);
+    
+    // Clear localStorage on logout
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('currentUser');
   };
 
   return (

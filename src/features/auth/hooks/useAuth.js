@@ -17,11 +17,11 @@ export const useAuth = () => {
     
     try {
       // Validate credentials using the service
-      const result = await authService.validateCredentials({ username, password });
+      const result = await authService.validateCredentials({ email: username, password });
       
       if (result.success) {
         // Use the context login function to set the authenticated state
-        contextLogin(username, password);
+        contextLogin(result.user, result.accessToken);
       } else {
         setError(result.error || 'Error de autenticación');
       }
