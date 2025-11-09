@@ -7,9 +7,8 @@ export const SurveyCategory = {
 };
 
 export const SurveyPriority = {
-  URGENT: 'Urgente',
-  IMPORTANT: 'Importante',
-  NORMAL: 'Normal',
+  HIGH: 'Importante',
+  MEDIUM: 'Normal',
   LOW: 'Baja',
 };
 
@@ -20,10 +19,10 @@ export const SurveyStatus = {
 };
 
 export const SurveyQuestionType = {
-  RATING: 'rating', // 1-10 range
-  MULTIPLE_CHOICE: 'multiple-choice',
-  TEXT: 'text', // open question
-  YES_NO: 'yes-no'
+  NUMBER: 'NUMBER', // 1-10 range
+  SELECT: 'SELECT',
+  TEXT: 'TEXT', // open question
+  BOOLEAN: 'BOOLEAN'
 };
 
 export const SurveyFilter = {
@@ -37,7 +36,7 @@ export const surveyInterface = {
   title: '',
   description: '',
   category: SurveyCategory.SERVICES,
-  priority: SurveyPriority.NORMAL,
+  priority: SurveyPriority.MEDIUM,
   estimatedTime: '',
   participantCount: 0,
   questionCount: 0,

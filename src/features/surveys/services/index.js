@@ -12,7 +12,7 @@ export const mockSurveys = [
     title: 'Satisfacción con Servicios del Club',
     description: 'Ayúdanos a mejorar nuestros servicios compartiendo tu experiencia.',
     category: SurveyCategory.SERVICES,
-    priority: SurveyPriority.IMPORTANT,
+    priority: SurveyPriority.HIGH,
     estimatedTime: '3-5 min',
     participantCount: 156,
     questionCount: 8,
@@ -26,7 +26,7 @@ export const mockSurveys = [
     title: 'Calidad del Restaurante',
     description: 'Evalúa la calidad de nuestros alimentos y servicio en el restaurante.',
     category: SurveyCategory.RESTAURANT,
-    priority: SurveyPriority.NORMAL,
+    priority: SurveyPriority.MEDIUM,
     estimatedTime: '4-6 min',
     participantCount: 89,
     questionCount: 10,
@@ -40,7 +40,7 @@ export const mockSurveys = [
     title: 'Instalaciones Deportivas',
     description: 'Comparte tu opinión sobre nuestras instalaciones deportivas.',
     category: SurveyCategory.SPORTS,
-    priority: SurveyPriority.URGENT,
+    priority: SurveyPriority.MEDIUM,
     estimatedTime: '5-7 min',
     participantCount: 234,
     questionCount: 12,
@@ -54,7 +54,7 @@ export const mockSurveys = [
     title: 'Experiencia en Eventos',
     description: 'Ayúdanos a mejorar nuestros eventos y actividades.',
     category: SurveyCategory.EVENTS,
-    priority: SurveyPriority.NORMAL,
+    priority: SurveyPriority.MEDIUM,
     estimatedTime: '3-5 min',
     participantCount: 76,
     questionCount: 7,
@@ -421,6 +421,40 @@ export const mockSurveyQuestions = [
 
 // Service functions to mock API calls
 export const surveyService = {
+
+  getSurveyCategoryOptions: async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    return [
+      { value: 'TODAS', label: 'Todas' },
+      { value: 'SERVICES', label: 'Servicios' },
+      { value: 'RESTAURANT', label: 'Restaurante' },
+      { value: 'SPORTS', label: 'Deportes' },
+      { value: 'EVENTS', label: 'Eventos' }
+    ];
+  },
+
+  getSurveyPriorityOptions: async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    return [
+      { value: 'HIGH', label: 'Importante' },
+      { value: 'MEDIUM', label: 'Normal' },
+      { value: 'LOW', label: 'Baja' }
+    ];
+  },
+  
+  // Get survey by id
+  getSurveyById: async (id) => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const survey = mockSurveys.find(survey => survey.id === id);
+    if (survey) {
+      return survey;
+    } else {
+      throw new Error('Survey not found');
+    }
+  },
+
   // Get all surveys
   getSurveys: async (filters = {}) => {
     // Simulate network delay
@@ -440,10 +474,7 @@ export const surveyService = {
       } else if (filters.status === 'inactivas' || filters.status === SurveyStatus.INACTIVE) {
         filteredSurveys = filteredSurveys.filter(survey => !survey.isActive);
       }
-      // If status is 'todas' or 'all', no additional filtering is needed
     }
-    
-    // Apply search filter
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
       filteredSurveys = filteredSurveys.filter(survey => 
@@ -451,6 +482,8 @@ export const surveyService = {
         survey.description.toLowerCase().includes(searchTerm)
       );
     }
+    
+
     
     return filteredSurveys;
   },
@@ -479,36 +512,24 @@ export const surveyService = {
 
   // Create a new survey
   createSurvey: async (surveyData) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    const newSurvey = {
-      id: Date.now().toString(), // Generate a new ID
-      ...surveyData,
-      questionCount: surveyData.questions ? surveyData.questions.length : 0,
-      participantCount: surveyData.participantCount || 0, // Preserve participant count if provided
-      averageRating: surveyData.averageRating || 0, // Preserve average rating if provided
-      dateCreated: new Date().toISOString().split('T')[0], // Format as YYYY-MM-DD
-    };
-    
-    // Add the new survey to our mock data
-    mockSurveys.push(newSurvey);
-    
-    // Add questions if provided
-    if (surveyData.questions) {
-      surveyData.questions.forEach((question, index) => {
-        const questionId = `${newSurvey.id}-${index + 1}`;
-        mockSurveyQuestions.push({
-          id: questionId,
-          surveyId: newSurvey.id,
-          question: question.question,
-          type: question.type,
-          options: question.options || [],
-          required: question.required
-        });
-      });
+    const token = localStorage.getItem('token');
+    console.log(token)
+    console.log(surveyData)
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/surveys`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(surveyData)
+    });
+    console.log(response)
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.message);
     }
-    
-    return newSurvey;
+
+    return response.json();
   },
 
   // Update a survey

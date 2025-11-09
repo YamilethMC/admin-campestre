@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { SurveyCategory, SurveyPriority, SurveyQuestionType } from '../../interfaces';
 import Modal from '../../../../shared/components/modal';
+import { useSurvey } from '../../hooks/useSurvey';
 
 const SurveyForm = ({ survey = null, onSave, onCancel }) => {
   const isEdit = !!survey;
   
+  const { surveyCategoryOptions, surveyPriorityOptions, loadingSurveyCategory, loadingSurveyPriority } = useSurvey();
   // Original data to compare for changes
   const [originalData, setOriginalData] = useState(null);
   
   const [formData, setFormData] = useState({
     title: survey?.title || '',
     description: survey?.description || '',
-    category: survey?.category || SurveyCategory.SERVICES,
-    priority: survey?.priority || SurveyPriority.NORMAL,
+    category: survey?.category || '',
+    priority: survey?.priority || '',
     estimatedTime: survey?.estimatedTime || '',
     imageUrl: survey?.imageUrl || '',
     imageFile: null, // For handling local file
@@ -110,9 +112,9 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
     };
     
     // If the question type is changed to 'yes-no', automatically add 'Sí' and 'No' options
-    if (field === 'type' && value === SurveyQuestionType.YES_NO) {
+    if (field === 'type' && value === SurveyQuestionType.BOOLEAN) {
       updatedQuestion.options = ['Sí', 'No'];
-    } else if (field === 'type' && updatedQuestion.type === SurveyQuestionType.YES_NO && value !== SurveyQuestionType.YES_NO) {
+    } else if (field === 'type' && updatedQuestion.type === SurveyQuestionType.BOOLEAN && value !== SurveyQuestionType.BOOLEAN) {
       // If changing from 'yes-no' to another type, reset options to default
       updatedQuestion.options = [''];
     }
@@ -238,13 +240,13 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
 
   const getQuestionTypeName = (type) => {
     switch (type) {
-      case SurveyQuestionType.RATING:
+      case SurveyQuestionType.NUMBER:
         return 'Rango (1-10)';
-      case SurveyQuestionType.MULTIPLE_CHOICE:
+      case SurveyQuestionType.SELECT:
         return 'Opción múltiple';
       case SurveyQuestionType.TEXT:
         return 'Abierta';
-      case SurveyQuestionType.YES_NO:
+      case SurveyQuestionType.BOOLEAN:
         return 'Sí/No';
       default:
         return 'Abierta';
@@ -264,7 +266,7 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
           </svg>
         </button>
         <h2 className="text-2xl font-bold text-gray-800">
-          {isEdit ? 'Editar Encuesta' : 'Crear Nueva Encuesta'}
+          {isEdit ? 'Editar Encuesta' : 'Crear nueva encuesta'}
         </h2>
       </div>
 
@@ -300,11 +302,15 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
               onChange={(e) => handleInputChange('category', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             >
-              {Object.entries(SurveyCategory)
-                .filter(([key]) => key !== 'ALL') // Exclude the 'ALL' category which is only for filtering
-                .map(([key, value]) => (
-                  <option key={key} value={value}>{value}</option>
-                ))}
+              <option value="">Seleccione una opción...</option>
+              {surveyCategoryOptions
+                .filter((option) => option.value !== 'TODAS') // ⬅️ aquí tu filtro
+                .map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))
+              }
             </select>
           </div>
 
@@ -315,8 +321,11 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
               onChange={(e) => handleInputChange('priority', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             >
-              {Object.entries(SurveyPriority).map(([key, value]) => (
-                <option key={key} value={value}>{value}</option>
+              <option value="">Seleccione una opción...</option>
+              {surveyPriorityOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
               ))}
             </select>
           </div>
@@ -430,7 +439,7 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
                 </div>
               </div>
 
-              {(question.type === SurveyQuestionType.MULTIPLE_CHOICE || question.type === SurveyQuestionType.YES_NO) && (
+              {(question.type === SurveyQuestionType.SELECT || question.type === SurveyQuestionType.BOOLEAN) && (
                 <div className="mb-3">
                   <div className="flex justify-between items-center mb-2">
                     <label className="block text-sm font-medium text-gray-700">Opciones</label>

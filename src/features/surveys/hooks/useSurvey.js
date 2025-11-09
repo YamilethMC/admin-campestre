@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { surveyService } from '../services';
+import { useContext } from 'react';
+import { AppContext } from '../../../shared/context/AppContext';
 
 export const useSurvey = () => {
+  const { addLog, addToast } = useContext(AppContext);
   const [allSurveys, setAllSurveys] = useState([]); // Store all surveys
   const [filteredSurveys, setFilteredSurveys] = useState([]); // Store filtered surveys
   const [loading, setLoading] = useState(true);
@@ -12,6 +15,12 @@ export const useSurvey = () => {
     status: 'todas',
     search: ''
   });
+
+  const [surveyCategoryOptions, setSurveyCategoryOptions] = useState([]);
+  const [surveyPriorityOptions, setSurveyPriorityOptions] = useState([]);
+
+  const [loadingSurveyCategory, setLoadingSurveyCategory] = useState(false);
+  const [loadingSurveyPriority, setLoadingSurveyPriority] = useState(false);
 
   // Load all surveys and stats
   const loadAllSurveys = async () => {
@@ -63,8 +72,36 @@ export const useSurvey = () => {
 
   // Load initial data
   useEffect(() => {
+    const loadSurveyCategoryOptions = async () => {
+      try {
+        setLoadingSurveyCategory(true);
+        const options = await surveyService.getSurveyCategoryOptions();
+        setSurveyCategoryOptions(options);
+      } catch (error) {
+        console.error('Error loading survey category options:', error);
+        addLog('Error al cargar las opciones de categoría de encuestas');
+        addToast('Error al cargar las opciones de categoría de encuestas', 'error');
+      } finally {
+        setLoadingSurveyCategory(false);
+      }
+    };
+    const loadSurveyPriorityOptions = async () => {
+      try {
+        setLoadingSurveyPriority(true);
+        const options = await surveyService.getSurveyPriorityOptions();
+        setSurveyPriorityOptions(options);
+      } catch (error) {
+        console.error('Error loading survey priority options:', error);
+        addLog('Error al cargar las opciones de prioridad de encuestas');
+        addToast('Error al cargar las opciones de prioridad de encuestas', 'error');
+      } finally {
+        setLoadingSurveyPriority(false);
+      }
+    };
+    loadSurveyCategoryOptions();
+    loadSurveyPriorityOptions();
     loadAllSurveys();
-  }, []);
+  }, [addLog, addToast]);
 
   // Apply filters whenever filters change or all surveys change
   useEffect(() => {
@@ -92,11 +129,62 @@ export const useSurvey = () => {
     }
   };
 
+ const buildSurveyData = (formData) => {
+    return {
+      title: formData.title,
+      description: formData.description,
+      category: formData.category,
+      priority: formData.priority,
+      estimatedTime: formData.estimatedTime,
+      //imageUrl: formData.imageUrl,
+      isActive: true,
+      questions: formData.questions.map((q, qIndex) => ({
+        surveyId: 0,
+        question: q.question,
+        type: q.type,
+        required: q.required,
+        order: qIndex,
+        options: (q.type === "SELECT" || q.type === "CHECKBOX" || q.type === "BOOLEAN" || q.type === "YES_NO")
+          ? q.options.map((opt, optIndex) => ({
+              surveyQuestionId: 0,
+              option: opt,
+              value: opt.toLowerCase().replace(/\s/g, ''),
+              order: optIndex
+            }))
+          : []
+      }))
+      /*questions: [
+        {
+          //surveyId: 0,
+          question: formData.question,
+          type: formData.type,
+          required: formData.required,
+          //order: formData.order,
+          options: [
+            {
+              //surveyQuestionId: 0,
+              option: formData.option,
+              //value: formData.value,
+              //order: formData.order
+            },
+            {
+              //surveyQuestionId: 0,
+              option: formData.option,
+              //value: formData.value,
+              //order: formData.order
+            }
+          ]
+        }
+      ]*/
+    };
+  };
+
   // Create new survey
   const createSurvey = async (surveyData) => {
+    const surveyDataF = buildSurveyData(surveyData);
     try {
       setLoading(true);
-      const newSurvey = await surveyService.createSurvey(surveyData);
+      const newSurvey = await surveyService.createSurvey(surveyDataF);
       // Add the new survey to all surveys
       setAllSurveys(prev => [...prev, newSurvey]);
       return newSurvey;
@@ -209,6 +297,12 @@ export const useSurvey = () => {
     getSurveyById,
     updateFilters,
     resetFilters,
-    deleteSurvey
+    deleteSurvey,
+    surveyCategoryOptions,
+    surveyPriorityOptions,
+    loadingSurveyCategory,
+    loadingSurveyPriority,
+    addLog,
+    addToast
   };
 };
