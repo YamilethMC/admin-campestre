@@ -28,11 +28,9 @@ const SurveyCard = ({ survey, onEdit, onViewResponses, onToggleStatus, onDelete 
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case SurveyPriority.URGENT:
+      case SurveyPriority.HIGH:
         return 'bg-red-100 text-red-800 border-red-200';
-      case SurveyPriority.IMPORTANT:
-        return 'bg-orange-100 text-orange-800 border-orange-200';
-      case SurveyPriority.NORMAL:
+      case SurveyPriority.MEDIUM:
         return 'bg-blue-100 text-blue-800 border-blue-200';
       case SurveyPriority.LOW:
         return 'bg-green-100 text-green-800 border-green-200';
