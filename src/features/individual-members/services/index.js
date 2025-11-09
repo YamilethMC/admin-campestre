@@ -5,8 +5,8 @@ export const memberService = {
     await new Promise(resolve => setTimeout(resolve, 300));
     
     return [
-      { value: 'Hombre', label: 'Hombre' },
-      { value: 'Mujer', label: 'Mujer' }
+      { value: 'MASCULINO', label: 'Masculino' },
+      { value: 'FEMENINO', label: 'Femenino' }
     ];
   },
 
@@ -33,22 +33,27 @@ export const memberService = {
   
   // Add a new member
   addMember: async (memberData) => {
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Create a mock response
-    const mockResponse = {
-      ...memberData,
-      id: Date.now(), // In a real app, this would come from the server
-      numero_socio: parseInt(memberData.numero_socio) // Ensure it's a number
-    };
-    
-    // In a real app, this would make an actual API call
-    console.log('Adding member:', mockResponse);
-    
-    return mockResponse;
+    const token = localStorage.getItem("authToken");
+    console.log(memberData)
+    console.log(token)
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/club-members`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(memberData),
+    });
+
+    console.log(response);
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error al registrar socio');
+    }
+
+    return await response.json();
   },
-  
+
   // Validate member data
   validateMember: (memberData) => {
     const errors = [];

@@ -6,6 +6,7 @@ export const useIndividualMember = () => {
   const { members, setMembers, addLog, addToast } = useContext(AppContext);
   
   const [formData, setFormData] = useState({
+    code_socio: '',
     nombre: '',
     apellidos: '',
     sexo: '',
@@ -44,34 +45,34 @@ export const useIndividualMember = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    setFormData(prev => {
+      let newValue = type === "checkbox" ? checked : value;
 
-    if (name === "telefono_movil" || name === "telefono_fijo" || name === "telefono_emergencia" || name === "codigo_postal" || name === "numero_exterior" || name === "numero_interior") {
-      // Permite solo dígitos y corta a 10
-      const soloNumeros = value.replace(/\D/g, "").slice(0, 10);
-
-      setFormData({
-        ...formData,
-        [name]: soloNumeros,
-      });
-    }
-
-    if(name === "fecha_nacimiento") {
-      const fechaActual = formattedDate();
-
-      if(value >= fechaActual) {
-        addLog('Error: La fecha de nacimiento no puede ser futura');
-        addToast('Error: La fecha de nacimiento no puede ser futura', 'error');
-        setFormData(prev => ({
-          ...prev,
-          fecha_nacimiento: '',
-        }));
+      if (name === "telefono_movil" || name === "telefono_fijo" || name === "telefono_emergencia") {
+        // Permite solo dígitos y corta a 10
+        newValue = value.replace(/\D/g, "").slice(0, 10);
       }
-    }
-  };
+
+      if( name === "code_socio" || name === "codigo_postal" || name === "numero_exterior" || name === "numero_interior") {
+        newValue = value.replace(/\D/g, "");
+      }
+
+      if(name === "fecha_nacimiento") {
+        const fechaActual = formattedDate();
+
+        if(value >= fechaActual) {
+          addLog('Error: La fecha de nacimiento no puede ser futura');
+          addToast('Error: La fecha de nacimiento no puede ser futura', 'error');
+          newValue = '';
+        }
+      }
+
+      return {
+        ...prev,
+        [name]: newValue,
+      };
+    });
+  }
 
   const formattedDate = () => {
     const fechaActual = new Date();
@@ -82,28 +83,89 @@ export const useIndividualMember = () => {
     return `${year}-${month}-${day}`;
   }
 
-  const handleSubmit = (e) => {
+  const phone = [
+    {
+      number: formData.telefono_movil,
+      alias: formData.alias_movil,
+      type: "MOVIL"
+    },
+    {
+      number: formData.telefono_fijo,
+      alias: formData.alias_fijo,
+      type: "PHONE"
+    },
+    {
+      number: formData.telefono_emergencia,
+      alias: formData.alias_emergencia,
+      type: "EMERGENCY"
+    }
+  ].filter(p => p.number && p.number.trim() !== "");
+
+
+  const buildMemberData = () => {
+    return {
+      email: formData.email,
+      //roleId: 1,
+      active: true,
+      name: formData.nombre,
+      lastName: formData.apellidos,
+      type: "SOCIO",
+      birthDate: new Date(formData.fecha_nacimiento).toISOString(),
+      gender: formData.sexo,
+      RFC: formData.rfc,
+      address: {
+        street: formData.calle,
+        externalNumber: formData.numero_exterior,
+        internalNumber: formData.numero_interior,
+        suburb: formData.colonia,
+        city: formData.ciudad,
+        zipCode: formData.codigo_postal,
+        state: formData.estado,
+        country: formData.pais
+      },
+      phone: phone,
+      /*qrCode: {
+        code: crypto.randomUUID(),        // Generamos uno temporal
+        status: true,
+        expiresAt: "2025-12-31T23:59:59.999Z"
+      },*/
+      title: formData.titulo,
+      profession: formData.profesion,
+      paymentMethod: formData.metodo_pago,
+      dateOfAdmission: new Date().toISOString(),
+      memberCode: formData.code_socio,
+      //invitedById: Number(formData.invitedById || 1),
+      //relationship: "WIFE"
+    };
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Validación de campos requeridos
-      if (!validateFormData()) {
-        return;
-      }
+    if (!validateFormData()) {
+      return;
+    }
 
-    const newMember = {
-      ...formData,
-      id: members.length > 0 ? Math.max(...members.map(m => m.id)) + 1 : 1,
-      numero_socio: members.length + 1, // Asegurar que sea número
-      fecha_nacimiento: formData.fecha_nacimiento ? new Date(formData.fecha_nacimiento).toISOString().split('T')[0] : null, // YYYY-MM-DD format
-      fecha_admision: formData.fecha_admision ? new Date(formData.fecha_admision).toISOString().split('T')[0] : null  // YYYY-MM-DD format
-    };
-    
-    setMembers(prev => [...prev, newMember]);
-    addLog(`Socio agregado: ${newMember.nombre} ${newMember.apellidos} (N° ${newMember.numero_socio})`);
-    addToast(`Socio agregado: ${newMember.nombre} ${newMember.apellidos} (N° ${newMember.numero_socio})`, 'success');
-    
-    // Resetear formulario
+    const memberData = buildMemberData();
+
+    try {
+      const result = await memberService.addMember(memberData);
+
+      addToast("Socio registrado exitosamente ✅", "success");
+      addLog(`Socio agregado: ${formData.nombre} ${formData.apellidos}`);
+      if(result){
+        resetForm();
+      }
+    } catch (err) {
+      console.error(err);
+      addToast(err.message, "error");
+    }
+  };
+
+  const resetForm = () => {
     setFormData({
+      code_socio: '',
       nombre: '',
       apellidos: '',
       sexo: '',
@@ -134,6 +196,12 @@ export const useIndividualMember = () => {
 
   const validateFormData = () => {
     // Aquí puedes agregar validaciones adicionales si es necesario
+    if (!formData.code_socio) {
+      addLog('Error: El código de socio es obligatorio');
+      addToast('Error: El código de socio es obligatorio', 'error');
+      return false;
+    }
+    
     if (!formData.nombre) {
       addLog('Error: El nombre es obligatorio');
       addToast('Error: El nombre es obligatorio', 'error');
