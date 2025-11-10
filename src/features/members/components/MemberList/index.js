@@ -1,12 +1,12 @@
-import React, { useContext, useState, useMemo } from 'react';
-import { AppContext } from '../../../../shared/context/AppContext';
+import React, { useState, useMemo, useEffect } from 'react';
 import MemberFilters from '../MemberFilters';
 import IndividualMemberForm from '../../../individual-members/components/IndividualMemberForm';
+import { useMembers } from '../../hooks/useMembers';
+import { memberService } from '../../services';
 
 const MemberList = () => {
-  const { members, setMembers } = useContext(AppContext);
   const [filters, setFilters] = useState({
-    status: 'activos', // Default to showing active members first
+    active: true, // Default to showing active members first
     search: ''
   });
   const [editingMember, setEditingMember] = useState(null);
@@ -15,18 +15,22 @@ const MemberList = () => {
   const [modalAction, setModalAction] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
 
+  const { members, meta, loadMembers, setActive } = useMembers();
+
+  useEffect(() => {
+    loadMembers({ active: filters.active });
+  }, [filters.active]);
+
   // Apply filters to members
   const filteredMembers = useMemo(() => {
     let result = [...members];
 
     // Apply status filter
-    if (filters.status) {
-      if (filters.status === 'activos') {
-        result = result.filter(member => member.activo);
-      } else if (filters.status === 'inactivos') {
-        result = result.filter(member => !member.activo);
-      }
-    }
+    /*if (filters.status === 'activos') {
+      result = result.filter(member => member.activo);
+    } else if (filters.status === 'inactivos') {
+      result = result.filter(member => !member.activo);
+    }*/
 
     // Apply search filter
     if (filters.search) {
@@ -47,6 +51,10 @@ const MemberList = () => {
       ...prev,
       ...newFilters
     }));
+    if (newFilters.active !== undefined) {
+    setActive(newFilters.active);
+    loadMembers({ active: newFilters.active });
+  }
   };
 
   const handleEditMember = (member) => {
@@ -55,17 +63,16 @@ const MemberList = () => {
     setDropdownOpen(null); // Close any open dropdowns
   };
 
-  const handleDeleteMember = (memberId) => {
-    setMembers(prev => prev.filter(m => m.id !== memberId));
+  const handleDeleteMember = async (memberId) => {
+    await memberService.deleteMember(memberId);
+    loadMembers();
     setDropdownOpen(null); // Close the dropdown
   };
 
   const handleSaveMember = (memberData) => {
     if (editingMember) {
       // Update existing member
-      setMembers(prev => 
-        prev.map(m => m.id === editingMember.id ? { ...m, ...memberData } : m)
-      );
+      loadMembers();
     } else {
       // Add new member - this would be for creating new members
       // For now, we're only handling edits
@@ -133,7 +140,7 @@ const MemberList = () => {
       />
 
       {/* Members List */}
-      <h2 className="text-xl font-semibold mb-4 text-primary">Lista de Socios</h2>
+      <h2 className="text-xl font-semibold mb-4 text-primary">Lista de socios</h2>
 
       {filteredMembers.length === 0 ? (
         <p className="text-gray-500">No hay socios registrados con los filtros aplicados.</p>
@@ -157,14 +164,14 @@ const MemberList = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredMembers.map((member) => (
                   <tr key={member.id} className={member.id % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{member.numero_socio}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.nombre}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.apellidos}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.email}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.titulo}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.profesion}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.metodo_pago}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.fecha_admision}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{member.memberCode}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.user.name}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.user.lastName}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.user.email}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.title}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.profession}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.paymentMethod}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.dateOfAdmission}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                       <div className="relative">
                         <button
