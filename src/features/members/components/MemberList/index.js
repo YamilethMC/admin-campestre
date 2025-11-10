@@ -15,7 +15,7 @@ const MemberList = () => {
   const [modalAction, setModalAction] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
 
-  const { members, meta, loadMembers, setActive } = useMembers();
+  const { members, meta, page, setPage, loadMembers, setActive } = useMembers();
 
   useEffect(() => {
     loadMembers({ active: filters.active, search: filters.search });
@@ -51,6 +51,7 @@ const MemberList = () => {
       ...prev,
       ...newFilters
     }));
+    setPage(1);
     if (newFilters.active !== undefined) {
     setActive(newFilters.active);
     loadMembers({ active: newFilters.active });
@@ -212,6 +213,47 @@ const MemberList = () => {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {meta && (
+        <div className="flex justify-center items-center gap-3 mt-4">
+
+          {/* Botón Anterior */}
+          <button
+            disabled={page === 1}
+            onClick={() => setPage(page - 1)}
+            className={`px-3 py-1 rounded border text-sm ${
+              page === 1 ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
+            }`}
+          >
+            Anterior
+          </button>
+
+          {/* Botones numerados */}
+          {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map(num => (
+            <button
+              key={num}
+              onClick={() => setPage(num)}
+              className={`px-3 py-1 rounded border text-sm ${
+                page === num ? 'bg-primary text-white border-primary' : 'border-gray-300 text-gray-700'
+              }`}
+            >
+              {num}
+            </button>
+          ))}
+
+          {/* Botón Siguiente */}
+          <button
+            disabled={page === meta.totalPages}
+            onClick={() => setPage(page + 1)}
+            className={`px-3 py-1 rounded border text-sm ${
+              page === meta.totalPages ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
+            }`}
+          >
+            Siguiente
+          </button>
+
         </div>
       )}
 
