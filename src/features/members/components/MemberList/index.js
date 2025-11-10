@@ -15,14 +15,15 @@ const MemberList = () => {
   const [modalAction, setModalAction] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
 
-  const { members, meta, page, setPage, loadMembers, setActive } = useMembers();
+  const { members, meta, page, setPage, loadMembers, setActive, search, setSearch } = useMembers();
 
   useEffect(() => {
     loadMembers({ active: filters.active, search: filters.search });
   }, [filters.active, filters.search]);
 
+  const filteredMembers = members;
   // Apply filters to members
-  const filteredMembers = useMemo(() => {
+ /* const filteredMembers = useMemo(() => {
     let result = [...members];
 
     // Apply status filter
@@ -33,7 +34,7 @@ const MemberList = () => {
     }*/
 
     // Apply search filter
-    if (filters.search) {
+   /* if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
       result = result.filter(member =>
         member.user.name.toLowerCase().includes(searchTerm) ||
@@ -44,18 +45,22 @@ const MemberList = () => {
     }
 
     return result;
-  }, [members, filters]);
+  }, [members, filters]);*/
 
   const updateFilters = (newFilters) => {
     setFilters(prev => ({
       ...prev,
       ...newFilters
     }));
-    setPage(1);
+    if (newFilters.search !== undefined) {
+      setSearch(newFilters.search); // 👈 ACTUALIZA SETSEARCH
+      setPage(1);
+    }
+
     if (newFilters.active !== undefined) {
-    setActive(newFilters.active);
-    loadMembers({ active: newFilters.active });
-  }
+      setActive(newFilters.active);
+      setPage(1);
+    }
   };
 
   const handleEditMember = (member) => {
@@ -257,9 +262,9 @@ const MemberList = () => {
         </div>
       )}
 
-      <div className="mt-4 text-sm text-gray-600">
+      {/*<div className="mt-4 text-sm text-gray-600">
         Total de socios: {filteredMembers.length} de {members.length}
-      </div>
+      </div>*/}
 
       {/* Confirmation Modal */}
       {showConfirmationModal && (
