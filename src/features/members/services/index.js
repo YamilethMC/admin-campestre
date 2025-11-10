@@ -5,12 +5,13 @@ export const memberService = {
         limit = 10,
         orderBy = 'name',
         order = 'asc',
-        active = true
+        active = true,
+        search = ''
     } = {}) {
         const token = localStorage.getItem("authToken");
         console.log('active', active)
         const response = await fetch(
-            `${process.env.REACT_APP_API_URL}/club-members?page=${page}&limit=${limit}&orderBy=${orderBy}&order=${order}&active=${active}`,
+            `${process.env.REACT_APP_API_URL}/club-members?page=${page}&limit=${limit}&search=${search}&orderBy=${orderBy}&order=${order}&active=${active}`,
             {
             headers: {
                 "accept": "*/*",

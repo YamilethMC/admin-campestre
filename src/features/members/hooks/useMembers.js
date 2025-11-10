@@ -6,10 +6,11 @@ export function useMembers() {
   const [meta, setMeta] = useState(null);
   const [active, setActive] = useState(true); // 👈 Estado para activo/inactivo
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
 
-  const loadMembers = async ({page = 1, limit = 10, active: activeParam = active } = {})=> {
+  const loadMembers = async ({page = 1, limit = 10, active: activeParam = active, search: searchParam = search  } = {})=> {
     try {
-      const data = await memberService.fetchMembers({ page, limit, active: activeParam });
+      const data = await memberService.fetchMembers({ page, limit, active: activeParam, search: searchParam });
       setMembers(data.members);
       setMeta(data.meta);
     } catch (err) {
@@ -18,8 +19,8 @@ export function useMembers() {
   };
 
   useEffect(() => {
-    loadMembers({page, active}); // Se ejecuta al montar el componente
-  }, [active, page]);
+    loadMembers({page, active, search}); // Se ejecuta al montar el componente
+  }, [active, page, search]);
 
   return {
     members,
@@ -28,6 +29,8 @@ export function useMembers() {
     setActive,
     page,
     setPage,
-    loadMembers
+    loadMembers,
+    search,
+    setSearch
     };
 }

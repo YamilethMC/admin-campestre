@@ -18,8 +18,8 @@ const MemberList = () => {
   const { members, meta, loadMembers, setActive } = useMembers();
 
   useEffect(() => {
-    loadMembers({ active: filters.active });
-  }, [filters.active]);
+    loadMembers({ active: filters.active, search: filters.search });
+  }, [filters.active, filters.search]);
 
   // Apply filters to members
   const filteredMembers = useMemo(() => {
@@ -36,10 +36,10 @@ const MemberList = () => {
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
       result = result.filter(member =>
-        member.nombre.toLowerCase().includes(searchTerm) ||
-        member.apellidos.toLowerCase().includes(searchTerm) ||
-        member.email.toLowerCase().includes(searchTerm) ||
-        String(member.numero_socio).toLowerCase().includes(searchTerm)
+        member.user.name.toLowerCase().includes(searchTerm) ||
+        member.user.lastName.toLowerCase().includes(searchTerm) ||
+        member.user.email.toLowerCase().includes(searchTerm) ||
+        String(member.memberCode).toLowerCase().includes(searchTerm)
       );
     }
 
