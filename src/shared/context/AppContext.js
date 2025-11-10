@@ -37,7 +37,8 @@ export const AppProvider = ({ children }) => {
       titulo: 'Ingeniero',
       profesion: 'Software',
       metodo_pago: 'Tarjeta de crédito',
-      fecha_admision: '2020-06-15'
+      fecha_admision: '2020-06-15',
+      activo: true
     },
     {
       id: 2,
@@ -66,7 +67,8 @@ export const AppProvider = ({ children }) => {
       titulo: 'Arquitecta',
       profesion: 'Diseño',
       metodo_pago: 'Transferencia bancaria',
-      fecha_admision: '2021-03-22'
+      fecha_admision: '2021-03-22',
+      activo: false
     }
   ]);
   
