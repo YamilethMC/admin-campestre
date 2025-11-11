@@ -15,19 +15,33 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
     description: survey?.description || '',
     category: survey?.category || '',
     priority: survey?.priority || '',
-    estimatedTime: survey?.estimatedTime || '',
+    estimatedTime: survey?.timeStimed || '',
     imageUrl: survey?.imageUrl || '',
     imageFile: null, // For handling local file
-    isActive: survey ? survey.isActive : true,
-    questions: survey?.questions && Array.isArray(survey.questions) && survey.questions.length > 0 
-      ? survey.questions.map(q => ({
-          ...q,
+    isActive: survey ? survey.active : true,
+    questions: survey?.surveyQuestions && Array.isArray(survey.surveyQuestions) && survey.surveyQuestions.length > 0 
+      ? survey.surveyQuestions.map(q => ({
+        id: q.id,
+        question: q.question,
+        type: q.type,
+        required: q.required,
+        order: q.order,
+        options: q.type === SurveyQuestionType.BOOLEAN && (!q.options || q.options.length === 0)
+          ? ['Sí', 'No']
+          : (q.options && Array.isArray(q.options))
+            ? q.options.map(opt => opt.option) // Extract the option text from each option object
+            : [''] // Ensure options array exists
+      }))
+      : [{ id: Date.now(), question: '', type: SurveyQuestionType.TEXT, options: [''], required:
+      false }]
+   })
+          /*...q,
           options: q.type === SurveyQuestionType.YES_NO && (!q.options || q.options.length === 0) 
             ? ['Sí', 'No'] 
             : q.options || [''] // Ensure options array exists
         }))
       : [{ id: Date.now(), question: '', type: SurveyQuestionType.TEXT, options: [''], required: false }]
-  });
+  });*/
   
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
@@ -44,12 +58,12 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
         description: survey.description,
         category: survey.category,
         priority: survey.priority,
-        estimatedTime: survey.estimatedTime,
+        estimatedTime: survey.timeStimed,
         imageUrl: survey.imageUrl,
         imageFile: null, // No file selected initially when editing
-        isActive: survey.isActive,
-        questions: survey.questions 
-          ? survey.questions.map(q => ({ ...q }))
+        isActive: survey.active,
+        questions: survey.surveyQuestions 
+          ? survey.surveyQuestions.map(q => ({ ...q }))
           : [{ id: Date.now(), question: '', type: SurveyQuestionType.TEXT, options: [''], required: false }]
       });
     } else {

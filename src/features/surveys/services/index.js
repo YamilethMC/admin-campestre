@@ -490,7 +490,7 @@ export const surveyService = {
 
   // Get survey by id
   getSurveyById: async (id) => {
-    await new Promise(resolve => setTimeout(resolve, 300));
+    /*await new Promise(resolve => setTimeout(resolve, 300));
     const survey = mockSurveys.find(survey => survey.id === id);
     if (survey) {
       // Get questions for this survey
@@ -501,7 +501,22 @@ export const surveyService = {
         questions: questions
       };
     }
-    return null;
+    return null;*/
+
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/survey/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.message);
+    }
+    const data = await response.json();
+    return data.data;
   },
 
   // Get questions for a specific survey
@@ -512,10 +527,8 @@ export const surveyService = {
 
   // Create a new survey
   createSurvey: async (surveyData) => {
-    const token = localStorage.getItem('token');
-    console.log(token)
-    console.log(surveyData)
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/surveys`, {
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/survey`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -523,7 +536,6 @@ export const surveyService = {
       },
       body: JSON.stringify(surveyData)
     });
-    console.log(response)
     if (!response.ok) {
       const err = await response.json();
       throw new Error(err.message);

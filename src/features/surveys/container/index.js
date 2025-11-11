@@ -60,6 +60,7 @@ const SurveysContainer = () => {
   // Handle editing a survey
   const handleEditSurvey = async (survey) => {
     try {
+      console.log('llegue acà: ', survey)
       // Get the full survey data including questions
       const fullSurvey = await getSurveyById(survey.id);
       setCurrentSurvey(fullSurvey);

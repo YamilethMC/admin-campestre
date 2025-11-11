@@ -188,6 +188,7 @@ export const useSurvey = () => {
     try {
       setLoading(true);
       const survey = await surveyService.getSurveyById(id);
+      console.log('survey: ', survey)
       return survey;
     } catch (err) {
       setError(err.message);
