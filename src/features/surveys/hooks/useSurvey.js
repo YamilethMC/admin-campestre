@@ -5,69 +5,37 @@ import { AppContext } from '../../../shared/context/AppContext';
 
 export const useSurvey = () => {
   const { addLog, addToast } = useContext(AppContext);
-  const [allSurveys, setAllSurveys] = useState([]); // Store all surveys
-  const [filteredSurveys, setFilteredSurveys] = useState([]); // Store filtered surveys
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [stats, setStats] = useState({ active: 0, inactive: 0 });
-  const [filters, setFilters] = useState({
-    category: 'Todas',
-    status: 'activas',
-    search: ''
-  });
+  const [surveys, setSurveys] = useState([]);
+  const [meta, setMeta] = useState(null);
+  const [activeCount, setActiveCount] = useState(0);
+  const [inactiveCount, setInactiveCount] = useState(0);
+  const [status, setStatus] = useState('true'); // 👈 Estado para status ('true' for active, 'false' for inactive)
+  const [category, setCategory] = useState('TODAS'); // 👈 Estado para categoría
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
 
   const [surveyCategoryOptions, setSurveyCategoryOptions] = useState([]);
   const [surveyPriorityOptions, setSurveyPriorityOptions] = useState([]);
 
+  const [loading, setLoading] = useState(true);
   const [loadingSurveyCategory, setLoadingSurveyCategory] = useState(false);
   const [loadingSurveyPriority, setLoadingSurveyPriority] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Load all surveys and stats
-  const loadAllSurveys = async () => {
+  const loadSurveys = async ({page = 1, limit = 10, status: statusParam = status, category: categoryParam = category, search: searchParam = search } = {})=> {
     try {
       setLoading(true);
-      // Load unfiltered surveys
-      const surveysData = await surveyService.getSurveys(); // No filters - get all
-      setAllSurveys(surveysData);
-      
-      const statsData = await surveyService.getSurveyStats();
-      setStats(statsData);
+      const data = await surveyService.fetchSurveys({ page, limit, status: statusParam, category: categoryParam, search: searchParam });
+      setSurveys(data.surveys);
+      setMeta(data.meta);
+      setActiveCount(data.activeCount);
+      setInactiveCount(data.inactiveCount);
     } catch (err) {
       setError(err.message);
+      console.error("Error loading surveys:", err);
     } finally {
       setLoading(false);
     }
-  };
-
-  // Apply filters to all surveys
-  const applyFilters = () => {
-    let result = [...allSurveys];
-    
-    // Apply category filter
-    if (filters.category && filters.category !== 'Todas') {
-      result = result.filter(survey => survey.category === filters.category);
-    }
-    
-    // Apply status filter
-    if (filters.status) {
-      if (filters.status === 'activas') {
-        result = result.filter(survey => survey.isActive);
-      } else if (filters.status === 'inactivas') {
-        result = result.filter(survey => !survey.isActive);
-      }
-      // If status is 'todas', no additional filtering is needed
-    }
-    
-    // Apply search filter
-    if (filters.search) {
-      const searchTerm = filters.search.toLowerCase();
-      result = result.filter(survey => 
-        survey.title.toLowerCase().includes(searchTerm) || 
-        survey.description.toLowerCase().includes(searchTerm)
-      );
-    }
-    
-    setFilteredSurveys(result);
   };
 
   // Load initial data
@@ -100,29 +68,16 @@ export const useSurvey = () => {
     };
     loadSurveyCategoryOptions();
     loadSurveyPriorityOptions();
-    loadAllSurveys();
-  }, [addLog, addToast]);
-
-  // Apply filters whenever filters change or all surveys change
-  useEffect(() => {
-    applyFilters();
-  }, [filters, allSurveys]);
+    loadSurveys({page, status, category, search});
+  }, [addLog, addToast, status, page, category, search]);
 
   // Toggle survey status
   const toggleSurveyStatus = async (id) => {
     try {
       const updatedSurvey = await surveyService.toggleSurveyStatus(id);
       if (updatedSurvey) {
-        // Update the all surveys list with the new status
-        setAllSurveys(prevSurveys =>
-          prevSurveys.map(survey =>
-            survey.id === id ? updatedSurvey : survey
-          )
-        );
-        
-        // Update stats
-        const updatedStats = await surveyService.getSurveyStats();
-        setStats(updatedStats);
+        // Refresh the list to reflect the status change
+        loadSurveys();
       }
     } catch (err) {
       setError(err.message);
@@ -185,8 +140,8 @@ export const useSurvey = () => {
     try {
       setLoading(true);
       const newSurvey = await surveyService.createSurvey(surveyDataF);
-      // Add the new survey to all surveys
-      setAllSurveys(prev => [...prev, newSurvey]);
+      // Refresh the list to show the new survey
+      loadSurveys();
       return newSurvey;
     } catch (err) {
       setError(err.message);
@@ -202,16 +157,8 @@ export const useSurvey = () => {
       setLoading(true);
       const updatedSurvey = await surveyService.updateSurvey(id, surveyData);
       if (updatedSurvey) {
-        // Update the all surveys list with the new survey data
-        setAllSurveys(prevSurveys =>
-          prevSurveys.map(survey =>
-            survey.id === id ? updatedSurvey : survey
-          )
-        );
-        
-        // Update stats
-        const updatedStats = await surveyService.getSurveyStats();
-        setStats(updatedStats);
+        // Refresh the list to reflect the update
+        loadSurveys();
       }
       return updatedSurvey;
     } catch (err) {
@@ -250,21 +197,18 @@ export const useSurvey = () => {
     }
   };
 
-  // Update filters
-  const updateFilters = (newFilters) => {
-    setFilters(prev => ({
-      ...prev,
-      ...newFilters
-    }));
-  };
-
   // Delete a survey
   const deleteSurvey = async (id) => {
     try {
       const success = await surveyService.deleteSurvey(id);
       if (success) {
-        // Remove the deleted survey from all surveys
-        setAllSurveys(prev => prev.filter(survey => survey.id !== id));
+        // If the current page has only one survey and there are other pages, go to previous page
+        if (surveys.length === 1 && page > 1) {
+          setPage(page - 1);
+        } else {
+          // Refresh the list to reflect the deletion
+          loadSurveys();
+        }
         return true;
       }
       return false;
@@ -274,29 +218,27 @@ export const useSurvey = () => {
     }
   };
 
-  // Reset filters to default
-  const resetFilters = () => {
-    setFilters({
-      category: 'Todas',
-      status: 'todas',
-      search: ''
-    });
-  };
-
   return {
-    surveys: filteredSurveys, // Return filtered surveys
+    surveys,
+    meta,
+    activeCount,
+    inactiveCount,
+    status,
+    setStatus,
+    category,
+    setCategory,
+    page,
+    setPage,
+    loadSurveys,
+    search,
+    setSearch,
     loading,
     error,
-    stats,
-    filters,
-    loadSurveys: loadAllSurveys,
     toggleSurveyStatus,
     createSurvey,
     updateSurvey,
     getSurveyResponses,
     getSurveyById,
-    updateFilters,
-    resetFilters,
     deleteSurvey,
     surveyCategoryOptions,
     surveyPriorityOptions,

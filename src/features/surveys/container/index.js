@@ -10,22 +10,46 @@ const SurveysContainer = () => {
   const [view, setView] = useState('list'); // 'list', 'form', or 'responses'
   const [currentSurvey, setCurrentSurvey] = useState(null);
   const [responses, setResponses] = useState(null);
-  
+
   const {
     surveys,
     loading,
     error,
-    stats,
-    filters,
+    meta,
+    activeCount,
+    inactiveCount,
+    status,
+    setStatus,
+    category,
+    setCategory,
+    page,
+    setPage,
     loadSurveys,
+    search,
+    setSearch,
     toggleSurveyStatus,
     createSurvey,
     updateSurvey,
     getSurveyResponses,
     getSurveyById,
-    updateFilters,
     deleteSurvey
   } = useSurvey();
+
+  // Update filters
+  const updateFilters = (newFilters) => {
+    if (newFilters.category !== undefined) {
+      setCategory(newFilters.category);
+      setPage(1);
+    }
+    if (newFilters.status !== undefined) {
+      setStatus(newFilters.status);
+      setPage(1);
+    }
+    if (newFilters.search !== undefined) {
+      setSearch(newFilters.search);
+      setPage(1);
+    }
+  };
 
   // Handle adding a new survey
   const handleAddSurvey = () => {
@@ -128,19 +152,22 @@ const SurveysContainer = () => {
   // Default list view - show content even if loading
   return (
     <div>
-      <SurveyHeader 
-        activeCount={stats.active} 
-        inactiveCount={stats.inactive} 
+      <SurveyHeader
+        activeCount={activeCount}
+        inactiveCount={inactiveCount}
       />
-      
-      <SurveyFilters 
-        filters={filters}
+
+      <SurveyFilters
+        filters={{ status, category, search }}
         onFilterChange={updateFilters}
       />
-      
+
       <SurveyList
         surveys={surveys}
-        filters={filters}
+        filters={{ status, category, search }}
+        meta={meta}
+        page={page}
+        setPage={setPage}
         loading={loading} // Pass loading state to the list component so it can handle it internally if needed
         onEdit={handleEditSurvey}
         onViewResponses={handleViewResponses}

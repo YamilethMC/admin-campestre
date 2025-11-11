@@ -4,7 +4,30 @@ import { filterStyles } from './Style';
 
 const SurveyFilters = ({ filters, onFilterChange }) => {
   const handleSearchChange = (e) => {
-    onFilterChange({ ...filters, search: e.target.value });
+    onFilterChange({ search: e.target.value });
+  };
+
+  const handleStatusChange = (status) => {
+    let statusValue = '';
+    if (status === 'activas') {
+      statusValue = 'true';
+    } else if (status === 'inactivas') {
+      statusValue = 'false';
+    } else {
+      statusValue = 'true'; // Default to active
+    }
+    onFilterChange({ status: statusValue });
+  };
+
+  const handleCategoryChange = (category) => {
+    onFilterChange({ category });
+  };
+
+  // Function to map status values for UI display
+  const getStatusDisplayValue = (status) => {
+    if (status === 'true') return 'activas';
+    if (status === 'false') return 'inactivas';
+    return 'activas'; // default to activas for any other value
   };
 
   return (
@@ -17,9 +40,9 @@ const SurveyFilters = ({ filters, onFilterChange }) => {
             {/* "Todas" as the first option */}
             <button
               key="Todas"
-              onClick={() => onFilterChange({ ...filters, category: 'Todas' })}
+              onClick={() => handleCategoryChange('TODAS')}
               className={`${filterStyles.filterButton} ${
-                filters.category === 'Todas'
+                filters.category === 'TODAS' || filters.category === 'Todas'
                   ? filterStyles.activeFilterButton
                   : filterStyles.inactiveFilterButton
               }`}
@@ -30,58 +53,50 @@ const SurveyFilters = ({ filters, onFilterChange }) => {
               .filter(([key]) => key !== 'ALL') // Exclude the 'ALL' category which is only for filtering
               .map(([key, value]) => (
                 <button
-                  key={value}
-                  onClick={() => onFilterChange({ ...filters, category: value })}
+                  key={key} // Use the key (English value) as the identifier
+                  onClick={() => handleCategoryChange(key)} // Send the English value to the API
                   className={`${filterStyles.filterButton} ${
-                    filters.category === value
+                    filters.category === key // Compare with the English value
                       ? filterStyles.activeFilterButton
                       : filterStyles.inactiveFilterButton
                   }`}
                 >
-                  {value}
+                  {value} {/* Display the Spanish value */}
                 </button>
               ))}
           </div>
         </div>
 
-        {/* Status Filter */}
+        {/* Status Filter - without "Todas" option */}
         <div className={filterStyles.filterGroup}>
           <h3 className={filterStyles.label}>Estatus</h3>
           <div className="flex flex-wrap gap-2">
-            {/* "Todas" as the first option */}
-            {/*<button
-              key="todas"
-              onClick={() => onFilterChange({ ...filters, status: 'todas' })}
+            <button
+              key="activas"
+              onClick={() => handleStatusChange('activas')}
               className={`${filterStyles.filterButton} ${
-                filters.status === 'todas'
+                getStatusDisplayValue(filters.status) === 'activas'
                   ? filterStyles.activeFilterButton
                   : filterStyles.inactiveFilterButton
               }`}
             >
-              Todas
-            </button>*/}
-            {Object.entries(SurveyStatus).map(([key, value]) => {
-              if (value !== 'todas') { // Skip the 'todas' option since we added it first
-                return (
-                  <button
-                    key={value}
-                    onClick={() => onFilterChange({ ...filters, status: value })}
-                    className={`${filterStyles.filterButton} ${
-                      filters.status === value
-                        ? filterStyles.activeFilterButton
-                        : filterStyles.inactiveFilterButton
-                    }`}
-                  >
-                    {value === 'activas' ? 'Activas' : 'Inactivas'}
-                  </button>
-                );
-              }
-              return null; // Skip the 'todas' option since we already added it at the beginning
-            })}
+              Activas
+            </button>
+            <button
+              key="inactivas"
+              onClick={() => handleStatusChange('inactivas')}
+              className={`${filterStyles.filterButton} ${
+                getStatusDisplayValue(filters.status) === 'inactivas'
+                  ? filterStyles.activeFilterButton
+                  : filterStyles.inactiveFilterButton
+              }`}
+            >
+              Inactivas
+            </button>
           </div>
         </div>
       </div>
-      
+
       {/* Search Filter - Separate section */}
       <div className={filterStyles.searchContainer}>
         <h3 className={filterStyles.label}>Buscar</h3>

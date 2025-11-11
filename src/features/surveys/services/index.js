@@ -659,6 +659,65 @@ export const surveyService = {
     });
     
     return responses;
+  },
+
+  // Fetch surveys with pagination, filtering and search
+  async fetchSurveys({
+    page = 1,
+    limit = 10,
+    search = '',
+    category = '',
+    status = '' // 'true', 'false', or empty for all
+  } = {}) {
+    const token = localStorage.getItem("authToken");
+    
+    // Build query parameters
+    let query = `${process.env.REACT_APP_API_URL}/survey?page=${page}&limit=${limit}`;
+    if (search) query += `&search=${encodeURIComponent(search)}`;
+    if (category && category !== 'TODAS') query += `&category=${encodeURIComponent(category)}`;
+    if (status) query += `&active=${encodeURIComponent(status)}`;
+    console.log('url: ', query)
+    const response = await fetch(query, {
+      headers: {
+        "accept": "*/*",
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error("Error al obtener encuestas");
+    }
+
+    const data = await response.json();
+    console.log('surveys data', data);
+    
+    // The API returns { surveysActive, surveysInactive, meta }
+    let surveys = [];
+    let activeCount = 0;
+    let inactiveCount = 0;
+    
+    // Handle the different status filter scenarios
+    if (status === 'true') {
+      // Only active surveys
+      surveys = data.data.surveysActive || [];
+    } else if (status === 'false') {
+      // Only inactive surveys
+      surveys = data.data.surveysInactive || [];
+    } else {
+      // All surveys (active first)
+      surveys = [...(data.data.surveysActive || []), ...(data.data.surveysInactive || [])];
+    }
+    
+    // Calculate counts based on data returned
+    activeCount = data.data.surveysActive ? data.data.surveysActive.length : 0;
+    inactiveCount = data.data.surveysInactive ? data.data.surveysInactive.length : 0;
+    
+    return {
+      surveys: surveys,
+      meta: data.data.meta,
+      activeCount,
+      inactiveCount
+    };
   }
 };
 
