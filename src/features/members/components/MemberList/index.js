@@ -71,7 +71,11 @@ const MemberList = () => {
 
   const handleDeleteMember = async (memberId) => {
     await memberService.deleteMember(memberId);
-    loadMembers();
+    if (members.length === 1 && page > 1) {
+      setPage(page - 1);
+    } else {
+      loadMembers();
+    }
     setDropdownOpen(null); // Close the dropdown
   };
 
@@ -191,13 +195,13 @@ const MemberList = () => {
                         {dropdownOpen === member.id && (
                           <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
                             <div className="py-1" role="menu">
-                              <button
+                              {/*<button
                                 onClick={() => handleEditMember(member)}
                                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                                 role="menuitem"
                               >
                                 Editar
-                              </button>
+                              </button>*/}
                               <button
                                 onClick={() => {
                                   confirmAction('delete', member.id);

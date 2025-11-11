@@ -28,6 +28,25 @@ export const memberService = {
         console.log('data', data)
         console.log('data.data', data.data)
         return data.data; // contiene members + meta
+    },
+
+    async deleteMember(id) {
+        const token = localStorage.getItem("authToken");
+
+        const response = await fetch(
+            `${process.env.REACT_APP_API_URL}/club-members/${id}`,
+            {
+                method: "DELETE",
+                headers: {
+                    "accept": "*/*",
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
+        console.log('el response', response)
+        if (!response.ok) throw new Error("Error al eliminar miembro");
+
+        return true;
     }
 
 };
