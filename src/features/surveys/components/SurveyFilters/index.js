@@ -49,7 +49,7 @@ const SurveyFilters = ({ filters, onFilterChange }) => {
           <h3 className={filterStyles.label}>Estatus</h3>
           <div className="flex flex-wrap gap-2">
             {/* "Todas" as the first option */}
-            <button
+            {/*<button
               key="todas"
               onClick={() => onFilterChange({ ...filters, status: 'todas' })}
               className={`${filterStyles.filterButton} ${
@@ -59,7 +59,7 @@ const SurveyFilters = ({ filters, onFilterChange }) => {
               }`}
             >
               Todas
-            </button>
+            </button>*/}
             {Object.entries(SurveyStatus).map(([key, value]) => {
               if (value !== 'todas') { // Skip the 'todas' option since we added it first
                 return (

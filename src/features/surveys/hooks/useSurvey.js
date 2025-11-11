@@ -12,7 +12,7 @@ export const useSurvey = () => {
   const [stats, setStats] = useState({ active: 0, inactive: 0 });
   const [filters, setFilters] = useState({
     category: 'Todas',
-    status: 'todas',
+    status: 'activas',
     search: ''
   });
 
