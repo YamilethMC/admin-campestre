@@ -82,6 +82,58 @@ export const useSurvey = () => {
     }
   };
 
+    const buildUpdateSurveyData = (formData) => {
+    console.log('formData update: ', formData)
+  return {
+    title: formData.title,
+    description: formData.description,
+    active: formData.active,
+    priority: formData.priority,
+    category: formData.category,
+    timeStimed: formData.estimatedTime,
+    questions: formData.questions.map((q, qIndex) => {
+    // Se construye la pregunta base
+    const question = {
+      question: q.question,
+      type: q.type,
+      required: q.required,
+      order: qIndex,
+    };
+
+    // Solo se agrega id si es > 0
+    if (q.id && q.id > 0) {
+      question.id = q.id;
+    }
+
+    // Verifica si el tipo de pregunta requiere opciones
+    if (["SELECT", "CHECKBOX", "BOOLEAN", "YES_NO"].includes(q.type)) {
+      question.options = q.options.map((opt, optIndex) => {
+        console.log('opt: ', opt.id)
+        // Si opt es string, lo convertimos a objeto
+        const optionText = typeof opt === "string" ? opt : opt.option;
+
+        const option = {
+          option: optionText,
+          value: optionText.toLowerCase().replace(/\s/g, ""),
+          order: optIndex,
+        };
+
+        // Solo se agrega id si es > 0
+        if (opt.id && opt.id > 0) {
+          option.id = opt.id;
+        }
+
+        return option;
+      });
+    } else {
+      question.options = [];
+    }
+
+    return question;
+  }),
+};
+};
+
  const buildSurveyData = (formData) => {
     return {
       title: formData.title,
@@ -152,7 +204,7 @@ export const useSurvey = () => {
   // Update existing survey
   const updateSurvey = async (id, surveyData) => {
     console.log('surveyData LLEGUEEEEE: ')
-    const surveyDataF = buildSurveyData(surveyData);
+    const surveyDataF = buildUpdateSurveyData(surveyData);
     console.log('surveyDataF: ', surveyDataF)
     try {
       setLoading(true);

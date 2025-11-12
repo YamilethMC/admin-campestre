@@ -27,12 +27,12 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
         required: q.required,
         order: q.order,
         options: q.type === SurveyQuestionType.BOOLEAN && (!q.options || q.options.length === 0)
-          ? ['Sí', 'No']
+          ? [{id:0, option:'Sí'}, {id:1, option:'No'}]
           : (q.options && Array.isArray(q.options))
-            ? q.options.map(opt => opt.option) // Extract the option text from each option object
-            : [''] // Ensure options array exists
+            ? q.options.map(opt => ({id:opt.id, option:opt.option})) // Extract the option text from each option object
+            : [{id:0, option:''}] // Ensure options array exists
       }))
-      : [{ id: Date.now(), question: '', type: SurveyQuestionType.TEXT, options: [''], required:
+      : [{ id: Date.now(), question: '', type: SurveyQuestionType.TEXT, options: [{id:0, option:''}], required:
       false }]
    })
           /*...q,
@@ -127,10 +127,10 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
     
     // If the question type is changed to 'yes-no', automatically add 'Sí' and 'No' options
     if (field === 'type' && value === SurveyQuestionType.BOOLEAN) {
-      updatedQuestion.options = ['Sí', 'No'];
+      updatedQuestion.options = [{id:0, option:'Sí', value:'Sí'},{id:0, option:'No', value:'No'}];
     } else if (field === 'type' && updatedQuestion.type === SurveyQuestionType.BOOLEAN && value !== SurveyQuestionType.BOOLEAN) {
       // If changing from 'yes-no' to another type, reset options to default
-      updatedQuestion.options = [''];
+      updatedQuestion.options = [{id:0, option:'', value:''}];
     }
     
     updatedQuestions[index] = updatedQuestion;
@@ -143,7 +143,7 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
   const handleOptionChange = (questionIndex, optionIndex, value) => {
     const updatedQuestions = [...formData.questions];
     const updatedOptions = [...updatedQuestions[questionIndex].options];
-    updatedOptions[optionIndex] = value;
+    updatedOptions[optionIndex] = { ...updatedOptions[optionIndex], option: value };
     updatedQuestions[questionIndex].options = updatedOptions;
     setFormData(prev => ({
       ...prev,
@@ -153,7 +153,8 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
 
   const addOption = (questionIndex) => {
     const updatedQuestions = [...formData.questions];
-    updatedQuestions[questionIndex].options = [...updatedQuestions[questionIndex].options, ''];
+    const newOption = { id: 0, option: '' };
+    updatedQuestions[questionIndex].options = [...updatedQuestions[questionIndex].options, newOption];
     setFormData(prev => ({
       ...prev,
       questions: updatedQuestions
@@ -179,10 +180,10 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
       questions: [
         ...prev.questions,
         { 
-          id: Date.now(), 
+          id: 0, 
           question: '', 
           type: SurveyQuestionType.TEXT, 
-          options: [''], 
+          options: [{ id: 0, option: '' }], 
           required: false 
         }
       ]
@@ -473,7 +474,7 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
                     <div key={optionIndex} className="flex items-center mb-2">
                       <input
                         type="text"
-                        value={option}
+                        value={option.option}
                         onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}
                         className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                         placeholder={`Opción ${optionIndex + 1}`}
