@@ -280,7 +280,7 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
           </svg>
         </button>
         <h2 className="text-2xl font-bold text-gray-800">
-          {isEdit ? 'Editar Encuesta' : 'Crear nueva encuesta'}
+          {isEdit ? 'Editar encuesta' : 'Crear nueva encuesta'}
         </h2>
       </div>
 
@@ -524,7 +524,7 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
             type="submit"
             className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md transition-colors"
           >
-            {isEdit ? 'Guardar Cambios' : 'Crear Encuesta'}
+            {isEdit ? 'Guardar cambios' : 'Crear encuesta'}
           </button>
         </div>
       </form>

@@ -153,9 +153,13 @@ export const useSurvey = () => {
 
   // Update existing survey
   const updateSurvey = async (id, surveyData) => {
+    console.log('surveyData LLEGUEEEEE: ')
+    const surveyDataF = buildSurveyData(surveyData);
+    console.log('surveyDataF: ', surveyDataF)
     try {
       setLoading(true);
-      const updatedSurvey = await surveyService.updateSurvey(id, surveyData);
+      const updatedSurvey = await surveyService.updateSurvey(id, surveyDataF);
+      console.log('updatedSurvey: ', updatedSurvey)
       if (updatedSurvey) {
         // Refresh the list to reflect the update
         loadSurveys();

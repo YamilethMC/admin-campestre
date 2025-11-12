@@ -546,7 +546,21 @@ export const surveyService = {
 
   // Update a survey
   updateSurvey: async (id, surveyData) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/survey/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(surveyData)
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.message);
+    }
+    return response.json();
+    /*await new Promise(resolve => setTimeout(resolve, 500));
     
     const surveyIndex = mockSurveys.findIndex(survey => survey.id === id);
     if (surveyIndex === -1) return null;
@@ -589,7 +603,7 @@ export const surveyService = {
       });
     }
     
-    return mockSurveys[surveyIndex];
+    return mockSurveys[surveyIndex];*/
   },
 
   // Toggle survey status (activate/deactivate)
