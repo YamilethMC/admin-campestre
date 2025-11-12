@@ -92,7 +92,7 @@ const LoginForm = () => {
           </div>
 
           <div className="text-center text-sm text-gray-500 mt-4">
-            <p>Credenciales de prueba: admin / 123456</p>
+            <p>Credenciales de prueba: admin@campestre.com / 123456</p>
           </div>
         </form>
         <div className="text-center text-xs text-gray-500 border-t pt-4 mt-6">

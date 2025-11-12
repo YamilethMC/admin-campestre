@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-
+import { authService } from '../../features/auth/services';
 // Create the context
 export const AppContext = createContext();
 
@@ -137,7 +137,12 @@ export const AppProvider = ({ children }) => {
   };
 
   // Function to handle logout
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
     setIsAuthenticated(false);
     setCurrentUser(null);
     setAuthToken(null);

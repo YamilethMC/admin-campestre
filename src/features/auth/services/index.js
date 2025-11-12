@@ -49,4 +49,25 @@ export const authService = {
       };
     }
   },
+
+  async logout() {
+    const token = localStorage.getItem("authToken");
+    if (!token) return;
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/logout`, {
+        method: "POST",
+        headers: {
+          "accept": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        console.warn("Error al cerrar sesión en el servidor:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error en logout:", error);
+    }
+  }
 };
