@@ -651,7 +651,27 @@ export const surveyService = {
 
   // Delete a survey
   deleteSurvey: async (id) => {
-    await new Promise(resolve => setTimeout(resolve, 300));
+    console.log('delete')
+    const token = localStorage.getItem("authToken");
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/survey/${id}`, {
+        method: "DELETE",
+        headers: {
+          "accept": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        console.warn("Error al eliminar la encuesta en el servidor:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error al eliminar la encuesta:", error);
+    }
+    return true;
+    /*await new Promise(resolve => setTimeout(resolve, 300));
     
     const surveyIndex = mockSurveys.findIndex(survey => survey.id === id);
     if (surveyIndex === -1) return false;
@@ -668,7 +688,7 @@ export const surveyService = {
       }
     });
     
-    return true;
+    return true;*/
   },
   
   // Get all responses for a survey (for the responses view)
