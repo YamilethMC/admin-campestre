@@ -75,10 +75,8 @@ export const useSurvey = () => {
   const toggleSurveyStatus = async (id) => {
     try {
       const updatedSurvey = await surveyService.toggleSurveyStatus(id);
-      if (updatedSurvey) {
-        // Refresh the list to reflect the status change
-        loadSurveys();
-      }
+      // Refresh the list to reflect the status change
+      loadSurveys();
     } catch (err) {
       setError(err.message);
     }

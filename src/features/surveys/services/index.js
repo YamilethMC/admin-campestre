@@ -608,13 +608,32 @@ export const surveyService = {
 
   // Toggle survey status (activate/deactivate)
   toggleSurveyStatus: async (id) => {
-    await new Promise(resolve => setTimeout(resolve, 300));
+    const token = localStorage.getItem("authToken");
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/survey/${id}/toggle-active`, {
+        method: "PATCH",
+        headers: {
+          "accept": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        console.warn("Error al cambiar el estado de la encuesta en el servidor:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error al cambiar el estado de la encuesta:", error);
+    }
+
+    /*await new Promise(resolve => setTimeout(resolve, 300));
     
     const surveyIndex = mockSurveys.findIndex(survey => survey.id === id);
     if (surveyIndex === -1) return null;
     
     mockSurveys[surveyIndex].isActive = !mockSurveys[surveyIndex].isActive;
-    return mockSurveys[surveyIndex];
+    return mockSurveys[surveyIndex];*/
   },
 
   // Get survey statistics for the header
