@@ -14,8 +14,6 @@ const NoticesContainer = () => {
     loading,
     error,
     meta,
-    activeCount,
-    inactiveCount,
     status,
     setStatus,
     search,
@@ -114,10 +112,7 @@ const NoticesContainer = () => {
   // Default list view - show content even if loading
   return (
     <div>
-      <NoticeHeader
-        activeCount={activeCount}
-        inactiveCount={inactiveCount}
-      />
+      <NoticeHeader />
 
       <NoticeFilters
         filters={{ status, search }}

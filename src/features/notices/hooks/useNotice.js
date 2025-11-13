@@ -6,8 +6,6 @@ export const useNotice = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [meta, setMeta] = useState(null); // Pagination metadata
-  const [activeCount, setActiveCount] = useState(0);
-  const [inactiveCount, setInactiveCount] = useState(0);
   const [status, setStatus] = useState('activas'); // Default to active
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -40,17 +38,6 @@ export const useNotice = () => {
     }
   };
 
-  // Load notice statistics
-  const loadStats = async () => {
-    try {
-      const stats = await noticeService.getNoticeStats();
-      setActiveCount(stats.active);
-      setInactiveCount(stats.inactive);
-    } catch (err) {
-      console.error('Error loading notice stats:', err);
-    }
-  };
-
   // Toggle notice status (activate/deactivate)
   const toggleNoticeStatus = async (id, active) => {
     try {
@@ -63,8 +50,8 @@ export const useNotice = () => {
           )
         );
         
-        // Refresh stats
-        await loadStats();
+        // Refresh the list to maintain consistency
+        await loadNotices();
       }
     } catch (err) {
       setError(err.message);
@@ -80,7 +67,6 @@ export const useNotice = () => {
       
       // Refresh the list
       await loadNotices();
-      await loadStats();
       
       return newNotice;
     } catch (err) {
@@ -103,6 +89,9 @@ export const useNotice = () => {
           notice.id === id ? updatedNotice : notice
         )
       );
+      
+      // Refresh the list to maintain consistency
+      await loadNotices();
       
       return updatedNotice;
     } catch (err) {
@@ -136,7 +125,6 @@ export const useNotice = () => {
         } else {
           await loadNotices();
         }
-        await loadStats();
         return true;
       }
       return false;
@@ -151,18 +139,11 @@ export const useNotice = () => {
     loadNotices();
   }, [page, status, search]);
 
-  // Load stats on initial mount
-  useEffect(() => {
-    loadStats();
-  }, []);
-
   return {
     notices,
     loading,
     error,
     meta,
-    activeCount,
-    inactiveCount,
     status,
     setStatus,
     search,

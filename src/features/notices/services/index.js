@@ -4,22 +4,23 @@ export const noticeService = {
   fetchNotices: async ({
     page = 1,
     limit = 10,
-    search = '',
-    active = true, // Default to active notices
+    orderBy = 'name',
     order = 'asc',
-    orderBy = 'name'
+    active = true, // Default to active notices
+    search = ''
   } = {}) => {
     const token = localStorage.getItem("authToken");
 
-    // Build query parameters
-    let query = `${process.env.REACT_APP_API_URL}/notify?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}&order=${order}&orderBy=${orderBy}&active=${active}`;
-
-    const response = await fetch(query, {
-      headers: {
-        "accept": "application/json",
-        "Authorization": `Bearer ${token}`
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/notify?page=${page}&limit=${limit}&search=${search}&orderBy=${orderBy}&order=${order}&active=${active}`,
+      {
+        method: "GET",
+        headers: {
+          "accept": "*/*",
+          "Authorization": `Bearer ${token}`
+        }
       }
-    });
+    );
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -121,46 +122,7 @@ export const noticeService = {
     return result.data;
   },
 
-  // Get notice statistics for the header
-  getNoticeStats: async () => {
-    const token = localStorage.getItem("authToken");
-    
-    // Get both active and inactive notices to calculate stats
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/notify?page=1&limit=9999&active=true`, {
-      headers: {
-        "accept": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
-    });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Error al obtener estadísticas de avisos');
-    }
-
-    const activeResponse = await response.json();
-    const activeCount = Array.isArray(activeResponse.data.notices) ? activeResponse.data.notices.length : 0;
-
-    const inactiveResponse = await fetch(`${process.env.REACT_APP_API_URL}/notify?page=1&limit=9999&active=false`, {
-      headers: {
-        "accept": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
-    });
-
-    if (!inactiveResponse.ok) {
-      const errorData = await inactiveResponse.json();
-      throw new Error(errorData.message || 'Error al obtener estadísticas de avisos');
-    }
-
-    const inactiveData = await inactiveResponse.json();
-    const inactiveCount = Array.isArray(inactiveData.data.notices) ? inactiveData.data.notices.length : 0;
-
-    return {
-      active: activeCount,
-      inactive: inactiveCount
-    };
-  },
 
   // Delete a notice
   deleteNotice: async (id) => {
