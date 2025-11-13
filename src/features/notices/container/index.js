@@ -8,21 +8,39 @@ import { useNotice } from '../hooks/useNotice';
 const NoticesContainer = () => {
   const [view, setView] = useState('list'); // 'list' or 'form'
   const [currentNotice, setCurrentNotice] = useState(null);
-  
+
   const {
     notices,
     loading,
     error,
-    stats,
-    filters,
+    meta,
+    activeCount,
+    inactiveCount,
+    status,
+    setStatus,
+    search,
+    setSearch,
+    page,
+    setPage,
     loadNotices,
     toggleNoticeStatus,
     createNotice,
     updateNotice,
     getNoticeById,
-    updateFilters,
     deleteNotice
   } = useNotice();
+
+  // Update filters
+  const updateFilters = (newFilters) => {
+    if (newFilters.status !== undefined) {
+      setStatus(newFilters.status);
+      setPage(1);
+    }
+    if (newFilters.search !== undefined) {
+      setSearch(newFilters.search);
+      setPage(1);
+    }
+  };
 
   // Handle adding a new notice
   const handleAddNotice = () => {
@@ -96,19 +114,22 @@ const NoticesContainer = () => {
   // Default list view - show content even if loading
   return (
     <div>
-      <NoticeHeader 
-        activeCount={stats.active} 
-        inactiveCount={stats.inactive} 
+      <NoticeHeader
+        activeCount={activeCount}
+        inactiveCount={inactiveCount}
       />
-      
-      <NoticeFilters 
-        filters={filters}
+
+      <NoticeFilters
+        filters={{ status, search }}
         onFilterChange={updateFilters}
       />
-      
+
       <NoticeList
         notices={notices}
-        filters={filters}
+        filters={{ status, search }}
+        meta={meta}
+        page={page}
+        setPage={setPage}
         loading={loading} // Pass loading state to the list component so it can handle it internally if needed
         onEdit={handleEditNotice}
         onToggleStatus={toggleNoticeStatus}

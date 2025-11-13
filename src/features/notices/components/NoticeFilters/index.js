@@ -1,40 +1,74 @@
-import React from 'react';
-import { filterStyles } from './Style';
+import React, { useState, useEffect } from 'react';
 
 const NoticeFilters = ({ filters, onFilterChange }) => {
-  const handleStatusChange = (e) => {
-    onFilterChange({ status: e.target.value });
-  };
+  const [searchInput, setSearchInput] = useState(filters.search || '');
 
-  const handleSearchChange = (e) => {
-    onFilterChange({ search: e.target.value });
+  // Update local state when prop changes
+  useEffect(() => {
+    setSearchInput(filters.search || '');
+  }, [filters.search]);
+
+  // Handle search change with debounce
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      onFilterChange({ search: searchInput });
+    }, 300);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchInput, onFilterChange]);
+
+  const handleStatusChange = (status) => {
+    onFilterChange({ status });
   };
 
   return (
-    <div className={filterStyles.container}>
-      <h3 className={filterStyles.title}>Filtros</h3>
-      <div className={filterStyles.filterRow}>
-        <div className={filterStyles.filterGroup}>
-          <label className={filterStyles.label}>Estado</label>
-          <select
-            value={filters.status || 'todas'}
-            onChange={handleStatusChange}
-            className={filterStyles.select}
+    <div className="mb-6">
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+        {/* Status filter buttons */}
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => handleStatusChange('activas')}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              filters.status === 'activas'
+                ? 'bg-primary text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
           >
-            <option value="todas">Todas</option>
-            <option value="activas">Activas</option>
-            <option value="inactivas">Inactivas</option>
-          </select>
+            Activas
+          </button>
+          <button
+            onClick={() => handleStatusChange('inactivas')}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              filters.status === 'inactivas'
+                ? 'bg-primary text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            Inactivas
+          </button>
         </div>
-        <div className={`${filterStyles.filterGroup} md:col-span-2`}>
-          <label className={filterStyles.label}>Buscar</label>
-          <input
-            type="text"
-            placeholder="Buscar por título o descripción..."
-            value={filters.search || ''}
-            onChange={handleSearchChange}
-            className={filterStyles.searchInput}
-          />
+
+        {/* Search Input */}
+        <div className="w-full sm:w-auto flex-1">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Buscar avisos..."
+              className="w-full sm:w-80 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+            <svg
+              className="w-5 h-5 text-gray-400 absolute left-3 top-2.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
         </div>
       </div>
     </div>

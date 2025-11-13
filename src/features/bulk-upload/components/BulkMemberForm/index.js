@@ -44,31 +44,6 @@ const BulkMemberForm = () => {
           <p className="text-sm text-gray-600 mt-1">Subiendo archivo...</p>
         </div>
       )}
-
-      {uploadResult && (
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-md">
-          <h3 className="text-lg font-medium text-green-800">Carga exitosa</h3>
-          <p className="text-green-700">
-            Se han agregado {uploadResult.totalMembersAdded || 0} socios correctamente.
-          </p>
-          {uploadResult.errorCount > 0 && (
-            <p className="text-yellow-700">
-              {uploadResult.errorCount} registros tuvieron errores.
-            </p>
-          )}
-        </div>
-      )}
-
-      {(uploadResult || uploadResult === null) && !uploading && (
-        <div className="flex space-x-3">
-          <button
-            onClick={resetForm}
-            className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            Subir otro archivo
-          </button>
-        </div>
-      )}
     </div>
   );
 };

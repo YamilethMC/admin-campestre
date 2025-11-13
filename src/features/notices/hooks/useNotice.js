@@ -2,87 +2,73 @@ import { useState, useEffect } from 'react';
 import { noticeService } from '../services';
 
 export const useNotice = () => {
-  const [allNotices, setAllNotices] = useState([]); // Store all notices
-  const [filteredNotices, setFilteredNotices] = useState([]); // Store filtered notices
-  const [loading, setLoading] = useState(true);
+  const [notices, setNotices] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [stats, setStats] = useState({ active: 0, inactive: 0 });
-  const [filters, setFilters] = useState({
-    status: 'todas',
-    search: ''
-  });
+  const [meta, setMeta] = useState(null); // Pagination metadata
+  const [activeCount, setActiveCount] = useState(0);
+  const [inactiveCount, setInactiveCount] = useState(0);
+  const [status, setStatus] = useState('activas'); // Default to active
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
 
-  // Load all notices and stats
-  const loadAllNotices = async () => {
+  // Load notices with pagination, search, and filters
+  const loadNotices = async (params = {}) => {
     try {
       setLoading(true);
-      // Load unfiltered notices
-      const noticesData = await noticeService.getNotices(); // No filters - get all
-      setAllNotices(noticesData);
-      
-      const statsData = await noticeService.getNoticeStats();
-      setStats(statsData);
+      setError(null);
+
+      // Use provided params or current state
+      const currentParams = {
+        page: params.page || page,
+        limit: 10, // Fixed limit as requested
+        search: params.search || search,
+        active: params.status || status === 'activas', // Convert status to boolean
+        order: 'asc', // Fixed as requested
+        orderBy: 'name' // Fixed as requested
+      };
+
+      const response = await noticeService.fetchNotices(currentParams);
+
+      setNotices(response.data || []);
+      setMeta(response.meta || null);
     } catch (err) {
       setError(err.message);
+      console.error('Error loading notices:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Apply filters to all notices
-  const applyFilters = () => {
-    let result = [...allNotices];
-    
-    // Apply status filter
-    if (filters.status) {
-      if (filters.status === 'activas') {
-        result = result.filter(notice => notice.isActive);
-      } else if (filters.status === 'inactivas') {
-        result = result.filter(notice => !notice.isActive);
-      }
-      // If status is 'todas', no additional filtering is needed
+  // Load notice statistics
+  const loadStats = async () => {
+    try {
+      const stats = await noticeService.getNoticeStats();
+      setActiveCount(stats.active);
+      setInactiveCount(stats.inactive);
+    } catch (err) {
+      console.error('Error loading notice stats:', err);
     }
-    
-    // Apply search filter
-    if (filters.search) {
-      const searchTerm = filters.search.toLowerCase();
-      result = result.filter(notice => 
-        notice.title.toLowerCase().includes(searchTerm) || 
-        notice.description.toLowerCase().includes(searchTerm)
-      );
-    }
-    
-    setFilteredNotices(result);
   };
 
-  // Load initial data
-  useEffect(() => {
-    loadAllNotices();
-  }, []);
-
-  // Apply filters whenever filters change or all notices change
-  useEffect(() => {
-    applyFilters();
-  }, [filters, allNotices]);
-
-  // Toggle notice status
+  // Toggle notice status (activate/deactivate)
   const toggleNoticeStatus = async (id, active) => {
     try {
       const updatedNotice = await noticeService.toggleNoticeStatus(id, active);
       if (updatedNotice) {
-        // Update the all notices list with the new status
-        setAllNotices(prevNotices =>
-          prevNotices.map(notice =>
+        // Update the notice in the current list
+        setNotices(prev => 
+          prev.map(notice => 
             notice.id === id ? updatedNotice : notice
           )
         );
         
-        // Update stats
-        const updatedStats = await noticeService.getNoticeStats();
-        setStats(updatedStats);
+        // Refresh stats
+        await loadStats();
       }
     } catch (err) {
       setError(err.message);
+      throw err;
     }
   };
 
@@ -91,8 +77,11 @@ export const useNotice = () => {
     try {
       setLoading(true);
       const newNotice = await noticeService.createNotice(noticeData);
-      // Add the new notice to all notices
-      setAllNotices(prev => [...prev, newNotice]);
+      
+      // Refresh the list
+      await loadNotices();
+      await loadStats();
+      
       return newNotice;
     } catch (err) {
       setError(err.message);
@@ -107,18 +96,14 @@ export const useNotice = () => {
     try {
       setLoading(true);
       const updatedNotice = await noticeService.updateNotice(id, noticeData);
-      if (updatedNotice) {
-        // Update the all notices list with the new notice data
-        setAllNotices(prevNotices =>
-          prevNotices.map(notice =>
-            notice.id === id ? updatedNotice : notice
-          )
-        );
-        
-        // Update stats
-        const updatedStats = await noticeService.getNoticeStats();
-        setStats(updatedStats);
-      }
+      
+      // Update the notice in the current list
+      setNotices(prev => 
+        prev.map(notice => 
+          notice.id === id ? updatedNotice : notice
+        )
+      );
+      
       return updatedNotice;
     } catch (err) {
       setError(err.message);
@@ -131,23 +116,12 @@ export const useNotice = () => {
   // Get a single notice by ID
   const getNoticeById = async (id) => {
     try {
-      setLoading(true);
       const notice = await noticeService.getNoticeById(id);
       return notice;
     } catch (err) {
       setError(err.message);
       throw err;
-    } finally {
-      setLoading(false);
     }
-  };
-
-  // Update filters
-  const updateFilters = (newFilters) => {
-    setFilters(prev => ({
-      ...prev,
-      ...newFilters
-    }));
   };
 
   // Delete a notice
@@ -155,8 +129,14 @@ export const useNotice = () => {
     try {
       const success = await noticeService.deleteNotice(id);
       if (success) {
-        // Remove the deleted notice from all notices
-        setAllNotices(prev => prev.filter(notice => notice.id !== id));
+        // Refresh the list after deletion
+        if (notices.length === 1 && page > 1) {
+          // If this was the last item on the page and we're not on page 1, go to previous page
+          setPage(prev => prev - 1);
+        } else {
+          await loadNotices();
+        }
+        await loadStats();
         return true;
       }
       return false;
@@ -166,27 +146,34 @@ export const useNotice = () => {
     }
   };
 
-  // Reset filters to default
-  const resetFilters = () => {
-    setFilters({
-      status: 'todas',
-      search: ''
-    });
-  };
+  // Load initial data when filters or page changes
+  useEffect(() => {
+    loadNotices();
+  }, [page, status, search]);
+
+  // Load stats on initial mount
+  useEffect(() => {
+    loadStats();
+  }, []);
 
   return {
-    notices: filteredNotices, // Return filtered notices
+    notices,
     loading,
     error,
-    stats,
-    filters,
-    loadNotices: loadAllNotices,
+    meta,
+    activeCount,
+    inactiveCount,
+    status,
+    setStatus,
+    search,
+    setSearch,
+    page,
+    setPage,
+    loadNotices,
     toggleNoticeStatus,
     createNotice,
     updateNotice,
     getNoticeById,
-    updateFilters,
-    resetFilters,
     deleteNotice
   };
 };

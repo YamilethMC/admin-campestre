@@ -1,104 +1,64 @@
-import { 
-  NoticeStatus 
-} from '../interfaces';
-
-// Mock data for notices
-export const mockNotices = [
-  {
-    id: '1',
-    title: 'Mantenimiento programado en alberca',
-    description: 'Se realizará mantenimiento en la alberca principal del 15 al 17 de noviembre. Se suspenderá el servicio temporalmente.',
-    active: true,
-    dateCreated: '2024-11-01',
-    dateUpdated: '2024-11-01',
-  },
-  {
-    id: '2',
-    title: 'Evento familiar de fin de año',
-    description: 'Se realizará un evento familiar el día 20 de diciembre. Se invitan a todos los socios y sus familias.',
-    active: true,
-    dateCreated: '2024-10-28',
-    dateUpdated: '2024-10-28',
-  },
-  {
-    id: '3',
-    title: 'Cierre temporal del gimnasio',
-    description: 'El gimnasio estará temporalmente cerrado para mejoras del 20 al 25 de noviembre.',
-    active: true,
-    dateCreated: '2024-10-15',
-    dateUpdated: '2024-10-15',
-  },
-  {
-    id: '4',
-    title: 'Nuevas reglas de convivencia',
-    description: 'Se han actualizado las reglas de convivencia. Favor de revisarlas en el portal de socios.',
-    active: false,
-    dateCreated: '2024-09-10',
-    dateUpdated: '2024-09-10',
-    dateCompleted: '2024-10-10',
-  },
-  {
-    id: '5',
-    title: 'Emergencia - Corte de agua',
-    description: 'Se presentó un corte de agua en la zona norte. Se está trabajando para resolverlo.',
-    active: true,
-    dateCreated: '2024-11-02',
-    dateUpdated: '2024-11-02',
-  },
-];
-
-// Service functions to mock API calls
+// Service functions to connect to real API
 export const noticeService = {
-  // Get all notices
-  getNotices: async (filters = {}) => {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    let filteredNotices = [...mockNotices];
-    
-    // Apply status filter
-    if (filters.status) {
-      if (filters.status === 'activas' || filters.status === NoticeStatus.ACTIVE) {
-        filteredNotices = filteredNotices.filter(notice => notice.active);
-      } else if (filters.status === 'inactivas' || filters.status === NoticeStatus.INACTIVE) {
-        filteredNotices = filteredNotices.filter(notice => !notice.active);
+  // Get all notices with pagination, search, and filters
+  fetchNotices: async ({
+    page = 1,
+    limit = 10,
+    search = '',
+    active = true, // Default to active notices
+    order = 'asc',
+    orderBy = 'name'
+  } = {}) => {
+    const token = localStorage.getItem("authToken");
+
+    // Build query parameters
+    let query = `${process.env.REACT_APP_API_URL}/notify?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}&order=${order}&orderBy=${orderBy}&active=${active}`;
+
+    const response = await fetch(query, {
+      headers: {
+        "accept": "application/json",
+        "Authorization": `Bearer ${token}`
       }
-      // If status is 'todas' or 'all', no additional filtering is needed
-    }
-    
-    // Apply search filter
-    if (filters.search) {
-      const searchTerm = filters.search.toLowerCase();
-      filteredNotices = filteredNotices.filter(notice => 
-        notice.title.toLowerCase().includes(searchTerm) || 
-        notice.description.toLowerCase().includes(searchTerm)
-      );
-    }
-    
-    // Sort by dateUpdated in descending order (most recently updated/created first)
-    filteredNotices.sort((a, b) => {
-      const dateB = new Date(b.dateUpdated || b.dateCreated);
-      const dateA = new Date(a.dateUpdated || a.dateCreated);
-      return dateB - dateA;
     });
-    
-    return filteredNotices;
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al obtener avisos');
+    }
+
+    const responseData = await response.json();
+    // API returns { success: true, data: { notices: [...], meta: {...} }, ... }
+    // We need to return { data: [...], meta: {...} } to match the expected format
+    return {
+      data: responseData.data.notices || [],
+      meta: responseData.data.meta || null
+    };
   },
 
   // Get notice by id
   getNoticeById: async (id) => {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    return mockNotices.find(notice => notice.id === id);
+    const token = localStorage.getItem("authToken");
+    
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/notify/${id}`, {
+      headers: {
+        "accept": "application/json",
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al obtener aviso');
+    }
+
+    const responseData = await response.json();
+    return responseData.data;
   },
 
   // Create a new notice
   createNotice: async (noticeData) => {
     const token = localStorage.getItem("authToken");
-    noticeData.sentDate = new Date().toISOString();
-    console.log(typeof noticeData.sentDate); 
-    noticeData.visibleUntil = new Date(noticeData.visibleUntil).toISOString();
-console.log(typeof noticeData.visibleUntil); 
-  console.log('noticeData enviado:', noticeData);
+    
     const response = await fetch(`${process.env.REACT_APP_API_URL}/notify`, {
       method: 'POST',
       headers: {
@@ -108,51 +68,41 @@ console.log(typeof noticeData.visibleUntil);
       body: JSON.stringify(noticeData),
     });
 
-    console.log(response);
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || 'Error al registrar aviso');
     }
-    return await response.json();
-    /*await new Promise(resolve => setTimeout(resolve, 500));
     
-    const newNotice = {
-      id: Date.now().toString(), // Generate a new ID
-      ...noticeData,
-      dateCreated: new Date().toISOString().split('T')[0], // Format as YYYY-MM-DD
-      dateUpdated: new Date().toISOString().split('T')[0], // Format as YYYY-MM-DD
-    };
-    
-    // Add the new notice to our mock data
-    mockNotices.push(newNotice);
-
-    return newNotice;*/
+    const result = await response.json();
+    return result.data;
   },
 
   // Update a notice
   updateNotice: async (id, noticeData) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
+    const token = localStorage.getItem("authToken");
     
-    const noticeIndex = mockNotices.findIndex(notice => notice.id === id);
-    if (noticeIndex === -1) return null;
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/notify/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(noticeData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error al actualizar aviso');
+    }
     
-    // Preserve original values that shouldn't be changed
-    const originalNotice = mockNotices[noticeIndex];
-    
-    // Update the notice preserving important fields
-    mockNotices[noticeIndex] = {
-      ...noticeData,
-      id: id,
-      dateCreated: originalNotice.dateCreated, // Preserve original creation date
-      dateUpdated: new Date().toISOString().split('T')[0], // Update the modification date
-    };
-    
-    return mockNotices[noticeIndex];
+    const result = await response.json();
+    return result.data;
   },
 
   // Toggle notice status (activate/deactivate)
   toggleNoticeStatus: async (id, active) => {
     const token = localStorage.getItem("authToken");
+    
     const response = await fetch(`${process.env.REACT_APP_API_URL}/notify/${id}`, {
       method: 'PATCH',
       headers: {
@@ -162,32 +112,50 @@ console.log(typeof noticeData.visibleUntil);
       body: JSON.stringify({ active }),
     });
 
-    
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || 'Error al actualizar estado del aviso');
     }
-    
-    return true;
-    
-    /*await new Promise(resolve => setTimeout(resolve, 300));
-    
-    const noticeIndex = mockNotices.findIndex(notice => notice.id === id);
-    if (noticeIndex === -1) return null;
-    
-    mockNotices[noticeIndex].isActive = !mockNotices[noticeIndex].isActive;
-    mockNotices[noticeIndex].dateUpdated = new Date().toISOString().split('T')[0];
-    
-    return mockNotices[noticeIndex];*/
+
+    const result = await response.json();
+    return result.data;
   },
 
   // Get notice statistics for the header
   getNoticeStats: async () => {
-    await new Promise(resolve => setTimeout(resolve, 300));
+    const token = localStorage.getItem("authToken");
     
-    const activeCount = mockNotices.filter(notice => notice.active).length;
-    const inactiveCount = mockNotices.filter(notice => !notice.active).length;
-    
+    // Get both active and inactive notices to calculate stats
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/notify?page=1&limit=9999&active=true`, {
+      headers: {
+        "accept": "application/json",
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al obtener estadísticas de avisos');
+    }
+
+    const activeResponse = await response.json();
+    const activeCount = Array.isArray(activeResponse.data.notices) ? activeResponse.data.notices.length : 0;
+
+    const inactiveResponse = await fetch(`${process.env.REACT_APP_API_URL}/notify?page=1&limit=9999&active=false`, {
+      headers: {
+        "accept": "application/json",
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    if (!inactiveResponse.ok) {
+      const errorData = await inactiveResponse.json();
+      throw new Error(errorData.message || 'Error al obtener estadísticas de avisos');
+    }
+
+    const inactiveData = await inactiveResponse.json();
+    const inactiveCount = Array.isArray(inactiveData.data.notices) ? inactiveData.data.notices.length : 0;
+
     return {
       active: activeCount,
       inactive: inactiveCount
@@ -197,6 +165,7 @@ console.log(typeof noticeData.visibleUntil);
   // Delete a notice
   deleteNotice: async (id) => {
     const token = localStorage.getItem("authToken");
+    
     const response = await fetch(`${process.env.REACT_APP_API_URL}/notify/${id}`, {
       method: 'DELETE',
       headers: {
@@ -204,21 +173,11 @@ console.log(typeof noticeData.visibleUntil);
         'Authorization': `Bearer ${token}`
       },
     });
-    
+
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || 'Error al eliminar el aviso');
     }
-    console.log('LLEGUEEE')
-    return true;
-    
-    /*await new Promise(resolve => setTimeout(resolve, 300));
-    
-    const noticeIndex = mockNotices.findIndex(notice => notice.id === id);
-    if (noticeIndex === -1) return false;
-    
-    // Remove the notice
-    mockNotices.splice(noticeIndex, 1);*/
     
     return true;
   },
