@@ -93,7 +93,28 @@ export const noticeService = {
 
   // Create a new notice
   createNotice: async (noticeData) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
+    const token = localStorage.getItem("authToken");
+    noticeData.sentDate = new Date().toISOString();
+    console.log(typeof noticeData.sentDate); 
+    noticeData.visibleUntil = new Date(noticeData.visibleUntil).toISOString();
+console.log(typeof noticeData.visibleUntil); 
+  console.log('noticeData enviado:', noticeData);
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/notify`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(noticeData),
+    });
+
+    console.log(response);
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error al registrar aviso');
+    }
+    return await response.json();
+    /*await new Promise(resolve => setTimeout(resolve, 500));
     
     const newNotice = {
       id: Date.now().toString(), // Generate a new ID
@@ -105,7 +126,7 @@ export const noticeService = {
     // Add the new notice to our mock data
     mockNotices.push(newNotice);
 
-    return newNotice;
+    return newNotice;*/
   },
 
   // Update a notice

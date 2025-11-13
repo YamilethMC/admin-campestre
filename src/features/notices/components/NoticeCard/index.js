@@ -73,19 +73,41 @@ const NoticeCard = ({ notice, onEdit, onToggleStatus, onDelete }) => {
           <div className={cardStyles.infoContainer}>
             <div className={cardStyles.infoItem}>
               <svg className={cardStyles.infoIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                  d="M8 7V3m8 4V3m-9 8h10m-11 8h12a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
               {notice.dateCreated}
             </div>
+
+            {notice.visibleUntil && (
+            <div className={cardStyles.infoItem}>
+              <svg className={cardStyles.infoIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {notice.visibleUntil}
+            </div>
+            )}
+
+            {notice.type && (
+            <div className={cardStyles.infoItem}>
+              <svg className={cardStyles.infoIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                  d="M11 5a1 1 0 012 0v1a7 7 0 015 6v5l1 1H5l1-1v-5a7 7 0 015-6V5zM7 19h10" />
+              </svg>
+              {notice.type}
+            </div>
+            )}
+
             
-            {notice.dateUpdated && notice.dateUpdated !== notice.dateCreated && (
+            {/*{notice.dateUpdated && notice.dateUpdated !== notice.dateCreated && (
               <div className={cardStyles.infoItem}>
                 <svg className={cardStyles.infoIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
                 Actualizado: {notice.dateUpdated}
               </div>
-            )}
+            )}*/}
           </div>
           
           <div className={cardStyles.tagsContainer}>

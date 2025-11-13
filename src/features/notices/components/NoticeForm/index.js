@@ -10,8 +10,10 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
   
   const [formData, setFormData] = useState({
     title: notice?.title || '',
-    description: notice?.description || '',
-    isActive: notice ? notice.isActive : true,
+    message: notice?.message || '',
+    active: notice ? notice.active : true,
+    visibleUntil: notice ? notice.visibleUntil : '',
+    type: notice?.type || '',
   });
   
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -28,15 +30,19 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
       // For edit mode
       setOriginalData({
         title: notice.title,
-        description: notice.description,
-        isActive: notice.isActive,
+        message: notice.message,
+        active: notice.active,
+        visibleUntil: notice.visibleUntil,
+        type: notice.type,
       });
     } else {
       // For create mode - set original data to default values
       setOriginalData({
         title: '',
-        description: '',
-        isActive: true,
+        message: '',
+        active: true,
+        visibleUntil: '',
+        type: '',
       });
     }
   }, [notice]);
@@ -146,7 +152,7 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
       <form onSubmit={handleSubmit} className={formStyles.form}>
         <div className={formStyles.formRow}>
           <div>
-            <label className={formStyles.label}>Título del aviso</label>
+            <label className={formStyles.label}>Título del aviso <span className="text-red-500">*</span></label>
             <input
               type="text"
               value={formData.title}
@@ -164,8 +170,8 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
             <input
               type="checkbox"
               id="isActive"
-              checked={formData.isActive}
-              onChange={(e) => handleInputChange('isActive', e.target.checked)}
+              checked={formData.active}
+              onChange={(e) => handleInputChange('active', e.target.checked)}
               className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
             />
             <label htmlFor="isActive" className="ml-2 block text-sm text-gray-700">
@@ -174,14 +180,34 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
           </div>
 
           <div className="col-span-2">
-            <label className={formStyles.label}>Descripción</label>
+            <label className={formStyles.label}>Descripción <span className="text-red-500">*</span></label>
             <textarea
-              value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
+              value={formData.message}
+              onChange={(e) => handleInputChange('message', e.target.value)}
               rows="4"
               className={formStyles.textarea}
               required
             ></textarea>
+          </div>
+
+          <div>
+            <label className={formStyles.label}>Tipo de notificación</label>
+            <input
+              type="text"
+              value={formData.type}
+              onChange={(e) => handleInputChange('type', e.target.value)}
+              className={formStyles.input}
+            />
+          </div>
+
+          <div>
+            <label className={formStyles.label}>Visible hasta</label>
+            <input
+              type="date"
+              value={formData.visibleUntil}
+              onChange={(e) => handleInputChange('visibleUntil', e.target.value)}
+              className={formStyles.input}
+            />
           </div>
 
 
