@@ -89,7 +89,6 @@ export const useNotice = () => {
   // Create new notice
   const createNotice = async (noticeData) => {
     try {
-      console.log('noticeData: ', noticeData);
       setLoading(true);
       const newNotice = await noticeService.createNotice(noticeData);
       // Add the new notice to all notices

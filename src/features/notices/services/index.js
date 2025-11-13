@@ -196,13 +196,29 @@ console.log(typeof noticeData.visibleUntil);
 
   // Delete a notice
   deleteNotice: async (id) => {
-    await new Promise(resolve => setTimeout(resolve, 300));
+    const token = localStorage.getItem("authToken");
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/notify/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error al eliminar el aviso');
+    }
+    console.log('LLEGUEEE')
+    return true;
+    
+    /*await new Promise(resolve => setTimeout(resolve, 300));
     
     const noticeIndex = mockNotices.findIndex(notice => notice.id === id);
     if (noticeIndex === -1) return false;
     
     // Remove the notice
-    mockNotices.splice(noticeIndex, 1);
+    mockNotices.splice(noticeIndex, 1);*/
     
     return true;
   },
