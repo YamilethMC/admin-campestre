@@ -24,8 +24,13 @@ export const fileUploadService = {
         throw new Error(errorData.message || 'Error al obtener archivos');
       }
 
-      const data = await response.json();
-      return data.data;
+      const responseJson = await response.json();
+      // La API devuelve { success: true, data: { files: [...], meta: {...} }, ... }
+      // Necesitamos devolver { data: [...], meta: {...} } como esperan los componentes
+      return {
+        data: responseJson.data.files,
+        meta: responseJson.data.meta
+      };
     } catch (error) {
       console.error('Error getting files:', error);
       throw error;

@@ -51,7 +51,12 @@ const FileUploadForm = ({ file: currentFile, onSave, onCancel }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Show confirmation modal before saving
+    confirmAction('save');
+  };
 
+  const handleSaveConfirm = async () => {
     if (!currentFile && !file) {
       setToasts(prev => [...prev, {
         id: Date.now(),
@@ -88,16 +93,19 @@ const FileUploadForm = ({ file: currentFile, onSave, onCancel }) => {
         await onSave(fileData);
       }
 
-      if (!currentFile) {
-        setToasts(prev => [...prev, {
-          id: Date.now(),
-          message: 'Documento guardado correctamente',
-          type: 'success'
-        }]);
-      }
+      setToasts(prev => [...prev, {
+        id: Date.now(),
+        message: currentFile ? 'Documento actualizado correctamente' : 'Documento guardado correctamente',
+        type: 'success'
+      }]);
 
       // Reset form
       handleClearForm();
+      
+      // Call onCancel to go back to the list view after successful save/update
+      if (onCancel) {
+        onCancel();
+      }
     } catch (error) {
       setToasts(prev => [...prev, {
         id: Date.now(),
@@ -106,10 +114,8 @@ const FileUploadForm = ({ file: currentFile, onSave, onCancel }) => {
       }]);
     } finally {
       setIsUploading(false);
-      if (!currentFile) {
-        // Only reset the form for new files, don't navigate away
-        handleClearForm();
-      }
+      setShowConfirmationModal(false);
+      setModalAction(null);
     }
   };
 
@@ -129,10 +135,13 @@ const FileUploadForm = ({ file: currentFile, onSave, onCancel }) => {
 
   const handleConfirm = () => {
     if (modalAction === 'back' || modalAction === 'cancel') {
-      handleCancelForm();
+      if (onCancel) {
+        onCancel();
+      }
+    } else if (modalAction === 'save') {
+      handleSaveConfirm();
     }
-    setShowConfirmationModal(false);
-    setModalAction(null);
+    // The modal closing is handled in each specific function
   };
 
   const handleCancel = () => {
@@ -315,8 +324,9 @@ const FileUploadForm = ({ file: currentFile, onSave, onCancel }) => {
           <div className="bg-white rounded-lg p-6 w-96">
             <h3 className="text-lg font-medium text-gray-900 mb-2">Confirmar acción</h3>
             <p className="text-gray-600 mb-4">
-              ¿Estás seguro que deseas {modalAction === 'back' ? 'regresar' : 'cancelar'}? 
-              Los cambios no guardados se perderán.
+              {modalAction === 'back' || modalAction === 'cancel' 
+                ? '¿Estás seguro que deseas regresar? Los cambios no guardados se perderán.'
+                : '¿Estás seguro que deseas guardar los cambios?'}
             </p>
             <div className="flex justify-end space-x-3">
               <button
@@ -328,10 +338,10 @@ const FileUploadForm = ({ file: currentFile, onSave, onCancel }) => {
               </button>
               <button
                 type="button"
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none"
+                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none"
                 onClick={handleConfirm}
               >
-                Confirmar
+                {modalAction === 'save' ? 'Guardar' : 'Aceptar'}
               </button>
             </div>
           </div>
