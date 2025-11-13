@@ -66,9 +66,9 @@ export const useNotice = () => {
   }, [filters, allNotices]);
 
   // Toggle notice status
-  const toggleNoticeStatus = async (id) => {
+  const toggleNoticeStatus = async (id, active) => {
     try {
-      const updatedNotice = await noticeService.toggleNoticeStatus(id);
+      const updatedNotice = await noticeService.toggleNoticeStatus(id, active);
       if (updatedNotice) {
         // Update the all notices list with the new status
         setAllNotices(prevNotices =>

@@ -8,7 +8,7 @@ export const mockNotices = [
     id: '1',
     title: 'Mantenimiento programado en alberca',
     description: 'Se realizará mantenimiento en la alberca principal del 15 al 17 de noviembre. Se suspenderá el servicio temporalmente.',
-    isActive: true,
+    active: true,
     dateCreated: '2024-11-01',
     dateUpdated: '2024-11-01',
   },
@@ -16,7 +16,7 @@ export const mockNotices = [
     id: '2',
     title: 'Evento familiar de fin de año',
     description: 'Se realizará un evento familiar el día 20 de diciembre. Se invitan a todos los socios y sus familias.',
-    isActive: true,
+    active: true,
     dateCreated: '2024-10-28',
     dateUpdated: '2024-10-28',
   },
@@ -24,7 +24,7 @@ export const mockNotices = [
     id: '3',
     title: 'Cierre temporal del gimnasio',
     description: 'El gimnasio estará temporalmente cerrado para mejoras del 20 al 25 de noviembre.',
-    isActive: true,
+    active: true,
     dateCreated: '2024-10-15',
     dateUpdated: '2024-10-15',
   },
@@ -32,7 +32,7 @@ export const mockNotices = [
     id: '4',
     title: 'Nuevas reglas de convivencia',
     description: 'Se han actualizado las reglas de convivencia. Favor de revisarlas en el portal de socios.',
-    isActive: false,
+    active: false,
     dateCreated: '2024-09-10',
     dateUpdated: '2024-09-10',
     dateCompleted: '2024-10-10',
@@ -41,7 +41,7 @@ export const mockNotices = [
     id: '5',
     title: 'Emergencia - Corte de agua',
     description: 'Se presentó un corte de agua en la zona norte. Se está trabajando para resolverlo.',
-    isActive: true,
+    active: true,
     dateCreated: '2024-11-02',
     dateUpdated: '2024-11-02',
   },
@@ -59,9 +59,9 @@ export const noticeService = {
     // Apply status filter
     if (filters.status) {
       if (filters.status === 'activas' || filters.status === NoticeStatus.ACTIVE) {
-        filteredNotices = filteredNotices.filter(notice => notice.isActive);
+        filteredNotices = filteredNotices.filter(notice => notice.active);
       } else if (filters.status === 'inactivas' || filters.status === NoticeStatus.INACTIVE) {
-        filteredNotices = filteredNotices.filter(notice => !notice.isActive);
+        filteredNotices = filteredNotices.filter(notice => !notice.active);
       }
       // If status is 'todas' or 'all', no additional filtering is needed
     }
@@ -151,8 +151,26 @@ console.log(typeof noticeData.visibleUntil);
   },
 
   // Toggle notice status (activate/deactivate)
-  toggleNoticeStatus: async (id) => {
-    await new Promise(resolve => setTimeout(resolve, 300));
+  toggleNoticeStatus: async (id, active) => {
+    const token = localStorage.getItem("authToken");
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/notify/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ active }),
+    });
+
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error al actualizar estado del aviso');
+    }
+    
+    return true;
+    
+    /*await new Promise(resolve => setTimeout(resolve, 300));
     
     const noticeIndex = mockNotices.findIndex(notice => notice.id === id);
     if (noticeIndex === -1) return null;
@@ -160,15 +178,15 @@ console.log(typeof noticeData.visibleUntil);
     mockNotices[noticeIndex].isActive = !mockNotices[noticeIndex].isActive;
     mockNotices[noticeIndex].dateUpdated = new Date().toISOString().split('T')[0];
     
-    return mockNotices[noticeIndex];
+    return mockNotices[noticeIndex];*/
   },
 
   // Get notice statistics for the header
   getNoticeStats: async () => {
     await new Promise(resolve => setTimeout(resolve, 300));
     
-    const activeCount = mockNotices.filter(notice => notice.isActive).length;
-    const inactiveCount = mockNotices.filter(notice => !notice.isActive).length;
+    const activeCount = mockNotices.filter(notice => notice.active).length;
+    const inactiveCount = mockNotices.filter(notice => !notice.active).length;
     
     return {
       active: activeCount,

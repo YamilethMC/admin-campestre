@@ -30,15 +30,15 @@ const NoticeCard = ({ notice, onEdit, onToggleStatus, onDelete }) => {
 
 
 
-  const getStatusColor = (isActive) => {
-    return isActive 
+  const getStatusColor = (active) => {
+    return active 
       ? cardStyles.statusTag.active 
       : cardStyles.statusTag.inactive;
   };
 
   // Toggle active status
   const handleToggleStatus = async () => {
-    await onToggleStatus(notice.id);
+    await onToggleStatus(notice.id, notice.active);
     setIsMenuOpen(false);
   };
 
@@ -111,8 +111,8 @@ const NoticeCard = ({ notice, onEdit, onToggleStatus, onDelete }) => {
           </div>
           
           <div className={cardStyles.tagsContainer}>
-            <span className={`${cardStyles.tag} ${getStatusColor(notice.isActive)}`}>
-              {notice.isActive ? 'Activo' : 'Inactivo'}
+            <span className={`${cardStyles.tag} ${getStatusColor(notice.active)}`}>
+              {notice.active ? 'Activo' : 'Inactivo'}
             </span>
           </div>
         </div>
@@ -143,7 +143,7 @@ const NoticeCard = ({ notice, onEdit, onToggleStatus, onDelete }) => {
                 onClick={handleToggleStatus}
                 className={cardStyles.optionsMenuItem}
               >
-                {notice.isActive ? 'Desactivar' : 'Activar'}
+                {notice.active ? 'Desactivar' : 'Activar'}
               </button>
               <button
                 onClick={handleEdit}
