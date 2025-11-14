@@ -4,7 +4,11 @@ import { formStyles } from './Style';
 
 const NoticeForm = ({ notice = null, onSave, onCancel }) => {
   const isEdit = !!notice;
-  
+
+  const formatDateForInput = (isoString) => {
+     return isoString?.slice(0, 10) || "";
+  };
+
   // Original data to compare for changes
   const [originalData, setOriginalData] = useState(null);
   
@@ -12,7 +16,7 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
     title: notice?.title || '',
     message: notice?.message || '',
     active: notice ? notice.active : true,
-    visibleUntil: notice ? notice.visibleUntil : '',
+    visibleUntil: notice ? formatDateForInput(notice.visibleUntil) : '',
     type: notice?.type || '',
   });
   
@@ -32,7 +36,7 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
         title: notice.title,
         message: notice.message,
         active: notice.active,
-        visibleUntil: notice.visibleUntil,
+        visibleUntil: notice ? formatDateForInput(notice.visibleUntil) : '',
         type: notice.type,
       });
     } else {

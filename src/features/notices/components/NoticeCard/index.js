@@ -8,7 +8,18 @@ const NoticeCard = ({ notice, onEdit, onToggleStatus, onDelete }) => {
   const menuRef = useRef(null);
   const buttonRef = useRef(null);
 
-  // Close menu when clicking outside
+  const formatDateForInput = (isoString) => {
+    console.log(notice.visibleUntil);
+    if (!isoString) return "";
+
+    const date = new Date(isoString);
+    const day = String(date.getUTCDate()).padStart(2, "0");
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const year = date.getUTCFullYear();
+
+    return `${day}-${month}-${year}`;
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (isMenuOpen && 
@@ -26,17 +37,12 @@ const NoticeCard = ({ notice, onEdit, onToggleStatus, onDelete }) => {
     };
   }, [isMenuOpen]);
 
-
-
-
-
   const getStatusColor = (active) => {
     return active 
       ? cardStyles.statusTag.active 
       : cardStyles.statusTag.inactive;
   };
 
-  // Toggle active status
   const handleToggleStatus = async () => {
     await onToggleStatus(notice.id, notice.active);
     setIsMenuOpen(false);
@@ -76,7 +82,7 @@ const NoticeCard = ({ notice, onEdit, onToggleStatus, onDelete }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
                   d="M8 7V3m8 4V3m-9 8h10m-11 8h12a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-              {notice.dateCreated}
+              {formatDateForInput(notice.sentDate)}
             </div>
 
             {notice.visibleUntil && (
@@ -85,19 +91,11 @@ const NoticeCard = ({ notice, onEdit, onToggleStatus, onDelete }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
                   d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              {notice.visibleUntil}
+              {formatDateForInput(notice.visibleUntil)}
             </div>
             )}
 
-            {notice.type && (
-            <div className={cardStyles.infoItem}>
-              <svg className={cardStyles.infoIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                  d="M11 5a1 1 0 012 0v1a7 7 0 015 6v5l1 1H5l1-1v-5a7 7 0 015-6V5zM7 19h10" />
-              </svg>
-              {notice.type}
-            </div>
-            )}
+            
 
             
             {/*{notice.dateUpdated && notice.dateUpdated !== notice.dateCreated && (
@@ -114,6 +112,12 @@ const NoticeCard = ({ notice, onEdit, onToggleStatus, onDelete }) => {
             <span className={`${cardStyles.tag} ${getStatusColor(notice.active)}`}>
               {notice.active ? 'Activo' : 'Inactivo'}
             </span>
+
+            {notice.type && (
+              <span className={`${cardStyles.tag} ${cardStyles.typeTag}`}>
+                {notice.type}
+              </span>
+            )}
           </div>
         </div>
         

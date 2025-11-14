@@ -32,6 +32,7 @@ export const bulkUploadService = {
       }
 
       const responseJson = await response.json();
+      console.log('responseJson', responseJson);
       // La API devuelve { success: true, data: {...}, message: "...", ... }
       // Devolvemos el objeto data completo para que el hook pueda acceder a todas las propiedades
       return responseJson.data;

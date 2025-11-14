@@ -4,15 +4,14 @@ export const noticeService = {
   fetchNotices: async ({
     page = 1,
     limit = 10,
-    orderBy = 'name',
+    orderBy = 'title',
     order = 'asc',
     active = true, // Default to active notices
     search = ''
   } = {}) => {
     const token = localStorage.getItem("authToken");
-
     const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/notify?page=${page}&limit=${limit}&search=${search}&orderBy=${orderBy}&order=${order}&active=${active}`,
+      `${process.env.REACT_APP_API_URL}/notify?page=${page}&limit=${limit}&search=${search}&order=${order}&orderBy=${orderBy}&active=${active}`,
       {
         method: "GET",
         headers: {
@@ -31,7 +30,7 @@ export const noticeService = {
     // API returns { success: true, data: { notices: [...], meta: {...} }, ... }
     // We need to return { data: [...], meta: {...} } to match the expected format
     return {
-      data: responseData.data.notices || [],
+      data: responseData.data.notifications || [],
       meta: responseData.data.meta || null
     };
   },
@@ -59,7 +58,8 @@ export const noticeService = {
   // Create a new notice
   createNotice: async (noticeData) => {
     const token = localStorage.getItem("authToken");
-    
+    noticeData.sentDate = new Date().toISOString();
+    noticeData.visibleUntil = new Date(noticeData.visibleUntil).toISOString();
     const response = await fetch(`${process.env.REACT_APP_API_URL}/notify`, {
       method: 'POST',
       headers: {
@@ -81,7 +81,7 @@ export const noticeService = {
   // Update a notice
   updateNotice: async (id, noticeData) => {
     const token = localStorage.getItem("authToken");
-    
+    noticeData.visibleUntil = new Date(noticeData.visibleUntil).toISOString();
     const response = await fetch(`${process.env.REACT_APP_API_URL}/notify/${id}`, {
       method: 'PATCH',
       headers: {
@@ -103,7 +103,6 @@ export const noticeService = {
   // Toggle notice status (activate/deactivate)
   toggleNoticeStatus: async (id, active) => {
     const token = localStorage.getItem("authToken");
-    
     const response = await fetch(`${process.env.REACT_APP_API_URL}/notify/${id}`, {
       method: 'PATCH',
       headers: {

@@ -30,7 +30,7 @@ const NoticeFilters = ({ filters, onFilterChange }) => {
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => handleStatusChange('activas')}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               filters.status === 'activas'
                 ? 'bg-primary text-white'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -40,7 +40,7 @@ const NoticeFilters = ({ filters, onFilterChange }) => {
           </button>
           <button
             onClick={() => handleStatusChange('inactivas')}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               filters.status === 'inactivas'
                 ? 'bg-primary text-white'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'

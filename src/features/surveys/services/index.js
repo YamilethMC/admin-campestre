@@ -651,7 +651,6 @@ export const surveyService = {
 
   // Delete a survey
   deleteSurvey: async (id) => {
-    console.log('delete')
     const token = localStorage.getItem("authToken");
     if (!token) return;
     
@@ -741,7 +740,6 @@ export const surveyService = {
     if (search) query += `&search=${encodeURIComponent(search)}`;
     if (category && category !== 'TODAS') query += `&category=${encodeURIComponent(category)}`;
     if (status) query += `&active=${encodeURIComponent(status)}`;
-    console.log('url: ', query)
     const response = await fetch(query, {
       headers: {
         "accept": "*/*",
@@ -754,7 +752,6 @@ export const surveyService = {
     }
 
     const data = await response.json();
-    console.log('surveys data', data);
     
     // The API returns { surveysActive, surveysInactive, meta }
     let surveys = [];

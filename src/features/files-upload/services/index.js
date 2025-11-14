@@ -65,7 +65,7 @@ export const fileUploadService = {
       }
 
       const result = await response.json();
-      return result.data;
+      return {data: result.data.files, meta: result.data.meta};
     } catch (error) {
       console.error('Error uploading file:', error);
       throw error;
@@ -123,7 +123,7 @@ export const fileUploadService = {
       }
 
       const result = await response.json();
-      return result.data;
+      return {data: result.data.files, meta: result.data.meta};
     } catch (error) {
       console.error('Error updating file:', error);
       throw error;

@@ -23,9 +23,8 @@ export const useNotice = () => {
         search: params.search || search,
         active: params.status || status === 'activas', // Convert status to boolean
         order: 'asc', // Fixed as requested
-        orderBy: 'name' // Fixed as requested
+        orderBy: 'title' // Fixed as requested
       };
-
       const response = await noticeService.fetchNotices(currentParams);
 
       setNotices(response.data || []);
@@ -41,7 +40,8 @@ export const useNotice = () => {
   // Toggle notice status (activate/deactivate)
   const toggleNoticeStatus = async (id, active) => {
     try {
-      const updatedNotice = await noticeService.toggleNoticeStatus(id, active);
+      const activeValue = !active;
+      const updatedNotice = await noticeService.toggleNoticeStatus(id, activeValue);
       if (updatedNotice) {
         // Update the notice in the current list
         setNotices(prev => 

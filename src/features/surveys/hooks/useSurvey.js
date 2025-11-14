@@ -83,7 +83,6 @@ export const useSurvey = () => {
   };
 
     const buildUpdateSurveyData = (formData) => {
-    console.log('formData update: ', formData)
   return {
     title: formData.title,
     description: formData.description,
@@ -108,8 +107,7 @@ export const useSurvey = () => {
     // Verifica si el tipo de pregunta requiere opciones
     if (["SELECT", "CHECKBOX", "BOOLEAN", "YES_NO"].includes(q.type)) {
       question.options = q.options.map((opt, optIndex) => {
-        console.log('opt: ', opt.id)
-        // Si opt es string, lo convertimos a objeto
+
         const optionText = typeof opt === "string" ? opt : opt.option;
 
         const option = {
@@ -203,13 +201,10 @@ export const useSurvey = () => {
 
   // Update existing survey
   const updateSurvey = async (id, surveyData) => {
-    console.log('surveyData LLEGUEEEEE: ')
     const surveyDataF = buildUpdateSurveyData(surveyData);
-    console.log('surveyDataF: ', surveyDataF)
     try {
       setLoading(true);
       const updatedSurvey = await surveyService.updateSurvey(id, surveyDataF);
-      console.log('updatedSurvey: ', updatedSurvey)
       if (updatedSurvey) {
         // Refresh the list to reflect the update
         loadSurveys();
@@ -242,7 +237,6 @@ export const useSurvey = () => {
     try {
       setLoading(true);
       const survey = await surveyService.getSurveyById(id);
-      console.log('survey: ', survey)
       return survey;
     } catch (err) {
       setError(err.message);
