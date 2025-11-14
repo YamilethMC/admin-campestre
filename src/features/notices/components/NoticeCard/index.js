@@ -74,7 +74,7 @@ const NoticeCard = ({ notice, onEdit, onToggleStatus, onDelete }) => {
       <div className={cardStyles.cardTop}>
         <div className={cardStyles.contentContainer}>
           <h3 className={cardStyles.title}>{notice.title}</h3>
-          <p className={cardStyles.description}>{notice.description}</p>
+          <p className={cardStyles.description}>{notice.message}</p>
           
           <div className={cardStyles.infoContainer}>
             <div className={cardStyles.infoItem}>
