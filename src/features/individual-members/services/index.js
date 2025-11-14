@@ -34,8 +34,6 @@ export const memberService = {
   // Add a new member
   addMember: async (memberData) => {
     const token = localStorage.getItem("authToken");
-    console.log(memberData)
-    console.log(token)
     const response = await fetch(`${process.env.REACT_APP_API_URL}/club-members`, {
       method: 'POST',
       headers: {
@@ -45,7 +43,6 @@ export const memberService = {
       body: JSON.stringify(memberData),
     });
 
-    console.log(response);
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || 'Error al registrar socio');
