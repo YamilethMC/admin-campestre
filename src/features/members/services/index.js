@@ -10,7 +10,7 @@ export const memberService = {
     } = {}) {
         const token = localStorage.getItem("authToken");
         const response = await fetch(
-            `${process.env.REACT_APP_API_URL}/club-members?page=${page}&limit=${limit}&search=${search}&orderBy=${orderBy}&order=${order}&active=${active}`,
+            `${process.env.REACT_APP_API_URL}/club-members?page=${page}&limit=${limit}&search=${search}&order=${order}&orderBy=${orderBy}&active=${active}`,
             {
             headers: {
                 "accept": "*/*",

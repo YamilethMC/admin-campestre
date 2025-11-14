@@ -1,8 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import MemberFilters from '../MemberFilters';
-import IndividualMemberForm from '../../../individual-members/components/IndividualMemberForm';
+import IndividualMember from '../../../individual-members';
 import { useMembers } from '../../hooks/useMembers';
 import { memberService } from '../../services';
+import BulkMemberUploadContainer from '../../../bulk-upload';
 
 const MemberList = () => {
   const [filters, setFilters] = useState({
@@ -11,6 +12,7 @@ const MemberList = () => {
   });
   const [editingMember, setEditingMember] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [showBulkForm, setShowBulkForm] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
@@ -63,10 +65,15 @@ const MemberList = () => {
     }
   };
 
-  const handleEditMember = (member) => {
+  const handleFormMember = (member) => {
     setEditingMember(member);
     setShowForm(true);
-    setDropdownOpen(null); // Close any open dropdowns
+    setDropdownOpen(null); 
+  };
+
+  const handleBulkMember = () => {
+    setShowBulkForm(true);
+    setDropdownOpen(null); 
   };
 
   const handleDeleteMember = async (memberId) => {
@@ -76,7 +83,7 @@ const MemberList = () => {
     } else {
       loadMembers();
     }
-    setDropdownOpen(null); // Close the dropdown
+    setDropdownOpen(null); 
   };
 
   const handleSaveMember = (memberData) => {
@@ -100,6 +107,7 @@ const MemberList = () => {
     if (modalAction) {
       if (modalAction.action === 'back' || modalAction.action === 'cancel') {
         setShowForm(false);
+        setShowBulkForm(false);
         setEditingMember(null);
       } else if (modalAction.action === 'delete') {
         handleDeleteMember(modalAction.data);
@@ -115,29 +123,27 @@ const MemberList = () => {
   };
 
   const handleBack = () => {
-    confirmAction('back');
+    setShowForm(false);
+    setShowBulkForm(false);
+    setEditingMember(null);
   };
 
   if (showForm) {
     return (
-      <div className="bg-white p-4 rounded-xl shadow-md border border-gray-200">
-        <div className="mb-4">
-          <button
-            onClick={handleBack}
-            className="flex items-center text-primary hover:text-primary-dark font-medium"
-          >
-            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Regresar
-          </button>
-        </div>
-        <IndividualMemberForm 
-          initialData={editingMember} 
+        <IndividualMember
+          initialData={editingMember}
           onAddMember={handleSaveMember}
           onCancel={handleBack}
+          loadMembers={loadMembers}
         />
-      </div>
+    );
+  }
+
+  if (showBulkForm) {
+    return (
+        <BulkMemberUploadContainer
+          onCancel={handleBack}
+        />
     );
   }
 
@@ -150,7 +156,31 @@ const MemberList = () => {
       />
 
       {/* Members List */}
-      <h2 className="text-xl font-semibold mb-4 text-primary">Lista de socios</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold text-gray-800">Lista de socios</h2>
+
+        <div className="flex space-x-2">
+          <button
+            onClick={() => handleFormMember()}
+            className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md flex items-center transition-colors"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Agregar socio
+          </button>
+
+          <button
+            onClick={() => handleBulkMember()}
+            className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md flex items-center transition-colors"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Cargar masivamente
+          </button>
+        </div>
+      </div>
 
       {filteredMembers.length === 0 ? (
         <p className="text-gray-500">No hay socios registrados con los filtros aplicados.</p>

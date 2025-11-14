@@ -1,11 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useIndividualMember } from '../../hooks/useIndividualMember';
 
-const IndividualMemberForm = () => {
+const IndividualMemberForm = ({ onCancel, loadMembers }) => {
   const { formData, genderOptions, loadingGender, tituloOptions, loadingTitulo, paymentMethodOptions, loadingPaymentMethod, handleChange, handleSubmit } = useIndividualMember();
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setShowSubmitModal(true);
+  };
+
+  const handleConfirmSubmit = async () => {
+    // Perform the actual submission by calling the handleSubmit from the hook
+    const success = await handleSubmit({ preventDefault: () => {} });
+    setShowSubmitModal(false);
+
+    // If submission was successful and we have loadMembers function, reload the list and go back
+    if (success && loadMembers) {
+      loadMembers(); // Reload the members list to show the new member
+      // Delay calling onCancel to allow UI updates to complete
+      setTimeout(() => {
+        if (onCancel) {
+          onCancel();
+        }
+      }, 100);
+    }
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleFormSubmit} className="space-y-6">
       {/* Datos del Socio */}
       <div className="border border-gray-200 rounded-lg p-4 shadow-sm">
         <h3 className="text-lg font-medium text-gray-500 mb-4 uppercase tracking-wide">Datos del socio</h3>
@@ -439,6 +462,34 @@ const IndividualMemberForm = () => {
           Agregar Socio
         </button>
       </div>
+
+      {/* Confirmation Modal for Submit */}
+      {showSubmitModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Confirmar registro</h3>
+            <p className="text-gray-600 mb-4">
+              ¿Estás seguro que deseas registrar al socio? Verifica que todos los datos sean correctos.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                type="button"
+                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
+                onClick={() => setShowSubmitModal(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none"
+                onClick={handleConfirmSubmit}
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </form>
   );
 };
