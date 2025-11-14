@@ -256,12 +256,13 @@ const FileUploadForm = ({ file: currentFile, onSave, onCancel }) => {
             )}
           </div>
         )}
-
-        <div className="mb-6">
-          <label htmlFor="fileName" className="block text-sm font-medium text-gray-700 mb-2">
-            Nombre del archivo <span className="text-red-500">*</span>
-          </label>
-          <input
+        { currentFile && (
+          <>
+          <div className="mb-6">
+            <label htmlFor="fileName" className="block text-sm font-medium text-gray-700 mb-2">
+              Nombre del archivo
+            </label>
+            <input
             type="text"
             id="fileName"
             value={fileName}
@@ -270,7 +271,7 @@ const FileUploadForm = ({ file: currentFile, onSave, onCancel }) => {
             placeholder="Ingresa el nombre del documento"
           />
         </div>
-
+      
         <div className="mb-6">
           <label htmlFor="fileDescription" className="block text-sm font-medium text-gray-700 mb-2">
             Descripción
@@ -298,7 +299,8 @@ const FileUploadForm = ({ file: currentFile, onSave, onCancel }) => {
             placeholder="Ingresa el tipo de documento (ej. pdf, docx)"
           />
         </div>
-
+        </>
+)}
         <div className="flex space-x-3">
           <button
             type="submit"

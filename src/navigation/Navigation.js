@@ -19,7 +19,7 @@ const Navigation = ({ activeView, setActiveView }) => {
   
   const menuItems = [
     { id: 'dashboard', label: 'Inicio', icon: HomeIcon },
-    { id: 'memberList', label: 'Lista de socios', icon: MemberListIcon },
+    { id: 'memberList', label: 'Socios', icon: MemberListIcon },
     //{ id: 'addMember', label: 'Agregar socio', icon: AddMemberIcon },
     //{ id: 'bulkMembers', label: 'Carga masiva socios', icon: BulkUploadIcon },
     { id: 'accountStatements', label: 'Estados de cuenta (ZIP)', icon: AccountStatementIcon },
