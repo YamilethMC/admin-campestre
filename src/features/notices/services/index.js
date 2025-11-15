@@ -95,10 +95,7 @@ export const noticeService = {
   createNotice: async (noticeData) => {
     const token = localStorage.getItem("authToken");
     noticeData.sentDate = new Date().toISOString();
-    console.log(typeof noticeData.sentDate); 
     noticeData.visibleUntil = new Date(noticeData.visibleUntil).toISOString();
-console.log(typeof noticeData.visibleUntil); 
-  console.log('noticeData enviado:', noticeData);
     const response = await fetch(`${process.env.REACT_APP_API_URL}/notify`, {
       method: 'POST',
       headers: {
@@ -108,7 +105,6 @@ console.log(typeof noticeData.visibleUntil);
       body: JSON.stringify(noticeData),
     });
 
-    console.log(response);
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || 'Error al registrar aviso');
@@ -209,7 +205,6 @@ console.log(typeof noticeData.visibleUntil);
       const error = await response.json();
       throw new Error(error.message || 'Error al eliminar el aviso');
     }
-    console.log('LLEGUEEE')
     return true;
     
     /*await new Promise(resolve => setTimeout(resolve, 300));

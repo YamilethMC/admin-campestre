@@ -13,7 +13,7 @@ export const accountStatementService = {
   processAccountStatement: async (file, members, year, month) => {
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 500));
-    
+
     // Mock file list - in a real app this would extract from the ZIP file
     const mockFileList = [
       '1_estado_cuenta.pdf',
@@ -30,7 +30,7 @@ export const accountStatementService = {
       // Extract member number from file name (before the first '_')
       const match = fileName.match(/^(\d+)_/);
       const socioNumber = match ? parseInt(match[1]) : null;
-      
+
       if (socioNumber) {
         const member = members.find(m => m.numero_socio === socioNumber);
         if (member) {
@@ -63,6 +63,55 @@ export const accountStatementService = {
   },
 
   /**
+   * Upload ZIP file with account statements to the API
+   * @param {File} file - The ZIP file to upload
+   * @returns {Promise<Object>} API response
+   */
+  uploadAccountStatements: async (file) => {
+    const token = localStorage.getItem('authToken');
+
+    if (!token) {
+      throw new Error('No se encontró token de autorización');
+    }
+
+    const formData = new FormData();
+    formData.append('zipFile', file, file.name);
+    try {
+      const response = await fetch('http://192.168.1.5:3003/account-statements/upload-bulk', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        // Manejar diferentes tipos de errores
+        if (response.status === 401) {
+          throw new Error('No autorizado. Por favor inicie sesión nuevamente.');
+        } else if (response.status === 403) {
+          throw new Error('Acceso denegado. No tiene permisos para esta operación.');
+        } else if (response.status >= 500) {
+          throw new Error('Error del servidor. Por favor inténtelo más tarde.');
+        } else {
+          const errorResult = await response.json().catch(() => ({}));
+          throw new Error(errorResult.message || `Error HTTP ${response.status}`);
+        }
+      }
+
+      const result = await response.json();
+
+      return result;
+    } catch (error) {
+      console.error('Error uploading account statements:', error);
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        throw new Error('No se pudo conectar con el servidor. Verifique su conexión a internet y que la API esté disponible.');
+      }
+      throw error;
+    }
+  },
+
+  /**
    * Send account statements
    * @param {Array} results - Array of processing results
    * @returns {Promise<void>}
@@ -70,14 +119,10 @@ export const accountStatementService = {
   sendAccountStatements: async (results) => {
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 300));
-    
+
     // Count successful associations
     const successful = results.filter(r => r.status === 'Asociado exitosamente').length;
-    
-    console.log(`Account statements sent: ${successful} statements`);
-    
-    // In a real app, this would send the statements to members
-    // For now, we're just returning a successful response
+
     return Promise.resolve();
   }
 };

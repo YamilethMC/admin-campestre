@@ -18,7 +18,6 @@ export const fileUploadService = {
     
     // In a real app, this would make an actual API call
     // For now, we're just returning mock data
-    console.log('File upload data:', mockResponse);
     
     return mockResponse;
   }
