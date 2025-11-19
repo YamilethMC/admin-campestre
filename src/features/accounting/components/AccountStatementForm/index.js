@@ -1,61 +1,18 @@
 import React from 'react';
 import { useAccountStatement } from '../../hooks/useAccountStatement';
-import FileList from '../FileList';
-import UploadResults from '../UploadResults';
 
 const AccountStatementForm = () => {
   const {
-    year,
-    setYear,
-    month,
-    setMonth,
-    selectedFile,
     fileList,
-    uploadResults,
-    processingDone,
-    sentResults,
-    years,
-    months,
     handleFileUpload,
-    processUpload,
-    handleSend
+    handleUpload
   } = useAccountStatement();
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-      <h2 className="text-xl font-semibold mb-4 text-primary">Carga Masiva de Estados de Cuenta</h2>
+      <h2 className="text-xl font-semibold mb-4 text-primary">Carga masiva de estados de cuenta</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Año
-          </label>
-          <select
-            value={year}
-            onChange={(e) => setYear(Number(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-          >
-            {years.map(y => (
-              <option key={y} value={y}>{y}</option>
-            ))}
-          </select>
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Mes
-          </label>
-          <select
-            value={month}
-            onChange={(e) => setMonth(Number(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-          >
-            {months.map((m, index) => (
-              <option key={index + 1} value={index + 1}>{m}</option>
-            ))}
-          </select>
-        </div>
-        
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">   
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Archivo ZIP
@@ -91,13 +48,13 @@ const AccountStatementForm = () => {
         </div>
       </div>
 
-      {fileList.length > 0 && (
+      {/*{fileList.length > 0 && (
         <FileList fileList={fileList} />
-      )}
+      )}*/}
 
       {fileList.length > 0 && (
         <div className="flex space-x-4 mb-4">
-          <button
+          {/*<button
             onClick={processUpload}
             disabled={processingDone || sentResults}
             className={`px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
@@ -107,24 +64,19 @@ const AccountStatementForm = () => {
             }`}
           >
             Cargar
-          </button>
+          </button>*/}
           <button
-            onClick={handleSend}
-            disabled={!processingDone || sentResults}
-            className={`px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-              !processingDone || sentResults
-                ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                : 'bg-success text-white hover:bg-success/90 focus:ring-success' 
-            }`}
+            onClick={handleUpload}
+            className={`px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 bg-primary text-white hover:bg-primary-dark focus:ring-primary`}
           >
-            Enviar
+            Cargar
           </button>
         </div>
       )}
 
-      {uploadResults.length > 0 && (
+      {/*{uploadResults.length > 0 && (
         <UploadResults uploadResults={uploadResults} />
-      )}
+      )}*/}
     </div>
   );
 };

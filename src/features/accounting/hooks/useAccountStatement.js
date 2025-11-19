@@ -35,25 +35,14 @@ export const useAccountStatement = () => {
       addToast('Error: Por favor sube un archivo ZIP válido', 'error');
       return;
     }
-
     setSelectedFile(file);
 
-    // Simular la lista de archivos dentro del ZIP (usando datos mock)
-    const mockFileList = [
-      '1_estado_cuenta.pdf',
-      '2_estado_cuenta.pdf',
-      '3_estado_cuenta.pdf',
-      '4_estado_cuenta.pdf',
-      '5_estado_cuenta.pdf',
-      '10_estado_cuenta.pdf',
-      '15_estado_cuenta.pdf'
-    ];
+    setFileList([file.name]);
 
-    setFileList(mockFileList);
-    setProcessingDone(false); // Reset processing state when new file is selected
-    setSentResults(false); // Reset sent state when new file is selected
-    setUploadResults([]); // Clear previous results
-    addLog(`Archivo ZIP cargado: ${file.name} (${mockFileList.length} estados de cuenta simulados)`);
+    setProcessingDone(false);
+    setSentResults(false);
+    setUploadResults([]);
+    addLog(`Archivo ZIP seleccionado: ${file.name}`);
   };
 
   /**
@@ -75,16 +64,15 @@ export const useAccountStatement = () => {
     try {
       const results = await accountStatementService.processAccountStatement(selectedFile, members, year, month);
       setUploadResults(results);
-      setProcessingDone(true); // Set processing state to true
-      setSentResults(false); // Reset sent state when processing new results
-      
-      // Contar resultados
+      setProcessingDone(true);
+      setSentResults(false);
+
       const successful = results.filter(r => r.status === 'Asociado exitosamente').length;
       const failed = results.filter(r => r.status !== 'Asociado exitosamente').length;
-      
+
       const message = `Proceso completado: ${successful} estados asociados, ${failed} con errores. Año/Mes: ${year}/${months[month-1]}`;
       addLog(message);
-      
+
       return results;
     } catch (error) {
       addLog(`Error procesando estados de cuenta: ${error.message}`);
@@ -94,25 +82,33 @@ export const useAccountStatement = () => {
   };
 
   /**
-   * Send the processed account statements
+   * Upload the account statements ZIP file to the API
    */
-  const handleSend = async () => {
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      addLog('Error: Por favor selecciona un archivo ZIP primero');
+      addToast('Error: Por favor selecciona un archivo ZIP primero', 'error');
+      return;
+    }
+
     try {
-      // Count successful associations (where a member was found)
-      const successful = uploadResults.filter(r => r.status === 'Asociado exitosamente').length;
-      
-      if (successful > 0) {
-        await accountStatementService.sendAccountStatements(uploadResults);
-        addLog(`Estados de cuenta enviados: ${successful} estados enviados exitosamente`);
-        addToast(`Estados de cuenta enviados: ${successful} estados enviados exitosamente`, 'success');
+      // Upload the ZIP file to the API
+      const result = await accountStatementService.uploadAccountStatements(selectedFile);
+
+      // Check if the upload was successful
+      if (result.success && result.data.success) {
+        addLog(`Estados de cuenta subidos exitosamente: ${result.data.processed} de ${result.data.totalFiles} archivos procesados`);
+        addToast('Estados de cuenta subidos exitosamente', 'success');
       } else {
-        addLog('No se encontraron estados de cuenta para enviar');
-        addToast('No se encontraron estados de cuenta para enviar', 'info');
+        const errorMessage = result.message || 'Error desconocido al subir el archivo';
+        addLog(`Error al subir estados de cuenta: ${errorMessage}`);
+        addToast(`Error al subir estados de cuenta: ${errorMessage}`, 'error');
+        return;
       }
-      
+
       // After sending, set both buttons to disabled state (sentResults = true)
       setSentResults(true);
-      
+
       // Reset form fields after successful send
       resetForm();
     } catch (error) {
@@ -154,7 +150,7 @@ export const useAccountStatement = () => {
     months,
     handleFileUpload,
     processUpload,
-    handleSend,
+    handleUpload,
     resetForm,
     addLog,
     addToast
