@@ -11,7 +11,8 @@ import {
   LogIcon, 
   LogoutIcon,
   HomeIcon,
-  FileUploadIcon
+  FileUploadIcon,
+  FacilitiesIcon
 } from '../shared/components/icons/icons';
 
 const Navigation = ({ activeView, setActiveView }) => {
@@ -26,6 +27,7 @@ const Navigation = ({ activeView, setActiveView }) => {
     { id: 'surveys', label: 'Encuestas', icon: SurveysIcon },
     { id: 'filesUpload', label: 'Carga de archivos', icon: FileUploadIcon },
     { id: 'notices', label: 'Avisos', icon: NoticesIcon },
+    { id: 'instalaciones', label: 'Instalaciones', icon: FacilitiesIcon },
     // { id: 'logs', label: 'Panel de Logs', icon: LogIcon } // Comentado temporalmente
   ];
 

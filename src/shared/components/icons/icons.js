@@ -125,3 +125,10 @@ export const NoticesIcon = ({ className = "w-5 h-5" }) => (
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
   </svg>
 );
+
+// Facilities Icon
+export const FacilitiesIcon = ({ className = "w-5 h-5" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{width: '1em', height: '1em', display: 'inline', verticalAlign: 'middle'}}>
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7h18M3 12h18M3 17h18M4 7v10a1 1 0 001 1h1a1 1 0 001-1V7M16 7v10a1 1 0 001 1h1a1 1 0 001-1V7M10 7v10a1 1 0 001 1h1a1 1 0 001-1V7" />
+  </svg>
+);
