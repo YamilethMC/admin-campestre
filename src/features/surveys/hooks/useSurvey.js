@@ -153,7 +153,7 @@ export const useSurvey = () => {
           ? q.options.map((opt, optIndex) => ({
               surveyQuestionId: 0,
               option: opt.option,
-              value: opt.option.toLowerCase().replace(/\s/g, ''),
+              value: opt.option,
               order: opt.id
             }))
           : []
