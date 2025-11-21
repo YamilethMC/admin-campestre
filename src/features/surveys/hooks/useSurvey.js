@@ -133,6 +133,8 @@ export const useSurvey = () => {
 };
 
  const buildSurveyData = (formData) => {
+  console.log("formData:", formData);
+  console.log("OPTIONS:", formData.questions.options);
     return {
       title: formData.title,
       description: formData.description,
@@ -147,12 +149,12 @@ export const useSurvey = () => {
         type: q.type,
         required: q.required,
         order: qIndex,
-        options: (q.type === "SELECT" || q.type === "CHECKBOX" || q.type === "BOOLEAN" || q.type === "YES_NO")
+        options: (q.type === "SELECT" || q.type === "BOOLEAN")
           ? q.options.map((opt, optIndex) => ({
               surveyQuestionId: 0,
-              option: opt,
-              value: opt.toLowerCase().replace(/\s/g, ''),
-              order: optIndex
+              option: opt.option,
+              value: opt.option.toLowerCase().replace(/\s/g, ''),
+              order: opt.id
             }))
           : []
       }))
