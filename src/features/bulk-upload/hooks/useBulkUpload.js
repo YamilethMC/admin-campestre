@@ -28,22 +28,22 @@ export const useBulkUpload = () => {
     setUploading(true);
     setUploadResult(null);
 
-    try {
-      const result = await bulkUploadService.uploadMembers(file);
-      
-      setUploadResult(result);
+    const result = await bulkUploadService.uploadMembers(file);
+
+    if (result.success) {
+      setUploadResult(result.data);
       // Usar el mensaje de la respuesta de la API si está disponible
-      const message = result?.message || `Archivo subido exitosamente. ${result?.totalMembersAdded || 0} socios agregados.`;
+      const message = result.message || `Archivo subido exitosamente. ${result.data?.totalMembersAdded || 0} socios agregados.`;
       addLog(message);
       addToast(message, 'success');
-    } catch (error) {
-      const errorMessage = `Error al subir el archivo: ${error.message}`;
+    } else {
+      const errorMessage = result.error || 'Error al subir el archivo';
       addLog(errorMessage);
       addToast(errorMessage, 'error');
-      console.error('Bulk upload error:', error);
-    } finally {
-      setUploading(false);
+      console.error('Bulk upload error:', errorMessage);
     }
+
+    setUploading(false);
   };
 
   /**

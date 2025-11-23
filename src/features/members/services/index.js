@@ -15,16 +15,35 @@ export const memberService = {
             headers: {
                 "accept": "*/*",
                 "Authorization": `Bearer ${token}`
-            }
-            }
+            }}
         );
 
         if (!response.ok) {
-            throw new Error("Error al obtener miembros");
+            const error = await response.json();
+            let errorMessage = error.message || 'Error al obtener miembros';
+
+            switch (response.status) {
+                case 500:
+                    errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
+                    break;
+                default:
+                    errorMessage = error.message || 'Error al obtener miembros';
+            }
+
+            return {
+                success: false,
+                error: errorMessage,
+                status: response.status
+            };
         }
 
         const data = await response.json();
-        return data.data; // contiene members + meta
+
+        return {
+            success: true,
+            data: data.data,
+            status: response.status
+        };
     },
 
     async deleteMember(id) {
@@ -40,9 +59,34 @@ export const memberService = {
                 }
             }
         );
-        if (!response.ok) throw new Error("Error al eliminar miembro");
 
-        return true;
+        if (!response.ok) {
+            const error = await response.json();
+            let errorMessage = error.message || 'Error al eliminar miembro';
+
+            switch (response.status) {
+                case 404:
+                    errorMessage = 'Miembro no encontrado';
+                    break;
+                case 500:
+                    errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
+                    break;
+                default:
+                    errorMessage = error.message || 'Error al eliminar miembro';
+            }
+
+            return {
+                success: false,
+                error: errorMessage,
+                status: response.status
+            };
+        }
+
+        return {
+            success: true,
+            message: 'Miembro eliminado exitosamente',
+            status: response.status
+        };
     }
 
 };

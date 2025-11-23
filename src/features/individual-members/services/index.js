@@ -45,10 +45,39 @@ export const memberService = {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Error al registrar socio');
+      let errorMessage = error.message || 'Error al registrar socio';
+
+      // Manejar códigos de error específicos en el servicio
+      switch (response.status) {
+        case 400:
+          errorMessage = 'Solicitud incorrecta: Verifica los datos proporcionados';
+          break;
+        case 409:
+          errorMessage = 'Conflicto: Ya existe un socio con ese correo';
+          break;
+        case 500:
+          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
+          break;
+        default:
+          errorMessage = error.message || 'Error al registrar socio';
+      }
+
+      return {
+        success: false,
+        error: errorMessage,
+        status: response.status
+      };
     }
 
-    return await response.json();
+    const result = await response.json();
+
+    // Mensaje de éxito para el toast
+    return {
+      success: true,
+      data: result,
+      message: 'Socio registrado exitosamente',
+      status: response.status
+    };
   },
 
   // Validate member data
