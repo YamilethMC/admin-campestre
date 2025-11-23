@@ -1,6 +1,3 @@
-/**
- * Mock service for account statement upload
- */
 export const accountStatementService = {
   /**
    * Process a ZIP file containing account statements
@@ -71,13 +68,18 @@ export const accountStatementService = {
     const token = localStorage.getItem('authToken');
 
     if (!token) {
-      throw new Error('No se encontró token de autorización');
+      return {
+        success: false,
+        error: 'No se encontró token de autorización',
+        status: null
+      };
     }
 
     const formData = new FormData();
     formData.append('zipFile', file, file.name);
+
     try {
-      const response = await fetch('http://localhost:3003/account-statements/upload-bulk', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/account-statements/upload-bulk`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -86,30 +88,51 @@ export const accountStatementService = {
       });
 
       if (!response.ok) {
-        // Manejar diferentes tipos de errores
-        if (response.status === 401) {
-          throw new Error('No autorizado. Por favor inicie sesión nuevamente.');
-        } else if (response.status === 400) {
-          throw new Error('Error en la validación del archivo o formato no soportado.');
-        }else if (response.status === 403) {
-          throw new Error('Acceso denegado. No tiene permisos para esta operación.');
-        } else if (response.status >= 500) {
-          throw new Error('Error del servidor. Por favor inténtelo más tarde.');
-        } else {
-          const errorResult = await response.json().catch(() => ({}));
-          throw new Error(errorResult.message || `Error HTTP ${response.status}`);
+        const errorResult = await response.json().catch(() => ({}));
+        let errorMessage = errorResult.message || `Error HTTP ${response.status}`;
+
+        // Manejar códigos de error específicos en el servicio
+        switch (response.status) {
+          case 400:
+            errorMessage = errorResult.message || 'Error en la validación del archivo o formato no soportado';
+            break;
+          case 500:
+            errorMessage = errorResult.message || 'Error interno del servidor: Por favor intenta más tarde';
+            break;
+          default:
+            errorMessage = errorResult.message || `Error HTTP ${response.status}`;
         }
+
+        return {
+          success: false,
+          error: errorMessage,
+          status: response.status
+        };
       }
 
       const result = await response.json();
 
-      return result;
+      return {
+        success: true,
+        data: result,
+        message: result.message || 'Estados de cuenta subidos exitosamente',
+        status: response.status
+      };
     } catch (error) {
       console.error('Error uploading account statements:', error);
+      let errorMessage = 'Error de conexión. Por favor, intente de nuevo más tarde.';
+
       if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        throw new Error('No se pudo conectar con el servidor. Verifique su conexión a internet y que la API esté disponible.');
+        errorMessage = 'No se pudo conectar con el servidor. Verifique su conexión a internet y que la API esté disponible.';
+      } else {
+        errorMessage = error.message || errorMessage;
       }
-      throw error;
+
+      return {
+        success: false,
+        error: errorMessage,
+        status: null
+      };
     }
   },
 

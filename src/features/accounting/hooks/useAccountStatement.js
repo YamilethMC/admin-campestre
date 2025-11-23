@@ -91,18 +91,18 @@ export const useAccountStatement = () => {
       return;
     }
 
-    try {
-      // Upload the ZIP file to the API
-      const result = await accountStatementService.uploadAccountStatements(selectedFile);
+    // Upload the ZIP file to the API
+    const result = await accountStatementService.uploadAccountStatements(selectedFile);
 
+    if (result.success) {
       // Check if the upload was successful
-      if (result.success && result.data.success) {
+      if (result.data && result.data.success) {
         addLog(`Estados de cuenta subidos exitosamente: ${result.data.processed} de ${result.data.totalFiles} archivos procesados`);
-        addToast('Estados de cuenta subidos exitosamente', 'success');
+        addToast(result.message || 'Estados de cuenta subidos exitosamente', 'success');
       } else {
         const errorMessage = result.message || 'Error desconocido al subir el archivo';
         addLog(`Error al subir estados de cuenta: ${errorMessage}`);
-        addToast(`Error al subir estados de cuenta: ${errorMessage}`, 'error');
+        addToast(errorMessage, 'error');
         return;
       }
 
@@ -111,9 +111,10 @@ export const useAccountStatement = () => {
 
       // Reset form fields after successful send
       resetForm();
-    } catch (error) {
-      addLog(`Error enviando estados de cuenta: ${error.message}`);
-      addToast(`Error enviando estados de cuenta: ${error.message}`, 'error');
+    } else {
+      const errorMessage = result.error || 'Error desconocido al subir el archivo';
+      addLog(`Error al subir estados de cuenta: ${errorMessage}`);
+      addToast(errorMessage, 'error');
       return;
     }
   };
