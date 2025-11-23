@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { noticeService } from '../services';
+import { AppContext } from '../../../shared/context/AppContext';
 
 export const useNotice = () => {
+  const { addToast } = useContext(AppContext);
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -12,125 +14,98 @@ export const useNotice = () => {
 
   // Load notices with pagination, search, and filters
   const loadNotices = async (params = {}) => {
-    try {
-      setLoading(true);
-      setError(null);
+    setLoading(true);
+    setError(null);
 
-      // Use provided params or current state
-      const currentParams = {
-        page: params.page || page,
-        limit: 10, // Fixed limit as requested
-        search: params.search || search,
-        active: params.status || status === 'activas', // Convert status to boolean
-        order: 'asc', // Fixed as requested
-        orderBy: 'title' // Fixed as requested
-      };
-      const response = await noticeService.fetchNotices(currentParams);
+    // Use provided params or current state
+    const currentParams = {
+      page: params.page || page,
+      limit: 10, // Fixed limit as requested
+      search: params.search || search,
+      active: params.status || status === 'activas', // Convert status to boolean
+      order: 'asc', // Fixed as requested
+      orderBy: 'title' // Fixed as requested
+    };
+    const response = await noticeService.fetchNotices(currentParams);
 
-      setNotices(response.data || []);
-      setMeta(response.meta || null);
-    } catch (err) {
-      setError(err.message);
-      console.error('Error loading notices:', err);
-    } finally {
-      setLoading(false);
+    if (response.success) {
+      setNotices(response.data.data || []);
+      setMeta(response.data.meta || null);
+    } else {
+      addToast(response.error || 'Error al cargar avisos', 'error');
+      console.error('Error loading notices:', response.error);
     }
+
+    setLoading(false);
   };
 
   // Toggle notice status (activate/deactivate)
   const toggleNoticeStatus = async (id, active) => {
-    try {
-      const activeValue = !active;
-      const updatedNotice = await noticeService.toggleNoticeStatus(id, activeValue);
-      if (updatedNotice) {
-        // Update the notice in the current list
-        setNotices(prev => 
-          prev.map(notice => 
-            notice.id === id ? updatedNotice : notice
-          )
-        );
-        
-        // Refresh the list to maintain consistency
-        await loadNotices();
-      }
-    } catch (err) {
-      setError(err.message);
-      throw err;
+    const activeValue = !active;
+    const result = await noticeService.toggleNoticeStatus(id, activeValue);
+
+    if (result.success) {
+      // Refresh the list to maintain consistency
+      await loadNotices();
+    } else {
+      addToast(result.error || 'Error al actualizar estado del aviso', 'error');
     }
   };
 
   // Create new notice
   const createNotice = async (noticeData) => {
-    try {
-      setLoading(true);
-      const newNotice = await noticeService.createNotice(noticeData);
-      
+    setLoading(true);
+    const result = await noticeService.createNotice(noticeData);
+
+    if (result.success) {
       // Refresh the list
       await loadNotices();
-      
-      return newNotice;
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    } finally {
-      setLoading(false);
+    } else {
+      addToast(result.error || 'Error al registrar aviso', 'error');
+      //setLoading(false);
     }
   };
 
   // Update existing notice
   const updateNotice = async (id, noticeData) => {
-    try {
-      setLoading(true);
-      const updatedNotice = await noticeService.updateNotice(id, noticeData);
-      
-      // Update the notice in the current list
-      setNotices(prev => 
-        prev.map(notice => 
-          notice.id === id ? updatedNotice : notice
-        )
-      );
-      
+    setLoading(true);
+    const result = await noticeService.updateNotice(id, noticeData);
+
+    if (result.success) {
       // Refresh the list to maintain consistency
       await loadNotices();
-      
-      return updatedNotice;
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    } finally {
-      setLoading(false);
+    } else {
+      addToast(result.error || 'Error al actualizar aviso', 'error');
+      //setLoading(false);
     }
   };
 
   // Get a single notice by ID
   const getNoticeById = async (id) => {
-    try {
-      const notice = await noticeService.getNoticeById(id);
-      return notice;
-    } catch (err) {
-      setError(err.message);
-      throw err;
+    const result = await noticeService.getNoticeById(id);
+
+    if (result.success) {
+      return result.data;
+    } else {
+      addToast(result.error || 'Error al obtener aviso', 'error');
     }
   };
 
   // Delete a notice
   const deleteNotice = async (id) => {
-    try {
-      const success = await noticeService.deleteNotice(id);
-      if (success) {
-        // Refresh the list after deletion
-        if (notices.length === 1 && page > 1) {
-          // If this was the last item on the page and we're not on page 1, go to previous page
-          setPage(prev => prev - 1);
-        } else {
-          await loadNotices();
-        }
-        return true;
+    const result = await noticeService.deleteNotice(id);
+
+    if (result.success) {
+      // Refresh the list after deletion
+      if (notices.length === 1 && page > 1) {
+        // If this was the last item on the page and we're not on page 1, go to previous page
+        setPage(prev => prev - 1);
+      } else {
+        await loadNotices();
       }
-      return false;
-    } catch (err) {
-      setError(err.message);
-      throw err;
+      return true;
+    } else {
+      addToast(result.error || 'Error al eliminar el aviso', 'error');
     }
   };
 
