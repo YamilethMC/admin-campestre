@@ -32,7 +32,9 @@ export const useSurvey = () => {
       setInactiveCount(data.inactiveCount);
     } catch (err) {
       setError(err.message);
-      console.error("Error loading surveys:", err);
+      addLog('Error al cargar las encuestas');
+      addToast(err.message || 'Error desconocido', 'error');
+      return;
     } finally {
       setLoading(false);
     }
@@ -46,7 +48,6 @@ export const useSurvey = () => {
         const options = await surveyService.getSurveyCategoryOptions();
         setSurveyCategoryOptions(options);
       } catch (error) {
-        console.error('Error loading survey category options:', error);
         addLog('Error al cargar las opciones de categoría de encuestas');
         addToast('Error al cargar las opciones de categoría de encuestas', 'error');
       } finally {
@@ -59,7 +60,6 @@ export const useSurvey = () => {
         const options = await surveyService.getSurveyPriorityOptions();
         setSurveyPriorityOptions(options);
       } catch (error) {
-        console.error('Error loading survey priority options:', error);
         addLog('Error al cargar las opciones de prioridad de encuestas');
         addToast('Error al cargar las opciones de prioridad de encuestas', 'error');
       } finally {
@@ -74,67 +74,68 @@ export const useSurvey = () => {
   // Toggle survey status
   const toggleSurveyStatus = async (id) => {
     try {
-      const updatedSurvey = await surveyService.toggleSurveyStatus(id);
-      // Refresh the list to reflect the status change
-      loadSurveys();
+      const result = await surveyService.toggleSurveyStatus(id);
+
+      if(result && result.successMessage) {
+        loadSurveys();
+      }
     } catch (err) {
       setError(err.message);
+      addToast(err.message || 'Error desconocido', 'error');
+      return;
     }
   };
 
-    const buildUpdateSurveyData = (formData) => {
-  return {
-    title: formData.title,
-    description: formData.description,
-    active: formData.active,
-    priority: formData.priority,
-    category: formData.category,
-    timeStimed: formData.estimatedTime,
-    questions: formData.questions.map((q, qIndex) => {
-    // Se construye la pregunta base
-    const question = {
-      question: q.question,
-      type: q.type,
-      required: q.required,
-      order: qIndex,
-    };
-
-    // Solo se agrega id si es > 0
-    if (q.id && q.id > 0) {
-      question.id = q.id;
-    }
-
-    // Verifica si el tipo de pregunta requiere opciones
-    if (["SELECT", "CHECKBOX", "BOOLEAN", "YES_NO"].includes(q.type)) {
-      question.options = q.options.map((opt, optIndex) => {
-
-        const optionText = typeof opt === "string" ? opt : opt.option;
-
-        const option = {
-          option: optionText,
-          value: optionText.toLowerCase().replace(/\s/g, ""),
-          order: optIndex,
+  const buildUpdateSurveyData = (formData) => {
+    return {
+      title: formData.title,
+      description: formData.description,
+      active: formData.active,
+      priority: formData.priority,
+      category: formData.category,
+      timeStimed: formData.estimatedTime,
+      questions: formData.questions.map((q, qIndex) => {
+        // Se construye la pregunta base
+        const question = {
+          question: q.question,
+          type: q.type,
+          required: q.required,
+          order: qIndex,
         };
 
         // Solo se agrega id si es > 0
-        if (opt.id && opt.id > 0) {
-          option.id = opt.id;
+        if (q.id && q.id > 0) {
+          question.id = q.id;
         }
 
-        return option;
-      });
-    } else {
-      question.options = [];
-    }
+        // Verifica si el tipo de pregunta requiere opciones
+        if (["SELECT", "CHECKBOX", "BOOLEAN", "YES_NO"].includes(q.type)) {
+          question.options = q.options.map((opt, optIndex) => {
 
-    return question;
-  }),
-};
-};
+            const optionText = typeof opt === "string" ? opt : opt.option;
+
+            const option = {
+              option: optionText,
+              value: optionText.toLowerCase().replace(/\s/g, ""),
+              order: optIndex,
+            };
+
+            // Solo se agrega id si es > 0
+            if (opt.id && opt.id > 0) {
+              option.id = opt.id;
+            }
+
+            return option;
+          });
+        } else {
+          question.options = [];
+        }
+        return question;
+      }),
+    };
+  };
 
  const buildSurveyData = (formData) => {
-  console.log("formData:", formData);
-  console.log("OPTIONS:", formData.questions.options);
     return {
       title: formData.title,
       description: formData.description,
@@ -158,29 +159,6 @@ export const useSurvey = () => {
             }))
           : []
       }))
-      /*questions: [
-        {
-          //surveyId: 0,
-          question: formData.question,
-          type: formData.type,
-          required: formData.required,
-          //order: formData.order,
-          options: [
-            {
-              //surveyQuestionId: 0,
-              option: formData.option,
-              //value: formData.value,
-              //order: formData.order
-            },
-            {
-              //surveyQuestionId: 0,
-              option: formData.option,
-              //value: formData.value,
-              //order: formData.order
-            }
-          ]
-        }
-      ]*/
     };
   };
 
@@ -190,12 +168,15 @@ export const useSurvey = () => {
     try {
       setLoading(true);
       const newSurvey = await surveyService.createSurvey(surveyDataF);
-      // Refresh the list to show the new survey
-      loadSurveys();
+
+      if(newSurvey && newSurvey.successMessage) {
+        loadSurveys();
+      }
       return newSurvey;
     } catch (err) {
       setError(err.message);
-      throw err;
+      addToast(err.message || 'Error desconocido', 'error');
+      return;
     } finally {
       setLoading(false);
     }
@@ -208,13 +189,13 @@ export const useSurvey = () => {
       setLoading(true);
       const updatedSurvey = await surveyService.updateSurvey(id, surveyDataF);
       if (updatedSurvey) {
-        // Refresh the list to reflect the update
         loadSurveys();
       }
       return updatedSurvey;
     } catch (err) {
       setError(err.message);
-      throw err;
+      addToast(err.message || 'Error desconocido', 'error');
+      return;
     } finally {
       setLoading(false);
     }
@@ -228,7 +209,8 @@ export const useSurvey = () => {
       return responses;
     } catch (err) {
       setError(err.message);
-      throw err;
+      addToast(err.message || 'Error desconocido', 'error');
+      return;
     } finally {
       setLoading(false);
     }
@@ -242,7 +224,8 @@ export const useSurvey = () => {
       return survey;
     } catch (err) {
       setError(err.message);
-      throw err;
+      addToast(err.message || 'Error desconocido', 'error');
+      return;
     } finally {
       setLoading(false);
     }
@@ -251,13 +234,11 @@ export const useSurvey = () => {
   // Delete a survey
   const deleteSurvey = async (id) => {
     try {
-      const success = await surveyService.deleteSurvey(id);
-      if (success) {
-        // If the current page has only one survey and there are other pages, go to previous page
+      const result = await surveyService.deleteSurvey(id);
+      if (result && result.success) {
         if (surveys.length === 1 && page > 1) {
           setPage(page - 1);
         } else {
-          // Refresh the list to reflect the deletion
           loadSurveys();
         }
         return true;
@@ -265,7 +246,8 @@ export const useSurvey = () => {
       return false;
     } catch (err) {
       setError(err.message);
-      throw err;
+      addToast(err.message || 'Error desconocido', 'error');
+      return;
     }
   };
 
