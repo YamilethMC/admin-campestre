@@ -27,8 +27,8 @@ const FacilityForm = ({ facility, onSave, onCancel }) => {
         type: facility.type || '',
         description: facility.description || '',
         status: facility.status || 'ACTIVE',
-        openTime: facility.openTime ? (facility.openTime.length > 8 ? facility.openTime.substring(11, 19) : facility.openTime) : '08:00:00',
-        closeTime: facility.closeTime ? (facility.closeTime.length > 8 ? facility.closeTime.substring(11, 19) : facility.closeTime) : '22:00:00',
+        openTime: facility.openTime ? (facility.openTime.length > 8 ? facility.openTime.substring(11, 19) : facility.openTime.padEnd(8, ':00').substring(0, 8)) : '08:00:00',
+        closeTime: facility.closeTime ? (facility.closeTime.length > 8 ? facility.closeTime.substring(11, 19) : facility.closeTime.padEnd(8, ':00').substring(0, 8)) : '22:00:00',
         maxDuration: facility.maxDuration || 60
       });
     } else {
@@ -103,14 +103,22 @@ const FacilityForm = ({ facility, onSave, onCancel }) => {
     confirmAction('save');
   };
 
+  const formatTimeWithSeconds = (timeStr) => {
+    // If time doesn't have seconds, add :00
+    if (timeStr && timeStr.split(':').length === 2) {
+      return `${timeStr}:00`;
+    }
+    return timeStr;
+  };
+
   const handleConfirmSave = async () => {
     setIsSaving(true);
     try {
       // Format time strings to ISO format required by API
       const formattedData = {
         ...formData,
-        openTime: `2023-01-01T${formData.openTime}Z`,
-        closeTime: `2023-01-01T${formData.closeTime}Z`
+        openTime: `2023-01-01T${formatTimeWithSeconds(formData.openTime)}Z`,
+        closeTime: `2023-01-01T${formatTimeWithSeconds(formData.closeTime)}Z`
       };
 
       await onSave(formattedData);
