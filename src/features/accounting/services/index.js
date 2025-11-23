@@ -77,7 +77,7 @@ export const accountStatementService = {
     const formData = new FormData();
     formData.append('zipFile', file, file.name);
     try {
-      const response = await fetch('http://192.168.1.5:3003/account-statements/upload-bulk', {
+      const response = await fetch('http://localhost:3003/account-statements/upload-bulk', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -89,7 +89,9 @@ export const accountStatementService = {
         // Manejar diferentes tipos de errores
         if (response.status === 401) {
           throw new Error('No autorizado. Por favor inicie sesión nuevamente.');
-        } else if (response.status === 403) {
+        } else if (response.status === 400) {
+          throw new Error('Error en la validación del archivo o formato no soportado.');
+        }else if (response.status === 403) {
           throw new Error('Acceso denegado. No tiene permisos para esta operación.');
         } else if (response.status >= 500) {
           throw new Error('Error del servidor. Por favor inténtelo más tarde.');

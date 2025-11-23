@@ -114,7 +114,7 @@ export const useAccountStatement = () => {
     } catch (error) {
       addLog(`Error enviando estados de cuenta: ${error.message}`);
       addToast(`Error enviando estados de cuenta: ${error.message}`, 'error');
-      throw error;
+      return;
     }
   };
 
