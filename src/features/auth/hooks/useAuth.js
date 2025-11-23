@@ -20,7 +20,6 @@ export const useAuth = () => {
     if (result.success) {
       contextLogin(result.user, result.accessToken);
     } else {
-      setError(result.error || 'Error de autenticación');
       addToast(result.error || 'Error de autenticación', 'error');
     }
     setLoading(false);

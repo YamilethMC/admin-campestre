@@ -31,7 +31,6 @@ export const useSurvey = () => {
       setActiveCount(data.activeCount);
       setInactiveCount(data.inactiveCount);
     } catch (err) {
-      setError(err.message);
       addLog('Error al cargar las encuestas');
       addToast(err.message || 'Error desconocido', 'error');
       return;
@@ -80,7 +79,6 @@ export const useSurvey = () => {
         loadSurveys();
       }
     } catch (err) {
-      setError(err.message);
       addToast(err.message || 'Error desconocido', 'error');
       return;
     }
@@ -174,7 +172,6 @@ export const useSurvey = () => {
       }
       return newSurvey;
     } catch (err) {
-      setError(err.message);
       addToast(err.message || 'Error desconocido', 'error');
       return;
     } finally {
@@ -193,7 +190,6 @@ export const useSurvey = () => {
       }
       return updatedSurvey;
     } catch (err) {
-      setError(err.message);
       addToast(err.message || 'Error desconocido', 'error');
       return;
     } finally {
@@ -208,7 +204,6 @@ export const useSurvey = () => {
       const responses = await surveyService.getSurveyResponses(surveyId);
       return responses;
     } catch (err) {
-      setError(err.message);
       addToast(err.message || 'Error desconocido', 'error');
       return;
     } finally {
@@ -223,7 +218,6 @@ export const useSurvey = () => {
       const survey = await surveyService.getSurveyById(id);
       return survey;
     } catch (err) {
-      setError(err.message);
       addToast(err.message || 'Error desconocido', 'error');
       return;
     } finally {
@@ -245,7 +239,6 @@ export const useSurvey = () => {
       }
       return false;
     } catch (err) {
-      setError(err.message);
       addToast(err.message || 'Error desconocido', 'error');
       return;
     }

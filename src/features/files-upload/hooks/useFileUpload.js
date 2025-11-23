@@ -26,7 +26,6 @@ export const useFileUpload = () => {
       setFiles(response.data || []);
       setMeta(response.meta || null);
     } catch (err) {
-      setError(err.message);
       console.error('Error loading files:', err);
     } finally {
       setLoading(false);
@@ -42,7 +41,6 @@ export const useFileUpload = () => {
 
       return response;
     } catch (err) {
-      setError(err.message);
       throw err;
     } finally {
       setUploading(false);
@@ -54,7 +52,6 @@ export const useFileUpload = () => {
       const response = await fileUploadService.getFileById(id);
       return response;
     } catch (err) {
-      setError(err.message);
       throw err;
     }
   };
@@ -66,7 +63,6 @@ export const useFileUpload = () => {
       await loadFiles();
       return response;
     } catch (err) {
-      setError(err.message);
       throw err;
     }
   };
@@ -84,7 +80,6 @@ export const useFileUpload = () => {
       }
       return response;
     } catch (err) {
-      setError(err.message);
       throw err;
     }
   };
