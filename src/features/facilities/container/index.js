@@ -13,7 +13,7 @@ const FacilitiesContainer = () => {
   const [view, setView] = useState('list'); // 'list', 'form', or 'reservations'
   const [currentFacility, setCurrentFacility] = useState(null);
 
-  const { toasts, setToasts } = useContext(AppContext);
+  const { addToast } = useContext(AppContext);
 
   const {
     facilities,
@@ -65,16 +65,11 @@ const FacilitiesContainer = () => {
   const handleEditFacility = async (facility) => {
     try {
       // Load the full facility data
-      const fullFacility = await loadFacility(facility.id);
+      const fullFacility = await loadFacility(facility.id, addToast);
       setCurrentFacility(fullFacility);
       setView('form');
     } catch (err) {
-      // Show error toast
-      setToasts(prev => [...prev, {
-        id: Date.now(),
-        message: err.message || 'Error al cargar la instalación',
-        type: 'error'
-      }]);
+      // Error is handled in the loadFacility function
     }
   };
 
@@ -89,16 +84,16 @@ const FacilitiesContainer = () => {
     try {
       if (currentFacility) {
         // Update existing facility
-        await updateFacility(currentFacility.id, facilityData);
+        await updateFacility(currentFacility.id, facilityData, addToast);
       } else {
         // Create new facility
-        await createFacility(facilityData);
+        await createFacility(facilityData, addToast);
       }
       setView('list');
       resetFiltersToDefaults(); // Reset filters when returning to list
       loadFacilities(); // Reload list
     } catch (err) {
-      // Error is handled within the create/update functions
+      // Error is handled in the create/update functions
     }
   };
 
@@ -119,7 +114,7 @@ const FacilitiesContainer = () => {
   // Handle deleting a facility
   const handleDeleteFacility = async (id) => {
     try {
-      await deleteFacility(id);
+      await deleteFacility(id, addToast);
       // If the list is empty and we're not on page 1, go back a page
       if (facilities.length === 1 && page > 1) {
         setPage(page - 1);
@@ -127,12 +122,7 @@ const FacilitiesContainer = () => {
         loadFacilities();
       }
     } catch (err) {
-      // Show error toast
-      setToasts(prev => [...prev, {
-        id: Date.now(),
-        message: err.message || 'Error al eliminar la instalación',
-        type: 'error'
-      }]);
+      // Error is handled in the deleteFacility function
     }
   };
 
@@ -201,35 +191,48 @@ const FacilitiesContainer = () => {
 };
 
 // Separate functions for API calls to handle errors properly
-const loadFacility = async (id) => {
-  try {
-    return await facilityService.getFacilityById(id);
-  } catch (error) {
-    throw error;
+const loadFacility = async (id, addToast) => {
+  const result = await facilityService.getFacilityById(id);
+
+  if (result.success) {
+    return result.data;
+  } else {
+    addToast(result.error || 'Error al cargar la instalación', 'error');
+    return;
   }
 };
 
-const createFacility = async (facilityData) => {
-  try {
-    return await facilityService.createFacility(facilityData);
-  } catch (error) {
-    throw error;
+const createFacility = async (facilityData, addToast) => {
+  const result = await facilityService.createFacility(facilityData);
+
+  if (result.success) {
+    addToast(result.message || 'Instalación creada exitosamente', 'success');
+    return result.data;
+  } else {
+    addToast(result.error || 'Error al crear instalación', 'error');
+    return;
   }
 };
 
-const updateFacility = async (id, facilityData) => {
-  try {
-    return await facilityService.updateFacility(id, facilityData);
-  } catch (error) {
-    throw error;
+const updateFacility = async (id, facilityData, addToast) => {
+  const result = await facilityService.updateFacility(id, facilityData);
+
+  if (result.success) {
+    return result.data;
+  } else {
+    addToast(result.error || 'Error al actualizar instalación', 'error');
+    return;
   }
 };
 
-const deleteFacility = async (id) => {
-  try {
-    return await facilityService.deleteFacility(id);
-  } catch (error) {
-    throw error;
+const deleteFacility = async (id, addToast) => {
+  const result = await facilityService.deleteFacility(id);
+
+  if (result.success) {
+    return result;
+  } else {
+    addToast(result.error || 'Error al eliminar instalación', 'error');
+    return;
   }
 };
 

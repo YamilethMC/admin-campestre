@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { facilityService } from '../services';
+import { AppContext } from '../../../shared/context/AppContext';
 
 export function useFacilities(initialFilters = {}) {
+  const { addToast } = useContext(AppContext);
   const [facilities, setFacilities] = useState([]);
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('ACTIVE');
@@ -14,27 +15,25 @@ export function useFacilities(initialFilters = {}) {
 
   const loadFacilities = async (filters = {}) => {
     setLoading(true);
-    setError(null);
-    try {
-      const response = await facilityService.fetchFacilities({
-        page: filters.page !== undefined ? filters.page : page,
-        limit: 10, // Fixed limit as requested
-        search: filters.search !== undefined ? filters.search : search,
-        status: filters.status !== undefined ? filters.status : status,
-        type: filters.type !== undefined ? filters.type : type,
-        date: filters.date !== undefined ? filters.date : date,
-        order: 'asc', // Fixed as requested
-        orderBy: 'name' // Fixed as requested
-      });
-      
-      setFacilities(response.data);
-      setMeta(response.meta);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al cargar instalaciones');
-      console.error("Error loading facilities:", err);
-    } finally {
-      setLoading(false);
+    const response = await facilityService.fetchFacilities({
+      page: filters.page !== undefined ? filters.page : page,
+      limit: 10, // Fixed limit as requested
+      search: filters.search !== undefined ? filters.search : search,
+      status: filters.status !== undefined ? filters.status : status,
+      type: filters.type !== undefined ? filters.type : type,
+      date: filters.date !== undefined ? filters.date : date,
+      order: 'asc', // Fixed as requested
+      orderBy: 'name' // Fixed as requested
+    });
+
+    if (response.success) {
+      setFacilities(response.data.data);
+      setMeta(response.data.meta);
+    } else {
+      addToast(response.error || 'Error al cargar instalaciones', 'error');
+      return;
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -54,7 +53,6 @@ export function useFacilities(initialFilters = {}) {
     facilities,
     meta,
     loading,
-    error,
     page,
     setPage,
     search,

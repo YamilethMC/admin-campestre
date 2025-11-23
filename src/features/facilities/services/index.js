@@ -36,11 +36,31 @@ export const facilityService = {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || "Error al obtener instalaciones");
+      let errorMessage = "Error al obtener instalaciones";
+
+      // Manejar códigos de error específicos en el servicio
+      switch (response.status) {
+        case 500:
+          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
+          break;
+        default:
+          errorMessage = "Error al obtener instalaciones";
+      }
+
+      return {
+        success: false,
+        error: errorMessage,
+        status: response.status
+      };
     }
 
     const data = await response.json();
-    return data.data; // contains facilities data + meta
+
+    return {
+      success: true,
+      data: data.data, // contains facilities data + meta
+      status: response.status
+    };
   },
 
   async createFacility(facilityData) {
@@ -61,11 +81,35 @@ export const facilityService = {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || "Error al crear instalación");
+      let errorMessage = "Error al crear instalación";
+
+      // Manejar códigos de error específicos en el servicio
+      switch (response.status) {
+        case 400:
+          errorMessage = 'Solicitud incorrecta: Verifica los datos de la instalación';
+          break;
+        case 500:
+          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
+          break;
+        default:
+          errorMessage = "Error al crear instalación";
+      }
+
+      return {
+        success: false,
+        error: errorMessage,
+        status: response.status
+      };
     }
 
     const result = await response.json();
-    return result.data;
+
+    return {
+      success: true,
+      data: result.data,
+      message: 'Instalación creada exitosamente',
+      status: response.status
+    };
   },
 
   async updateFacility(id, facilityData) {
@@ -86,11 +130,35 @@ export const facilityService = {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || "Error al actualizar instalación");
+      let errorMessage = "Error al actualizar instalación";
+
+      // Manejar códigos de error específicos en el servicio
+      switch (response.status) {
+        case 404:
+          errorMessage = 'Instalación no encontrada';
+          break;
+        case 500:
+          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
+          break;
+        default:
+          errorMessage = "Error al actualizar instalación";
+      }
+
+      return {
+        success: false,
+        error: errorMessage,
+        status: response.status
+      };
     }
 
     const result = await response.json();
-    return result.data;
+
+    return {
+      success: true,
+      data: result.data,
+      message: 'Instalación actualizada exitosamente',
+      status: response.status
+    };
   },
 
   async getFacilityById(id) {
@@ -108,11 +176,37 @@ export const facilityService = {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || "Error al obtener instalación");
+      let errorMessage = "Error al obtener instalación";
+
+      // Manejar códigos de error específicos en el servicio
+      switch (response.status) {
+        case 400:
+          errorMessage = 'Solicitud incorrecta: Verifica los datos proporcionados';
+          break;
+        case 404:
+          errorMessage = 'Instalación no encontrada';
+          break;
+        case 500:
+          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
+          break;
+        default:
+          errorMessage = "Error al obtener instalación";
+      }
+
+      return {
+        success: false,
+        error: errorMessage,
+        status: response.status
+      };
     }
 
     const result = await response.json();
-    return result.data;
+
+    return {
+      success: true,
+      data: result.data,
+      status: response.status
+    };
   },
 
   async deleteFacility(id) {
@@ -131,9 +225,31 @@ export const facilityService = {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || "Error al eliminar instalación");
+      let errorMessage = "Error al eliminar instalación";
+
+      // Manejar códigos de error específicos en el servicio
+      switch (response.status) {
+        case 404:
+          errorMessage = 'Instalación no encontrada';
+          break;
+        case 500:
+          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
+          break;
+        default:
+          errorMessage = "Error al eliminar instalación";
+      }
+
+      return {
+        success: false,
+        error: errorMessage,
+        status: response.status
+      };
     }
 
-    return true;
+    return {
+      success: true,
+      message: 'Instalación eliminada exitosamente',
+      status: response.status
+    };
   }
 };
