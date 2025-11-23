@@ -7,30 +7,23 @@ export const useAuth = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { login: contextLogin } = useContext(AppContext);
+  const { login: contextLogin, addToast } = useContext(AppContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     setLoading(true);
     setError('');
-    
-    try {
-      // Validate credentials using the service
-      const result = await authService.validateCredentials({ email: username, password });
-      
-      if (result.success) {
-        // Use the context login function to set the authenticated state
-        contextLogin(result.user, result.accessToken);
-      } else {
-        setError(result.error || 'Error de autenticación');
-      }
-    } catch (err) {
-      setError('Error de autenticación');
-      console.error('Login error:', err);
-    } finally {
-      setLoading(false);
+
+    const result = await authService.validateCredentials({ email: username, password });
+
+    if (result.success) {
+      contextLogin(result.user, result.accessToken);
+    } else {
+      setError(result.error || 'Error de autenticación');
+      addToast(result.error || 'Error de autenticación', 'error');
     }
+    setLoading(false);
   };
 
   const resetForm = () => {

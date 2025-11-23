@@ -21,13 +21,27 @@ export const authService = {
 
       const data = await response.json();
       if (!response.ok) {
+        let errorMessage = data.message || 'Error de autenticación';
+
+        // Manejar códigos de error específicos en el servicio
+        switch (response.status) {
+          case 401:
+            errorMessage = 'Credenciales incorrectas: Usuario o contraseña no válidos';
+            break;
+          case 500:
+            errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
+            break;
+          default:
+            errorMessage = data.message || 'Error de autenticación';
+        }
+
         return {
           success: false,
-          error: data.message || 'Error de autenticación',
+          error: errorMessage,
+          status: response.status
         };
       }
-      
-      // Map the API response to match the expected format in your app
+
       return {
         success: true,
         user: {
@@ -46,6 +60,7 @@ export const authService = {
       return {
         success: false,
         error: 'Error de conexión. Por favor, intente de nuevo más tarde.',
+        status: null
       };
     }
   },
@@ -64,10 +79,39 @@ export const authService = {
       });
 
       if (!response.ok) {
-        console.warn("Error al cerrar sesión en el servidor:", response.statusText);
+        const err = await response.json();
+        let errorMessage = err.message || 'Error al cerrar sesión';
+
+        switch (response.status) {
+          case 401:
+            errorMessage = 'No autorizado: Token inválido o expirado';
+            break;
+          case 500:
+            errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
+            break;
+          default:
+            errorMessage = err.message || 'Error al cerrar sesión';
+        }
+
+        return {
+          success: false,
+          error: errorMessage,
+          status: response.status
+        };
       }
+
+      return {
+        success: true,
+        message: 'Sesión cerrada exitosamente',
+        status: response.status
+      };
     } catch (error) {
       console.error("Error en logout:", error);
+      return {
+        success: false,
+        error: 'Error de conexión. Por favor, intente de nuevo más tarde.',
+        status: null
+      };
     }
   }
 };
