@@ -151,7 +151,7 @@ export const useIndividualMember = () => {
     try {
       const result = await memberService.addMember(memberData);
 
-      addToast("Socio registrado exitosamente ✅", "success");
+      addToast("Socio registrado exitosamente", "success");
       addLog(`Socio agregado: ${formData.nombre} ${formData.apellidos}`);
       if(result){
         resetForm();
@@ -161,30 +161,6 @@ export const useIndividualMember = () => {
       console.error(err);
       addToast(err.message, "error");
       return false;
-    }
-  };
-
-  const performSubmit = async () => {
-    // Validación de campos requeridos
-    if (!validateFormData()) {
-      return false; // Don't close the form if validation fails
-    }
-
-    const memberData = buildMemberData();
-
-    try {
-      const result = await memberService.addMember(memberData);
-
-      addToast("Socio registrado exitosamente ✅", "success");
-      addLog(`Socio agregado: ${formData.nombre} ${formData.apellidos}`);
-      if(result){
-        resetForm();
-      }
-      return true; // Indicate success to close the form
-    } catch (err) {
-      console.error(err);
-      addToast(err.message, "error");
-      return false; // Don't close the form if submission fails
     }
   };
 
