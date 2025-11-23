@@ -74,15 +74,13 @@ export const AppProvider = ({ children }) => {
     setIsAuthenticated(false);
     setCurrentUser(null);
     setAuthToken(null);
-    
+
     localStorage.removeItem('authToken');
     localStorage.removeItem('currentUser');
   };
 
   return (
     <AppContext.Provider value={{ 
-      members, 
-      setMembers, 
       logs, 
       setLogs, 
       toasts,
