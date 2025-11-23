@@ -692,37 +692,20 @@ export const surveyService = {
   
   // Get all responses for a survey (for the responses view)
   getSurveyResponses: async (surveyId) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Find the survey to get the participant count
-    const survey = mockSurveys.find(s => s.id === surveyId);
-    if (!survey) return [];
-    
-    // Get the actual questions to know their type and required status
-    const questions = mockSurveyQuestions.filter(q => q.surveyId === surveyId);
-    
-    // Generate mock responses for each question
-    const responses = questions.map(question => {
-      // For required questions, have responses matching the participant count
-      // For non-required questions (especially text/open questions), just have 1 for this exercise
-      const responseCount = question.required ? survey.participantCount : 1; 
-      
-      // For demo purposes only, in a real app this would come from actual responses
-      return {
-        questionId: question.id,
-        question: question.question,
-        type: question.type,
-        required: question.required,
-        responses: Array.from({ length: responseCount }, (_, i) => ({
-          id: `response-${question.id}-${i + 1}`,
-          value: generateMockResponse(question),
-          date: new Date(Date.now() - Math.floor(Math.random() * 7 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0], // Random date in past week
-          participant: `Participante ${i + 1}`
-        }))
-      };
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/survey/${surveyId}/responses`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
     });
-    
-    return responses;
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.message);
+    }
+    const data = await response.json();
+    return data.data; // The API returns the complete survey object with questions and responses
   },
 
   // Fetch surveys with pagination, filtering and search

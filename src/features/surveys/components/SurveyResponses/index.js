@@ -2,73 +2,106 @@ import React from 'react';
 import './SurveyResponses.css';
 
 const SurveyResponses = ({ survey, responses, onBack }) => {
-  // Calculate statistics for each question
-  const calculateQuestionStats = (questionResponses, totalParticipants, questionType, isRequired) => {
-    if (!questionResponses || questionResponses.length === 0) return null;
-    
-    // Determine the actual count to display
-    const displayCount = isRequired ? totalParticipants : questionResponses.length;
-    
-    // If it's a rating question, calculate average and distribution
-    if (questionType === 'rating' || (questionResponses.length > 0 && !isNaN(parseFloat(questionResponses[0].value)))) {
-      const numericValues = questionResponses.map(r => parseFloat(r.value)).filter(v => !isNaN(v));
-      const average = numericValues.reduce((sum, val) => sum + val, 0) / numericValues.length;
-      
-      // Calculate distribution (how many responses for each rating)
-      const distribution = {};
-      for (let i = 1; i <= 10; i++) {
-        distribution[i] = 0;
-      }
-      numericValues.forEach(value => {
-        const roundedValue = Math.round(value);
-        if (distribution.hasOwnProperty(roundedValue)) {
-          distribution[roundedValue]++;
+  // Calculate statistics for each question based on API response format
+  const calculateQuestionStats = (questionData) => {
+    // Check if question has responses based on its type
+    switch (questionData.type) {
+      case 'TEXT':
+        // For text questions, we get an array of responses directly
+        if (questionData.textResponses && Array.isArray(questionData.textResponses)) {
+          return {
+            count: questionData.textResponses.length,
+            displayCount: questionData.textResponses.length,
+            responses: questionData.textResponses
+          };
         }
-      });
-      
-      return {
-        average: average.toFixed(1),
-        count: questionResponses.length,
-        displayCount: displayCount,
-        distribution
-      };
+        break;
+
+      case 'NUMBER':
+        // For number/rating questions, we get count object for each rating value
+        if (questionData.numberCounts) {
+          const numberCounts = questionData.numberCounts;
+          // Calculate total responses
+          const totalResponses = Object.values(numberCounts).reduce((sum, count) => sum + count, 0);
+          // Calculate average
+          let sum = 0;
+          let count = 0;
+          for (const [rating, ratingCount] of Object.entries(numberCounts)) {
+            const numericRating = parseFloat(rating);
+            if (!isNaN(numericRating)) {
+              sum += numericRating * ratingCount;
+              count += ratingCount;
+            }
+          }
+          const average = count > 0 ? (sum / count).toFixed(1) : 0;
+
+          // Convert numberCounts to distribution format
+          const distribution = {};
+          for (let i = 1; i <= 10; i++) {
+            distribution[i] = numberCounts[i] || 0;
+          }
+
+          return {
+            average: average,
+            count: totalResponses,
+            displayCount: totalResponses,
+            distribution
+          };
+        }
+        break;
+
+      case 'SELECT':
+        // For select/multiple choice questions, we get option count object
+        if (questionData.optionCounts) {
+          const optionCounts = questionData.optionCounts;
+          const totalResponses = Object.values(optionCounts).reduce((sum, count) => sum + count, 0);
+
+          // Calculate percentage for each option
+          const calculatedPercentage = (count) => {
+            if (totalResponses === 0) return 0;
+            return Math.round((count / totalResponses) * 100);
+          };
+
+          const percentages = {};
+          for (const [option, count] of Object.entries(optionCounts)) {
+            percentages[option] = calculatedPercentage(count);
+          }
+
+          return {
+            optionCounts,
+            count: totalResponses,
+            displayCount: totalResponses,
+            percentages
+          };
+        }
+        break;
+
+      case 'BOOLEAN':
+        // For boolean questions, we get true and false counts
+        if (questionData.trueCount !== undefined && questionData.falseCount !== undefined) {
+          const totalResponses = questionData.trueCount + questionData.falseCount;
+          const truePercentage = totalResponses > 0 ? Math.round((questionData.trueCount / totalResponses) * 100) : 0;
+          const falsePercentage = totalResponses > 0 ? Math.round((questionData.falseCount / totalResponses) * 100) : 0;
+
+          return {
+            optionCounts: {
+              'Sí': questionData.trueCount,
+              'No': questionData.falseCount
+            },
+            count: totalResponses,
+            displayCount: totalResponses,
+            percentages: {
+              'Sí': truePercentage,
+              'No': falsePercentage
+            },
+            trueCount: questionData.trueCount,
+            falseCount: questionData.falseCount
+          };
+        }
+        break;
     }
-    
-    // For text questions, collect all responses
-    if (questionType === 'text') {
-      return {
-        count: questionResponses.length,
-        displayCount: displayCount,
-        responses: questionResponses.map(r => r.value)
-      };
-    }
-    
-    // For multiple choice, count options
-    const optionCounts = {};
-    questionResponses.forEach(response => {
-      if (optionCounts[response.value]) {
-        optionCounts[response.value]++;
-      } else {
-        optionCounts[response.value] = 1;
-      }
-    });
-    
-    // Calculate percentage based on either total participants (if required) or actual responses
-    const baseCount = isRequired ? totalParticipants : questionResponses.length;
-    const calculatedPercentage = (count) => {
-      if (baseCount === 0) return 0;
-      return Math.round((count / baseCount) * 100);
-    };
-    
-    return {
-      optionCounts,
-      count: questionResponses.length,
-      displayCount: displayCount,
-      percentages: Object.keys(optionCounts).reduce((acc, option) => {
-        acc[option] = calculatedPercentage(optionCounts[option]);
-        return acc;
-      }, {})
-    };
+
+    return null;
   };
 
   // Function to trigger the browser's print dialog
@@ -95,45 +128,45 @@ const SurveyResponses = ({ survey, responses, onBack }) => {
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-gray-800 mb-2">{survey.title}</h1>
-            <p className="text-gray-600 mb-4">{survey.description}</p>
-            
+            <h1 className="text-xl font-bold text-gray-800 mb-2">{responses.title}</h1>
+            <p className="text-gray-600 mb-4">{responses.description}</p>
+
             <div className="flex flex-wrap gap-4 text-sm text-gray-600">
               <div className="flex items-center">
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>{survey.estimatedTime}</span>
+                <span>{responses.estimatedTime}</span>
               </div>
-              
+
               <div className="flex items-center">
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
-                <span>{survey.participantCount} personas</span>
+                <span>{responses.responseCount} personas</span>
               </div>
-              
+
               <div className="flex items-center">
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
-                <span>{survey.questionCount} preguntas</span>
+                <span>{responses.questionCount} preguntas</span>
               </div>
-              
+
               <div>
                 <span className={`px-2 py-1 rounded-md text-xs font-medium border ${
-                  survey.isActive 
-                    ? 'bg-green-100 text-green-800 border-green-200' 
+                  responses.isActive
+                    ? 'bg-green-100 text-green-800 border-green-200'
                     : 'bg-gray-100 text-gray-800 border-gray-200'
                 }`}>
-                  {survey.isActive ? 'Activa' : 'Inactiva'}
+                  {responses.isActive ? 'Activa' : 'Inactiva'}
                 </span>
               </div>
             </div>
           </div>
-          
+
           <div className="ml-6">
-            <button 
+            <button
               onClick={handlePrint}
               className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md flex items-center transition-colors"
             >
@@ -151,27 +184,19 @@ const SurveyResponses = ({ survey, responses, onBack }) => {
         <div className="border-b border-gray-200 p-4">
           <h3 className="text-lg font-medium text-gray-800">Respuestas a las preguntas</h3>
         </div>
-        
+
         <div className="divide-y divide-gray-200">
-          {responses && responses.length > 0 ? (
-            responses.map((questionResponse, index) => {
-              const stats = calculateQuestionStats(
-                questionResponse.responses, 
-                survey.participantCount, 
-                questionResponse.type, 
-                questionResponse.required
-              );
-              
+          {responses && responses.questions && responses.questions.length > 0 ? (
+            responses.questions.map((question, index) => {
+              const stats = calculateQuestionStats(question);
+
               return (
-                <div key={questionResponse.questionId} className="p-6">
+                <div key={question.id} className="p-6">
                   <div className="mb-4">
                     <h4 className="text-md font-medium text-gray-800 mb-2">
-                      {index + 1}. {questionResponse.question}
-                      {questionResponse.required && (
-                        <span className="ml-2 text-xs text-red-600">(obligatoria)</span>
-                      )}
+                      {index + 1}. {question.question}
                     </h4>
-                    
+
                     {/* Statistics */}
                     {stats && (
                       <div className="mb-4 p-3 bg-gray-50 rounded-md">
@@ -179,11 +204,6 @@ const SurveyResponses = ({ survey, responses, onBack }) => {
                           {stats.average ? (
                             <div>
                               Total: {stats.displayCount} respuestas | Promedio: {stats.average}/10
-                              {questionResponse.required && stats.count !== stats.displayCount && (
-                                <span className="block text-xs text-gray-500">
-                                  (de {survey.participantCount} participantes)
-                                </span>
-                              )}
                             </div>
                           ) : stats.responses ? ( // Text response type
                             <div>Total: {stats.displayCount} respuestas</div>
@@ -193,7 +213,7 @@ const SurveyResponses = ({ survey, responses, onBack }) => {
                             <div>Total: {stats.displayCount} respuestas</div>
                           )}
                         </div>
-                        
+
                         {/* Distribution for rating questions */}
                         {stats.distribution && (
                           <div className="mb-3">
@@ -207,8 +227,8 @@ const SurveyResponses = ({ survey, responses, onBack }) => {
                                     <div className="w-8 text-sm font-medium">{rating}</div>
                                     <div className="flex-1 ml-2">
                                       <div className="w-full bg-gray-200 rounded-full h-2">
-                                        <div 
-                                          className="bg-primary h-2 rounded-full" 
+                                        <div
+                                          className="bg-primary h-2 rounded-full"
                                           style={{ width: `${(count / stats.displayCount) * 100}%` }}
                                         ></div>
                                       </div>
@@ -219,7 +239,7 @@ const SurveyResponses = ({ survey, responses, onBack }) => {
                             </div>
                           </div>
                         )}
-                        
+
                         {/* Text responses (open questions) */}
                         {stats.responses && (
                           <div className="space-y-2">
@@ -232,12 +252,12 @@ const SurveyResponses = ({ survey, responses, onBack }) => {
                               ))
                             ) : (
                               <div className="p-2 bg-white rounded border border-gray-200 text-sm italic text-gray-500">
-                                Por este ejercicio, por favor
+                                No hay respuestas
                               </div>
                             )}
                           </div>
                         )}
-                        
+
                         {/* Options for multiple choice questions */}
                         {stats.optionCounts && (
                           <div className="space-y-2">
@@ -254,8 +274,8 @@ const SurveyResponses = ({ survey, responses, onBack }) => {
                                   </div>
                                 </div>
                                 <div className="w-full bg-gray-200 rounded-full h-2">
-                                  <div 
-                                    className="bg-primary h-2 rounded-full" 
+                                  <div
+                                    className="bg-primary h-2 rounded-full"
                                     style={{ width: `${stats.percentages ? stats.percentages[option] : 0}%` }}
                                   ></div>
                                 </div>
