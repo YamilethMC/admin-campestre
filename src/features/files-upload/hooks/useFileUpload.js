@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { fileUploadService } from '../services';
+import { AppContext } from '../../../shared/context/AppContext';
 
 export const useFileUpload = () => {
+  const { addToast } = useContext(AppContext);
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -11,65 +13,74 @@ export const useFileUpload = () => {
   const [uploading, setUploading] = useState(false);
 
   const loadFiles = async (params = {}) => {
-    try {
-      setLoading(true);
-      setError(null);
+    setLoading(true);
+    setError(null);
 
-      const response = await fileUploadService.getFiles({
-        page: params.page || page,
-        limit: 10,
-        search: params.search || search,
-        order: 'asc',
-        orderBy: 'name'
-      });
-
-      setFiles(response.data || []);
-      setMeta(response.meta || null);
-    } catch (err) {
-      console.error('Error loading files:', err);
-    } finally {
-      setLoading(false);
+    const response = await fileUploadService.getFiles({
+      page: params.page || page,
+      limit: 10,
+      search: params.search || search,
+      order: 'asc',
+      orderBy: 'name'
+    });
+    if (response.success) {
+      setFiles(response.data.data || []);
+      setMeta(response.data.meta || null);
+    } else {
+      addToast(response.error || 'Error al cargar archivos', 'error');
+      console.error('Error loading files:', response.error);
+      return;
     }
+
+    setLoading(false);
   };
 
   const uploadFile = async (fileData) => {
-    try {
-      setUploading(true);
-      setError(null);
+    setUploading(true);
+    setError(null);
 
-      const response = await fileUploadService.uploadFile(fileData);
+    const response = await fileUploadService.uploadFile(fileData);
 
-      return response;
-    } catch (err) {
-      throw err;
-    } finally {
+    if (response.success) {
+      addToast(response.message || 'Archivo subido exitosamente', 'success');
       setUploading(false);
+      return response;
+    } else {
+      addToast(response.error || 'Error al subir archivo', 'error');
+      setUploading(false);
+      return;
     }
   };
 
   const getFileById = async (id) => {
-    try {
-      const response = await fileUploadService.getFileById(id);
-      return response;
-    } catch (err) {
-      throw err;
+    const response = await fileUploadService.getFileById(id);
+
+    if (response.success) {
+      return response.data;
+    } else {
+      addToast(response.error || 'Error al obtener archivo', 'error');
+      return
     }
   };
 
   const updateFile = async (id, fileData) => {
-    try {
-      const response = await fileUploadService.updateFile(id, fileData);
+    const response = await fileUploadService.updateFile(id, fileData);
+
+    if (response.success) {
       // Refresh the list after update
       await loadFiles();
+      addToast(response.message || 'Archivo actualizado exitosamente', 'success');
       return response;
-    } catch (err) {
-      throw err;
+    } else {
+      addToast(response.error || 'Error al actualizar archivo', 'error');
+      return;
     }
   };
 
   const deleteFile = async (id) => {
-    try {
-      const response = await fileUploadService.deleteFile(id);
+    const response = await fileUploadService.deleteFile(id);
+
+    if (response.success) {
       // Refresh the list after deletion
       // Check if this was the last file on the current page and we're not on the first page
       if (files.length === 1 && page > 1) {
@@ -78,9 +89,11 @@ export const useFileUpload = () => {
       } else {
         await loadFiles();
       }
+      addToast(response.message, 'success');
       return response;
-    } catch (err) {
-      throw err;
+    } else {
+      addToast(response.error || 'Error al eliminar archivo', 'error');
+      return;
     }
   };
 
