@@ -4,7 +4,8 @@ export const EventTypes = {
   SPORT: 'SPORT',
   FAMILY: 'FAMILY',
   OTHER: 'OTHER',
-  ALL: 'TODAS'
+  ALL: 'TODAS',
+  BUSINESS: 'BUSINESS'
 };
 
 // Event interface
@@ -89,5 +90,6 @@ export const EventTypesOptions = [
   { value: EventTypes.SOCIAL, label: 'Social' },
   { value: EventTypes.SPORT, label: 'Deporte' },
   { value: EventTypes.FAMILY, label: 'Familiar' },
-  { value: EventTypes.OTHER, label: 'Otro' }
+  { value: EventTypes.OTHER, label: 'Otro' },
+  { value: EventTypes.BUSINESS, label: 'Negocios' } 
 ];

@@ -132,7 +132,7 @@ const EventRegistrations = ({
           <p className="text-lg font-semibold text-gray-900">{event?.type || 'N/A'}</p>
         </div>
         <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-sm font-medium text-gray-500">Total de Lugares</h3>
+          <h3 className="text-sm font-medium text-gray-500">Total de lugares</h3>
           <p className="text-lg font-semibold text-gray-900">{event?.totalSpots || 0}</p>
         </div>
         <div className="bg-gray-50 p-4 rounded-lg">
@@ -161,7 +161,7 @@ const EventRegistrations = ({
           onClick={handleViewMembers}
           className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
         >
-          Agregar Socio
+          Agregar socio
         </button>
       </div>
 
@@ -194,7 +194,7 @@ const EventRegistrations = ({
                     <div className="text-sm font-medium text-gray-900">{registration.clubMemberId}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">Nombre del Socio</div>
+                    <div className="text-sm text-gray-900">Nombre del socio</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">SOCIO-{registration.clubMemberId}</div>
@@ -245,9 +245,6 @@ const EventRegistrations = ({
         </div>
       ) : (
         <div className="text-center py-12">
-          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
           <h3 className="mt-2 text-sm font-medium text-gray-900">No hay registros</h3>
           <p className="mt-1 text-sm text-gray-500">
             Este evento aún no tiene registros de socios.
@@ -260,10 +257,7 @@ const EventRegistrations = ({
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div className="mt-3 text-center">
-              <svg className="w-16 h-16 text-blue-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-              </svg>
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mt-4">Agregar Socio</h3>
+              <h3 className="text-lg leading-6 font-medium text-gray-900 mt-4">Agregar socio</h3>
               <div className="mt-2 px-7 py-3">
                 <p className="text-sm text-gray-500">
                   Funcionalidad pendiente
@@ -287,9 +281,6 @@ const EventRegistrations = ({
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div className="mt-3 text-center">
-              <svg className="w-16 h-16 text-blue-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 11V9a2 2 0 00-2-2m2 4v4a2 2 0 104 0v-1m-4-3H9m2 0h4m6 1a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
               <h3 className="text-lg leading-6 font-medium text-gray-900 mt-4">
                 Número de inscripciones para el socio {showUpdateModal.clubMemberId}
               </h3>
@@ -340,9 +331,6 @@ const EventRegistrations = ({
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div className="mt-3 text-center">
-              <svg className="w-16 h-16 text-red-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
               <h3 className="text-lg leading-6 font-medium text-gray-900 mt-4">¿Estás seguro?</h3>
               <div className="mt-2 px-7 py-3">
                 <p className="text-sm text-gray-500">

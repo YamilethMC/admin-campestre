@@ -19,7 +19,6 @@ export const useEvents = () => {
   const loadEvents = async ({page: pageParam = 1, search: searchParam = search, type: typeParam = type, date: dateParam = date} = {}) => {
     try {
       setLoading(true);
-      setError(null);
       
       const data = await eventService.fetchEvents({ 
         page: pageParam, 
@@ -32,12 +31,10 @@ export const useEvents = () => {
         setEvents(data.data.events);
         setMeta(data.data.meta);
       } else {
-        setError(data.error);
         addLog(data.error);
         addToast(data.error, 'error');
       }
     } catch (err) {
-      setError(err.message);
       addLog(err.message);
       addToast(err.message || 'Error desconocido', 'error');
     } finally {
@@ -56,7 +53,6 @@ export const useEvents = () => {
       setLoading(true);
       const result = await eventService.createEvent(eventData);
       if (result.success) {
-        addToast(result.message, 'success');
         // Reload events after creation
         loadEvents();
         return result.data;
@@ -144,7 +140,6 @@ export const useEvents = () => {
       setLoading(true);
       const result = await eventService.updateEventRegistration(eventId, memberId, registrationData);
       if (result.success) {
-        addToast(result.message, 'success');
         return result.data;
       } else {
         addToast(result.error, 'error');
@@ -164,7 +159,6 @@ export const useEvents = () => {
       setLoading(true);
       const result = await eventService.deleteEventRegistration(eventId, memberId);
       if (result.success) {
-        addToast(result.message, 'success');
         return result.data;
       } else {
         addToast(result.error, 'error');
