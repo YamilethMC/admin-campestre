@@ -12,7 +12,8 @@ import {
   LogoutIcon,
   HomeIcon,
   FileUploadIcon,
-  FacilitiesIcon
+  FacilitiesIcon,
+  EventsIcon
 } from '../shared/components/icons/icons';
 
 const Navigation = ({ activeView, setActiveView }) => {
@@ -24,9 +25,10 @@ const Navigation = ({ activeView, setActiveView }) => {
     //{ id: 'addMember', label: 'Agregar socio', icon: AddMemberIcon },
     //{ id: 'bulkMembers', label: 'Carga masiva socios', icon: BulkUploadIcon },
     { id: 'accountStatements', label: 'Estados de cuenta (ZIP)', icon: AccountStatementIcon },
+    { id: 'events', label: 'Eventos', icon: EventsIcon },
     { id: 'surveys', label: 'Encuestas', icon: SurveysIcon },
-    { id: 'filesUpload', label: 'Carga de archivos', icon: FileUploadIcon },
     { id: 'notices', label: 'Avisos', icon: NoticesIcon },
+    { id: 'filesUpload', label: 'Carga de archivos', icon: FileUploadIcon },
     { id: 'instalaciones', label: 'Instalaciones', icon: FacilitiesIcon },
     // { id: 'logs', label: 'Panel de Logs', icon: LogIcon } // Comentado temporalmente
   ];

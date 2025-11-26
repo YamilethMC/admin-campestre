@@ -132,3 +132,10 @@ export const FacilitiesIcon = ({ className = "w-5 h-5" }) => (
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7h18M3 12h18M3 17h18M4 7v10a1 1 0 001 1h1a1 1 0 001-1V7M16 7v10a1 1 0 001 1h1a1 1 0 001-1V7M10 7v10a1 1 0 001 1h1a1 1 0 001-1V7" />
   </svg>
 );
+
+// Events Icon
+export const EventsIcon = ({ className = "w-5 h-5" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{width: '1em', height: '1em', display: 'inline', verticalAlign: 'middle'}}>
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+  </svg>
+);

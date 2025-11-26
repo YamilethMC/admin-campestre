@@ -166,7 +166,7 @@ const FacilitiesContainer = () => {
 
   // List view
   return (
-    <div className="max-w-7xl mx-auto">
+    <div>
       <FacilityHeader />
 
       <FacilityFilters
