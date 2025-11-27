@@ -243,7 +243,7 @@ export const useEvents = () => {
       const result = await response.json();
 
       if (result.success) {
-        return result.data.members || [];
+        return (result.data.members || []).filter(m => m.memberCode !== null);
       } else {
         addToast(result.message || 'Error al obtener miembros', 'error');
         return [];

@@ -12,6 +12,13 @@ const EventRegistrations = ({
   searchClubMembers
 }) => {
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+
+  // Function to open the add member modal and fetch initial members
+  const handleViewMembers = () => {
+    setShowAddMemberModal(true);
+    // Fetch initial members when modal opens
+    fetchMembers('');
+  };
   const [showUpdateModal, setShowUpdateModal] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(null);
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -40,16 +47,6 @@ const EventRegistrations = ({
     return result;
   };
 
-  // Handle search input change with debounce
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      fetchMembers(searchTerm);
-    }, 300); // 300ms debounce
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [searchTerm, searchClubMembers]);
 
   // Handle member selection
   const handleMemberSelect = async (member) => {
@@ -67,6 +64,17 @@ const EventRegistrations = ({
       // The error will be handled by the hook and already shown as a toast
       setMemberGuests([]);
     }
+  };
+
+  // Handle search input change - update the local state
+  const handleSearchChange = (value) => {
+    setSearchTerm(value);
+  };
+
+  // Function to handle search when user presses enter or clicks search button
+  const handleSearch = async (e) => {
+    e?.preventDefault();
+    fetchMembers(searchTerm);
   };
 
   // Handle guest selection
@@ -126,10 +134,6 @@ const EventRegistrations = ({
   const totalSpots = event?.totalSpots || 0;
   const ocupedSpots = registrations.reduce((sum, reg) => sum + (reg.totalRegistrations || 0), 0);
   const availableSpots = Math.max(0, totalSpots - ocupedSpots);
-
-  const handleViewMembers = () => {
-    setShowAddMemberModal(true);
-  };
 
   const handleAddMemberAccept = () => {
     setShowAddMemberModal(false);
@@ -418,21 +422,25 @@ const EventRegistrations = ({
                   <label htmlFor="memberSearch" className="block text-sm font-medium text-gray-700 mb-1">
                     Buscar socio
                   </label>
-                  <input
-                    type="text"
-                    id="memberSearch"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Buscar socio por nombre..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                  />
-                </div>
-
-                {loadingMembers && (
-                  <div className="text-center py-4">
-                    <div className="inline-block animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-primary"></div>
+                  <div className="flex">
+                    <input
+                      type="text"
+                      id="memberSearch"
+                      value={searchTerm}
+                      onChange={(e) => handleSearchChange(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
+                      placeholder="Buscar socio por nombre..."
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleSearch}
+                      className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-r-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary"
+                    >
+                      Buscar
+                    </button>
                   </div>
-                )}
+                </div>
 
                 {/* Members list */}
                 {!loadingMembers && (
