@@ -9,13 +9,22 @@ export const noticeService = {
     active = true, // Default to active notices
     search = ''
   } = {}) => {
-    console.log('el active en notice es: ', active)
-    if(active === false){
-      active = null
-    }
     const token = localStorage.getItem("authToken");
+
+    const params = new URLSearchParams({
+      page,
+      limit,
+      search,
+      order,
+      orderBy
+    });
+
+    if (active !== false) {
+      params.append("active", active);
+    }
+
     const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/notify?page=${page}&limit=${limit}&search=${search}&order=${order}&orderBy=${orderBy}&active=${active}`,
+      `${process.env.REACT_APP_API_URL}/notify?${params.toString()}`,
       {
         method: "GET",
         headers: {
