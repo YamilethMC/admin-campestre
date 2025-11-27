@@ -79,8 +79,17 @@ const EventForm = ({ event, onSave, onCancel }) => {
     }
   };
 
+  function toUTC(dateLocalString) {
+    const local = new Date(dateLocalString);        // Interpreta YYYY-MM-DDTHH:mm en tu zona local
+    return new Date(local.getTime() - local.getTimezoneOffset() * 60000).toISOString();
+  }
+
   const handleSaveConfirm = () => {
-    onSave(formData);
+    const adjustedData = {
+    ...formData,
+    date: toUTC(formData.date)
+    };
+    onSave(adjustedData);
     setShowSaveModal(false);
   };
 
