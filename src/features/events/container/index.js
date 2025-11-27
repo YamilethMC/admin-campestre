@@ -108,7 +108,8 @@ const EventsContainer = () => {
         await createEvent(eventData);
       }
       setView('list');
-      // Don't reset filters when returning from form - user should stay on same page/context
+      // Reload events to ensure latest data is shown
+      loadEvents();
     } catch (err) {
       // Error is handled in the create/update functions
     }
@@ -118,7 +119,8 @@ const EventsContainer = () => {
   const handleCancelForm = () => {
     setView('list');
     setCurrentEvent(null);
-    // Don't reset filters when returning from form - user should stay on same page/context
+    // Reload events to ensure latest data is shown
+    loadEvents();
   };
 
   // Handle going back from registrations view
@@ -126,7 +128,8 @@ const EventsContainer = () => {
     setView('list');
     setCurrentEvent(null);
     setRegistrations(null);
-    // Don't reset filters when returning from registrations view - user should stay on same page/context
+    // Reload events to ensure latest data is shown
+    loadEvents();
   };
 
   // Handle deleting an event

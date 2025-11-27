@@ -469,5 +469,66 @@ export const eventService = {
       data: result.data,
       status: response.status
     };
+  },
+
+  // Search club members
+  async searchClubMembers(search = '') {
+    const token = localStorage.getItem("authToken");
+
+    const params = new URLSearchParams({
+      page: '1',
+      limit: '10',
+      search,
+      orderBy: 'name',
+      active: 'true'
+    });
+
+    const response = await fetch(
+      `${API_BASE_URL}/club-members?${params}`,
+      {
+        headers: {
+          "accept": "*/*",
+          "Authorization": `Bearer ${token}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      let errorMessage = "Error al obtener miembros";
+
+      // Manejar códigos de error específicos en el servicio
+      switch (response.status) {
+        case 500:
+          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
+          break;
+        default:
+          errorMessage = errorData.message || "Error al obtener miembros";
+      }
+
+      return {
+        success: false,
+        error: errorMessage,
+        status: response.status
+      };
+    }
+
+    const result = await response.json();
+
+    if (result.success) {
+      // Filter out members without memberCode
+      const filteredMembers = (result.data.members || []).filter(m => m.memberCode !== null);
+      return {
+        success: true,
+        data: { members: filteredMembers },
+        status: response.status
+      };
+    } else {
+      return {
+        success: false,
+        error: result.message || "Error al obtener miembros",
+        status: response.status
+      };
+    }
   }
 };

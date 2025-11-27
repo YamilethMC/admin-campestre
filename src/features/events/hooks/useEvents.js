@@ -213,43 +213,16 @@ export const useEvents = () => {
   const searchClubMembers = async (search = '') => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("authToken");
-
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/club-members?page=1&limit=10&search=${search}&orderBy=name&active=true`,
-        {
-          headers: {
-            "accept": "*/*",
-            "Authorization": `Bearer ${token}`
-          }
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        let errorMessage = "Error al obtener miembros";
-
-        // Manejar códigos de error específicos
-        if (response.status === 500) {
-          errorMessage = 'Error del servidor';
-        } else {
-          errorMessage = errorData.message || "Error al obtener miembros";
-        }
-
-        addToast(errorMessage, 'error');
-        return [];
-      }
-
-      const result = await response.json();
+      const result = await eventService.searchClubMembers(search);
 
       if (result.success) {
-        return (result.data.members || []).filter(m => m.memberCode !== null);
+        return result.data.members || [];
       } else {
-        addToast(result.message || 'Error al obtener miembros', 'error');
+        addToast(result.error, 'error');
         return [];
       }
     } catch (error) {
-      addToast(error.message || 'Error de red al obtener miembros', 'error');
+      addToast(error.message || 'Error desconocido al buscar miembros', 'error');
       return [];
     } finally {
       setLoading(false);
