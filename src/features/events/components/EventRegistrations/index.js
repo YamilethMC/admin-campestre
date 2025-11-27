@@ -535,49 +535,82 @@ const EventRegistrations = ({
 
       {/* Update Registration Modal */}
       {showUpdateModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="mt-3 text-center">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mt-4">
-                Número de inscripciones para el socio {showUpdateModal.clubMemberId}
-              </h3>
-              <div className="mt-2 px-7 py-3">
-                <div className="flex items-center justify-center space-x-4">
-                  <button
-                    type="button"
-                    onClick={decrementRegistration}
-                    className="px-4 py-2 bg-gray-200 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={updatedRegistrationsCount <= 1}
-                  >
-                    -
-                  </button>
-                  <span className="text-xl font-bold min-w-[40px] text-center">
-                    {updatedRegistrationsCount}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={incrementRegistration}
-                    className="px-4 py-2 bg-gray-200 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={updatedRegistrationsCount >= availableSpots + showUpdateModal.totalRegistrations}
-                  >
-                    +
-                  </button>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md transform transition-all">
+            <div className="px-6 pt-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">
+                    Actualizar inscripciones
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Socio: {showUpdateModal.clubMember.user.name} {showUpdateModal.clubMember.user.lastName}
+                  </p>
                 </div>
-              </div>
-              <div className="items-center px-4 py-3">
                 <button
                   onClick={() => setShowUpdateModal(null)}
-                  className="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300 mr-2"
+                  className="text-gray-400 hover:text-gray-500 transition-colors"
                 >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleUpdateConfirm}
-                  className="px-4 py-2 bg-primary text-white text-base font-medium rounded-md shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary ml-2"
-                >
-                  Guardar
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
+            </div>
+
+            <div className="px-6 py-4">
+              <div className="text-center">
+                <div className="inline-flex items-center bg-gradient-to-r from-blue-50 to-blue-100 rounded-full px-4 py-2">
+                  <svg className="h-5 w-5 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                  <span className="text-2xl font-bold text-gray-900">{updatedRegistrationsCount}</span>
+                </div>
+
+                <p className="text-sm text-gray-500 mt-2">
+                  Personas registradas actualmente
+                </p>
+              </div>
+
+              <div className="mt-6 flex items-center justify-center">
+                <button
+                  type="button"
+                  onClick={decrementRegistration}
+                  disabled={updatedRegistrationsCount <= 1}
+                  className="h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-xl font-bold shadow-md transition-all duration-150 disabled:transform-none hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
+                >
+                  -
+                </button>
+
+                <div className="mx-6 text-center">
+                  <p className="text-sm text-gray-500">Disponibles</p>
+                  <p className="text-lg font-bold text-blue-600">{availableSpots + showUpdateModal.totalRegistrations - updatedRegistrationsCount}</p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={incrementRegistration}
+                  disabled={updatedRegistrationsCount >= availableSpots + showUpdateModal.totalRegistrations}
+                  className="h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-xl font-bold shadow-md transition-all duration-150 disabled:transform-none hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 px-6 py-4 rounded-b-xl flex justify-end space-x-3">
+              <button
+                onClick={() => setShowUpdateModal(null)}
+                className="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-100 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-300"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleUpdateConfirm}
+                className="px-5 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-md"
+              >
+                Guardar cambios
+              </button>
             </div>
           </div>
         </div>
