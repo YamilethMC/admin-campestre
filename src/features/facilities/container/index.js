@@ -75,7 +75,12 @@ const FacilitiesContainer = () => {
 
   // Handle viewing reservations
   const handleViewReservations = (facility) => {
-    setCurrentFacility(facility);
+    // Create a new facility object with the current date set
+    const facilityWithDate = {
+      ...facility,
+      selectedDate: new Date().toISOString().split('T')[0] // Format YYYY-MM-DD
+    };
+    setCurrentFacility(facilityWithDate);
     setView('reservations');
   };
 

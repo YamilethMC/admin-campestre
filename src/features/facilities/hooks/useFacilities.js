@@ -122,12 +122,78 @@ export function useFacilities(initialFilters = {}) {
     try {
       // Placeholder for deleting reservation - in the future this would call a service method
       console.log('Deleting reservation:', reservationId, 'from facility:', facilityId);
-
-      // Show success toast for the placeholder implementation
       return true;
     } catch (error) {
       addToast(error.message || 'Error al eliminar la reservación', 'error');
       return false;
+    }
+  };
+
+  // Get facility with reservations for a specific date
+  const getFacilityWithReservations = async (id, date) => {
+    try {
+      const result = await facilityService.getFacilityWithReservations(id, date);
+
+      if (result.success) {
+        return result.data;
+      } else {
+        addToast(result.error || 'Error al cargar la instalación', 'error');
+        return null;
+      }
+    } catch (error) {
+      addToast(error.message || 'Error desconocido al cargar la instalación', 'error');
+      return null;
+    }
+  };
+
+  // Create facility reservation
+  const createFacilityReservation = async (facilityId, memberId, reservationData) => {
+    try {
+      const result = await facilityService.createFacilityReservation(facilityId, memberId, reservationData);
+
+      if (result.success) {
+        return result.data;
+      } else {
+        addToast(result.error || 'Error al crear reservación', 'error');
+        return null;
+      }
+    } catch (error) {
+      addToast(error.message || 'Error desconocido al crear reservación', 'error');
+      return null;
+    }
+  };
+
+  // Update facility reservation (to cancel)
+  const updateFacilityReservation = async (reservationId, clubMemberId, reservationData) => {
+    try {
+      const result = await facilityService.updateFacilityReservation(reservationId, clubMemberId, reservationData);
+
+      if (result.success) {
+        return result.data;
+      } else {
+        addToast(result.error || 'Error al actualizar reservación', 'error');
+        return null;
+      }
+    } catch (error) {
+      addToast(error.message || 'Error desconocido al actualizar reservación', 'error');
+      return null;
+    }
+  };
+
+  // Search club members for reservations
+  const searchClubMembers = async (search = '') => {
+    try {
+      const result = await facilityService.searchClubMembers(search);
+
+      if (result.success) {
+        return result.data.members || [];
+      } else {
+        addToast(result.error || 'Error al buscar socios', 'error');
+        return [];
+      }
+    } catch (error) {
+      addToast(error.message || 'Error desconocido al buscar socios', 'error');
+      return [];
     }
   };
 
@@ -151,6 +217,10 @@ export function useFacilities(initialFilters = {}) {
     createFacility,
     updateFacility,
     deleteFacility,
-    deleteReservation
+    getFacilityWithReservations,
+    deleteReservation,
+    createFacilityReservation,
+    updateFacilityReservation,
+    searchClubMembers
   };
 }
