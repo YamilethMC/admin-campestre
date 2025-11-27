@@ -191,8 +191,11 @@ const MemberList = () => {
       </div>
 
       {filteredMembers.length === 0 ? (
+        <>
         <p className="text-gray-500">No hay socios registrados con los filtros aplicados.</p>
+        </>
       ) : (
+        <>
         <div className="border border-gray-200 rounded-lg">
           <div className="">
             <table className="min-w-full divide-y divide-gray-200">
@@ -261,9 +264,8 @@ const MemberList = () => {
             </table>
           </div>
         </div>
-      )}
 
-      {meta && (
+        {meta && (
         <div className="flex justify-center items-center gap-3 mt-4">
 
           {/* Botón Anterior */}
@@ -302,6 +304,7 @@ const MemberList = () => {
           </button>
 
         </div>
+      )}</>
       )}
 
       {/*<div className="mt-4 text-sm text-gray-600">
