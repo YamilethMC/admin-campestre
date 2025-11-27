@@ -151,12 +151,17 @@ export const useIndividualMember = () => {
     try {
       const result = await memberService.addMember(memberData);
 
-      addToast("Socio registrado exitosamente", "success");
-      addLog(`Socio agregado: ${formData.nombre} ${formData.apellidos}`);
-      if(result){
-        resetForm();
+      if(result.success){
+        addLog(`Socio agregado: ${formData.nombre} ${formData.apellidos}`);
+        if(result){
+          resetForm();
+        }
+        return true;
+      }else{
+        addToast(result.error, "error");
+        return false;
       }
-      return true;
+      
     } catch (err) {
       console.error(err);
       addToast(err.message, "error");

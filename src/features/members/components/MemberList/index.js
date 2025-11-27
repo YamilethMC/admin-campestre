@@ -1,9 +1,10 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import MemberFilters from '../MemberFilters';
 import IndividualMember from '../../../individual-members';
 import { useMembers } from '../../hooks/useMembers';
 import { memberService } from '../../services';
 import BulkMemberUploadContainer from '../../../bulk-upload';
+import { AppContext } from '../../../../shared/context/AppContext';
 
 const MemberList = () => {
   const [filters, setFilters] = useState({
@@ -16,6 +17,7 @@ const MemberList = () => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
+  const { addToast } = useContext(AppContext);
 
   const { members, meta, page, setPage, loadMembers, setActive, search, setSearch } = useMembers();
 
@@ -77,7 +79,12 @@ const MemberList = () => {
   };
 
   const handleDeleteMember = async (memberId) => {
-    await memberService.deleteMember(memberId);
+    const result = await memberService.deleteMember(memberId);
+    if (!result.success) {
+      addToast(result.error || 'Error al eliminar miembro', 'error');
+      return;
+    }
+
     if (members.length === 1 && page > 1) {
       setPage(page - 1);
     } else {
@@ -143,6 +150,7 @@ const MemberList = () => {
     return (
         <BulkMemberUploadContainer
           onCancel={handleBack}
+          onAddMember={handleSaveMember}
         />
     );
   }
