@@ -25,13 +25,20 @@ export const useSurvey = () => {
   const loadSurveys = async ({page = 1, limit = 10, status: statusParam = status, category: categoryParam = category, search: searchParam = search } = {})=> {
     try {
       setLoading(true);
-      const data = await surveyService.fetchSurveys({ page, limit, status: statusParam, category: categoryParam, search: searchParam });
-      setSurveys(data.surveys);
-      setMeta(data.meta);
-      setActiveCount(data.activeCount);
-      setInactiveCount(data.inactiveCount);
+      const result = await surveyService.fetchSurveys({ page, limit, status: statusParam, category: categoryParam, search: searchParam });
+
+      if (result.success) {
+        setSurveys(result.data.surveys);
+        setMeta(result.data.meta);
+        setActiveCount(result.data.activeCount);
+        setInactiveCount(result.data.inactiveCount);
+      } else {
+        addLog('Error al cargar las encuestas');
+        addToast(result.error || 'Error desconocido', 'error');
+        return;
+      }
     } catch (err) {
-      addLog('Error al cargar las encuestas');
+      addLog('Error desconocido al cargar las encuestas');
       addToast(err.message || 'Error desconocido', 'error');
       return;
     } finally {
@@ -75,8 +82,11 @@ export const useSurvey = () => {
     try {
       const result = await surveyService.toggleSurveyStatus(id);
 
-      if(result && result.successMessage) {
+      if (result.success) {
         loadSurveys();
+      } else {
+        addToast(result.error || 'Error desconocido', 'error');
+        return;
       }
     } catch (err) {
       addToast(err.message || 'Error desconocido', 'error');
@@ -165,15 +175,18 @@ export const useSurvey = () => {
     const surveyDataF = buildSurveyData(surveyData);
     try {
       setLoading(true);
-      const newSurvey = await surveyService.createSurvey(surveyDataF);
+      const result = await surveyService.createSurvey(surveyDataF);
 
-      if(newSurvey && newSurvey.successMessage) {
+      if (result.success) {
         loadSurveys();
+        return result.data;
+      } else {
+        addToast(result.error || 'Error desconocido', 'error');
+        return null;
       }
-      return newSurvey;
     } catch (err) {
       addToast(err.message || 'Error desconocido', 'error');
-      return;
+      return null;
     } finally {
       setLoading(false);
     }
@@ -184,14 +197,18 @@ export const useSurvey = () => {
     const surveyDataF = buildUpdateSurveyData(surveyData);
     try {
       setLoading(true);
-      const updatedSurvey = await surveyService.updateSurvey(id, surveyDataF);
-      if (updatedSurvey) {
+      const result = await surveyService.updateSurvey(id, surveyDataF);
+
+      if (result.success) {
         loadSurveys();
+        return result.data;
+      } else {
+        addToast(result.error || 'Error desconocido', 'error');
+        return null;
       }
-      return updatedSurvey;
     } catch (err) {
       addToast(err.message || 'Error desconocido', 'error');
-      return;
+      return null;
     } finally {
       setLoading(false);
     }
@@ -201,11 +218,17 @@ export const useSurvey = () => {
   const getSurveyResponses = async (surveyId) => {
     try {
       setLoading(true);
-      const responses = await surveyService.getSurveyResponses(surveyId);
-      return responses;
+      const result = await surveyService.getSurveyResponses(surveyId);
+
+      if (result.success) {
+        return result.data;
+      } else {
+        addToast(result.error || 'Error desconocido', 'error');
+        return null;
+      }
     } catch (err) {
       addToast(err.message || 'Error desconocido', 'error');
-      return;
+      return null;
     } finally {
       setLoading(false);
     }
@@ -215,11 +238,17 @@ export const useSurvey = () => {
   const getSurveyById = async (id) => {
     try {
       setLoading(true);
-      const survey = await surveyService.getSurveyById(id);
-      return survey;
+      const result = await surveyService.getSurveyById(id);
+
+      if (result.success) {
+        return result.data;
+      } else {
+        addToast(result.error || 'Error desconocido', 'error');
+        return null;
+      }
     } catch (err) {
       addToast(err.message || 'Error desconocido', 'error');
-      return;
+      return null;
     } finally {
       setLoading(false);
     }
@@ -229,18 +258,20 @@ export const useSurvey = () => {
   const deleteSurvey = async (id) => {
     try {
       const result = await surveyService.deleteSurvey(id);
-      if (result && result.success) {
+      if (result.success) {
         if (surveys.length === 1 && page > 1) {
           setPage(page - 1);
         } else {
           loadSurveys();
         }
         return true;
+      } else {
+        addToast(result.error || 'Error desconocido', 'error');
+        return false;
       }
-      return false;
     } catch (err) {
       addToast(err.message || 'Error desconocido', 'error');
-      return;
+      return false;
     }
   };
 

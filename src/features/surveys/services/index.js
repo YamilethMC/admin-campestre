@@ -49,10 +49,18 @@ export const surveyService = {
           errorMessage = err.message || 'Error desconocido';
       }
 
-      throw new Error(errorMessage);
+      return {
+        success: false,
+        error: errorMessage,
+        status: response.status
+      };
     }
     const data = await response.json();
-    return data.data;
+    return {
+      success: true,
+      data: data.data,
+      status: response.status
+    };
   },
 
   createSurvey: async (surveyData) => {
@@ -82,15 +90,20 @@ export const surveyService = {
           errorMessage = err.message || 'Error desconocido';
       }
 
-      throw new Error(errorMessage);
+      return {
+        success: false,
+        error: errorMessage,
+        status: response.status
+      };
     }
 
     const result = await response.json();
-    // Mensaje de éxito para el toast
-    if(response.ok && !result.error) {
-      result.successMessage = 'Encuesta creada exitosamente';
-    }
-    return result;
+    return {
+      success: true,
+      data: result,
+      message: result.message || 'Encuesta creada exitosamente',
+      status: response.status
+    };
   },
 
   updateSurvey: async (id, surveyData) => {
@@ -131,19 +144,30 @@ export const surveyService = {
           errorMessage = err.message || 'Error desconocido';
       }
 
-      throw new Error(errorMessage);
+      return {
+        success: false,
+        error: errorMessage,
+        status: response.status
+      };
     }
     const result = await response.json();
-    // Mensaje de éxito para el toast
-    if(response.ok && !result.error) {
-      result.successMessage = 'Encuesta actualizada exitosamente';
-    }
-    return result;
+    return {
+      success: true,
+      data: result,
+      message: result.message || 'Encuesta actualizada exitosamente',
+      status: response.status
+    };
   },
 
   toggleSurveyStatus: async (id) => {
     const token = localStorage.getItem("authToken");
-    if (!token) return;
+    if (!token) {
+      return {
+        success: false,
+        error: 'No se encontró el token de autenticación',
+        status: 401
+      };
+    }
 
     const response = await fetch(`${process.env.REACT_APP_API_URL}/survey/${id}/toggle-active`, {
       method: "PATCH",
@@ -176,16 +200,30 @@ export const surveyService = {
           errorMessage = err.message || 'Error desconocido';
       }
 
-      throw new Error(errorMessage);
+      return {
+        success: false,
+        error: errorMessage,
+        status: response.status
+      };
     }
 
-    return { success: true, successMessage: 'Estado de encuesta actualizado exitosamente' };
+    return {
+      success: true,
+      message: 'Estado de encuesta actualizado exitosamente',
+      status: response.status
+    };
   },
 
   // Delete a survey
   deleteSurvey: async (id) => {
     const token = localStorage.getItem("authToken");
-    if (!token) return;
+    if (!token) {
+      return {
+        success: false,
+        error: 'No se encontró el token de autenticación',
+        status: 401
+      };
+    }
 
     const response = await fetch(`${process.env.REACT_APP_API_URL}/survey/${id}`, {
       method: "DELETE",
@@ -218,9 +256,17 @@ export const surveyService = {
           errorMessage = err.message || 'Error desconocido';
       }
 
-      throw new Error(errorMessage);
+      return {
+        success: false,
+        error: errorMessage,
+        status: response.status
+      };
     }
-    return { success: true, successMessage: 'Encuesta eliminada exitosamente' };
+    return {
+      success: true,
+      message: 'Encuesta eliminada exitosamente',
+      status: response.status
+    };
   },
   
   // Get all responses for a survey (for the responses view)
@@ -254,10 +300,18 @@ export const surveyService = {
           errorMessage = err.message || 'Error desconocido';
       }
 
-      throw new Error(errorMessage);
+      return {
+        success: false,
+        error: errorMessage,
+        status: response.status
+      };
     }
     const data = await response.json();
-    return data.data;
+    return {
+      success: true,
+      data: data.data,
+      status: response.status
+    };
   },
 
   // Fetch surveys with pagination, filtering and search
@@ -269,7 +323,7 @@ export const surveyService = {
     status = '' // 'true', 'false', or empty for all
   } = {}) {
     const token = localStorage.getItem("authToken");
-    
+
     // Build query parameters
     let query = `${process.env.REACT_APP_API_URL}/survey?page=${page}&limit=${limit}`;
     if (search) query += `&search=${encodeURIComponent(search)}`;
@@ -300,16 +354,20 @@ export const surveyService = {
           errorMessage = err.message || 'Error desconocido';
       }
 
-      throw new Error(errorMessage);
+      return {
+        success: false,
+        error: errorMessage,
+        status: response.status
+      };
     }
 
     const data = await response.json();
-    
+
     // The API returns { surveysActive, surveysInactive, meta }
     let surveys = [];
     let activeCount = 0;
     let inactiveCount = 0;
-    
+
     // Handle the different status filter scenarios
     if (status === 'true') {
       // Only active surveys
@@ -321,16 +379,20 @@ export const surveyService = {
       // All surveys (active first)
       surveys = [...(data.data.surveysActive || []), ...(data.data.surveysInactive || [])];
     }
-    
+
     // Calculate counts based on data returned
     activeCount = data.data.surveysActive ? data.data.surveysActive.length : 0;
     inactiveCount = data.data.surveysInactive ? data.data.surveysInactive.length : 0;
-    
+
     return {
-      surveys: surveys,
-      meta: data.data.meta,
-      activeCount,
-      inactiveCount
+      success: true,
+      data: {
+        surveys: surveys,
+        meta: data.data.meta,
+        activeCount,
+        inactiveCount
+      },
+      status: response.status
     };
   }
 };
