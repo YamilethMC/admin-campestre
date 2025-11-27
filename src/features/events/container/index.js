@@ -40,23 +40,26 @@ const EventsContainer = () => {
 
   // Update filters
   const updateFilterParams = (newFilters) => {
-    if (newFilters.type !== undefined) {
+    if (newFilters.type !== undefined && type !== newFilters.type) {
       setType(newFilters.type);
       setPage(1);
     }
-    if (newFilters.search !== undefined) {
+    if (newFilters.search !== undefined && search !== newFilters.search) {
       setSearch(newFilters.search);
       setPage(1);
     }
-    if (newFilters.date !== undefined) {
+    if (newFilters.date !== undefined && date !== newFilters.date) {
       setDate(newFilters.date);
       setPage(1);
     }
   };
 
   const handleDateChange = (newDate) => {
-    setDate(newDate);
-    setPage(1);
+    // Only reset to page 1 if the date is actually different from the current date
+    if (date !== newDate) {
+      setDate(newDate);
+      setPage(1);
+    }
   };
 
   // Handle adding a new event
@@ -105,7 +108,7 @@ const EventsContainer = () => {
         await createEvent(eventData);
       }
       setView('list');
-      resetFiltersToDefaults(); // Reset filters when returning to list
+      // Don't reset filters when returning from form - user should stay on same page/context
     } catch (err) {
       // Error is handled in the create/update functions
     }
@@ -115,7 +118,7 @@ const EventsContainer = () => {
   const handleCancelForm = () => {
     setView('list');
     setCurrentEvent(null);
-    resetFiltersToDefaults(); // Reset filters when returning to list
+    // Don't reset filters when returning from form - user should stay on same page/context
   };
 
   // Handle going back from registrations view
@@ -123,7 +126,7 @@ const EventsContainer = () => {
     setView('list');
     setCurrentEvent(null);
     setRegistrations(null);
-    resetFiltersToDefaults(); // Reset filters when returning to list
+    // Don't reset filters when returning from registrations view - user should stay on same page/context
   };
 
   // Handle deleting an event

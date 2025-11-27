@@ -4,7 +4,7 @@ export const eventService = {
   // Fetch all events with pagination, search, filters, and date
   async fetchEvents({
     page = 1,
-    limit = 1,
+    limit = 10,
     search = '',
     order = 'asc',
     orderBy = 'name',
