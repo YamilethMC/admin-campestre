@@ -32,7 +32,10 @@ const EventsContainer = () => {
     updateEvent,
     deleteEvent,
     updateEventRegistration,
-    deleteEventRegistration
+    deleteEventRegistration,
+    createEventRegistration,
+    getClubMemberById,
+    searchClubMembers
   } = useEvents();
 
   // Update filters
@@ -167,6 +170,9 @@ const EventsContainer = () => {
         onBack={handleBackFromRegistrations}
         onUpdateRegistration={updateEventRegistration}
         onDeleteRegistration={deleteEventRegistration}
+        createEventRegistration={createEventRegistration}
+        getClubMemberById={getClubMemberById}
+        searchClubMembers={searchClubMembers}
         onRefreshEvent={async (eventId) => {
           const fullEvent = await getEventById(eventId);
           if (fullEvent) {

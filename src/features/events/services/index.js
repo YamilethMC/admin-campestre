@@ -367,5 +367,107 @@ export const eventService = {
       message: result.data.message || 'Registro cancelado exitosamente',
       status: response.status
     };
+  },
+
+  // Create event registration
+  async createEventRegistration(eventId, registrationData) {
+    const token = localStorage.getItem("authToken");
+
+    const response = await fetch(
+      `${API_BASE_URL}/events/${eventId}/registration`,
+      {
+        method: "POST",
+        headers: {
+          "accept": "application/json",
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(registrationData)
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      let errorMessage = "Error al crear registro";
+
+      // Manejar códigos de error específicos en el servicio
+      switch (response.status) {
+        case 400:
+          errorMessage = 'Datos de entrada inválidos';
+          break;
+        case 404:
+          errorMessage = 'Evento o Miembro no encontrado';
+          break;
+        case 409:
+          errorMessage = 'El evento está lleno o el socio ya está registrado';
+          break;
+        case 500:
+          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
+          break;
+        default:
+          errorMessage = errorData.message || "Error al crear registro";
+      }
+
+      return {
+        success: false,
+        error: errorMessage,
+        status: response.status
+      };
+    }
+
+    const result = await response.json();
+
+    return {
+      success: true,
+      data: result.data,
+      message: result.data.message || 'Registro creado exitosamente',
+      status: response.status
+    };
+  },
+
+  // Get club member by ID with guests
+  async getClubMemberById(memberId) {
+    const token = localStorage.getItem("authToken");
+
+    const response = await fetch(
+      `${API_BASE_URL}/club-members/${memberId}`,
+      {
+        headers: {
+          "accept": "*/*",
+          "Authorization": `Bearer ${token}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      let errorMessage = "Error al obtener miembro";
+
+      // Manejar códigos de error específicos en el servicio
+      switch (response.status) {
+        case 404:
+          errorMessage = 'Miembro no encontrado';
+          break;
+        case 500:
+          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
+          break;
+        default:
+          errorMessage = errorData.message || "Error al obtener miembro";
+      }
+
+      return {
+        success: false,
+        error: errorMessage,
+        status: response.status
+      };
+    }
+
+    const result = await response.json();
+
+    return {
+      success: true,
+      data: result.data,
+      status: response.status
+    };
   }
 };

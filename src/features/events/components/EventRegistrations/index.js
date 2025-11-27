@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const EventRegistrations = ({
   event,
@@ -6,7 +6,10 @@ const EventRegistrations = ({
   onBack,
   onUpdateRegistration,
   onDeleteRegistration,
-  onRefreshEvent
+  onRefreshEvent,
+  createEventRegistration,
+  getClubMemberById,
+  searchClubMembers
 }) => {
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(null);
@@ -14,11 +17,112 @@ const EventRegistrations = ({
   const [openDropdown, setOpenDropdown] = useState(null);
   const [updatedRegistrationsCount, setUpdatedRegistrationsCount] = useState(0);
 
+  // New state variables for member selection
+  const [members, setMembers] = useState([]);
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [memberGuests, setMemberGuests] = useState([]);
+  const [selectedGuests, setSelectedGuests] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loadingMembers, setLoadingMembers] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [registrationToSubmit, setRegistrationToSubmit] = useState(null);
+
   const toggleDropdown = (id) => {
     setOpenDropdown(openDropdown === id ? null : id);
   };
 
-  // Calculate event statistics
+  // Function to fetch members using the hook function
+  const fetchMembers = async (search = '') => {
+    setLoadingMembers(true);
+    const result = await searchClubMembers(search);
+    setMembers(result);
+    setLoadingMembers(false);
+    return result;
+  };
+
+  // Handle search input change with debounce
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      fetchMembers(searchTerm);
+    }, 300); // 300ms debounce
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm, searchClubMembers]);
+
+  // Handle member selection
+  const handleMemberSelect = async (member) => {
+    setSelectedMember(member);
+    setSelectedGuests([]); // Reset selected guests when selecting a new member
+
+    try {
+      const memberDetails = await getClubMemberById(member.id);
+      if (memberDetails) {
+        setMemberGuests(memberDetails.guests || []);
+      } else {
+        setMemberGuests([]);
+      }
+    } catch (error) {
+      // The error will be handled by the hook and already shown as a toast
+      setMemberGuests([]);
+    }
+  };
+
+  // Handle guest selection
+  const handleGuestSelect = (guestId, checked) => {
+    if (checked) {
+      setSelectedGuests(prev => [...prev, guestId]);
+    } else {
+      setSelectedGuests(prev => prev.filter(id => id !== guestId));
+    }
+  };
+
+  // Handle saving registration
+  const handleSaveRegistration = () => {
+    if (!selectedMember) return;
+
+    // The total registrations is 1 (member) + number of selected guests
+    const totalRegistrations = 1 + selectedGuests.length;
+
+    // Prepare the data to submit
+    const registrationData = {
+      clubMemberId: selectedMember.id,
+      totalRegistrations
+    };
+
+    setRegistrationToSubmit(registrationData);
+    setShowConfirmationModal(true);
+  };
+
+  // Confirm registration
+  const confirmRegistration = async () => {
+    if (!registrationToSubmit) return;
+
+    try {
+      const result = await createEventRegistration(event.id, registrationToSubmit);
+      if (result) {
+        // Refresh the event data to show new registration
+        if (onRefreshEvent) {
+          await onRefreshEvent(event.id);
+        }
+        // Close the modal
+        setShowAddMemberModal(false);
+        // Reset states
+        setSelectedMember(null);
+        setSelectedGuests([]);
+        setMemberGuests([]);
+        setSearchTerm('');
+        setRegistrationToSubmit(null);
+      }
+    } catch (error) {
+      // The error will be handled by the hook and already shown as a toast
+    } finally {
+      setShowConfirmationModal(false);
+    }
+  };
+
+    // Calculate event statistics
   const totalSpots = event?.totalSpots || 0;
   const ocupedSpots = registrations.reduce((sum, reg) => sum + (reg.totalRegistrations || 0), 0);
   const availableSpots = Math.max(0, totalSpots - ocupedSpots);
@@ -127,31 +231,56 @@ const EventRegistrations = ({
 
       {/* Event Details */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-sm font-medium text-gray-500">Tipo</h3>
-          <p className="text-lg font-semibold text-gray-900">{event?.type || 'N/A'}</p>
+        {/* Date Card */}
+        <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
+          <div className="flex items-center">
+            <div className="bg-blue-100 p-2 rounded-lg mr-3">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-blue-700">Fecha</h3>
+              <p className="text-lg font-semibold text-gray-900">{formatDate(event?.date)}</p>
+            </div>
+          </div>
         </div>
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-sm font-medium text-gray-500">Total de lugares</h3>
-          <p className="text-lg font-semibold text-gray-900">{event?.totalSpots || 0}</p>
+
+        {/* Location Card */}
+        <div className="bg-gradient-to-r from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
+          <div className="flex items-center">
+            <div className="bg-purple-100 p-2 rounded-lg mr-3">
+              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-purple-700">Lugar</h3>
+              <p className="text-lg font-semibold text-gray-900">{event?.location || 'N/A'}</p>
+            </div>
+          </div>
         </div>
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-sm font-medium text-gray-500">Disponibles</h3>
-          <p className={`text-lg font-semibold ${availableSpots > 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {availableSpots}
-          </p>
-        </div>
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-sm font-medium text-gray-500">Ocupados</h3>
-          <p className="text-lg font-semibold text-gray-900">{ocupedSpots}</p>
-        </div>
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-sm font-medium text-gray-500">Fecha</h3>
-          <p className="text-lg font-semibold text-gray-900">{formatDate(event?.date)}</p>
-        </div>
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-sm font-medium text-gray-500">Lugar</h3>
-          <p className="text-lg font-semibold text-gray-900">{event?.location || 'N/A'}</p>
+
+        {/* Spots Card */}
+        <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
+          <h3 className="text-sm font-medium text-green-700 mb-2">Lugares</h3>
+          <div className="grid grid-cols-3 gap-2">
+            <div className="text-center">
+              <p className="text-xs text-green-600">Total</p>
+              <p className="text-lg font-bold text-gray-900">{event?.totalSpots || 0}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-green-600">Disponibles</p>
+              <p className={`text-lg font-bold ${availableSpots > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {availableSpots}
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-green-600">Ocupados</p>
+              <p className="text-lg font-bold text-gray-900">{ocupedSpots}</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -166,81 +295,109 @@ const EventRegistrations = ({
       </div>
 
       {registrations.length > 0 ? (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Código
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Nombre
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Registros
-                </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {registrations.map((registration) => (
-                <tr key={registration.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{registration.clubMember.memberCode}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{registration.clubMember.user.name} {registration.clubMember.user.lastName}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{registration.totalRegistrations}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="relative inline-block text-left">
-                      <button
-                        onClick={() => toggleDropdown(registration.id)}
-                        className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-                      >
-                        <svg className="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6a2 2 0 110-4 2 2 0 010 4zM12 14a2 2 0 110-4 2 2 0 010 4zM12 22a2 2 0 110-4 2 2 0 010 4z" />
-                        </svg>
-                      </button>
-                      {openDropdown === registration.id && (
-                        <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
-                          <div className="py-1" role="none">
-                            <button
-                              onClick={() => {
-                                handleUpdateRegistrations(registration);
-                                setOpenDropdown(null);
-                              }}
-                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                            >
-                              Actualizar número de inscripciones
-                            </button>
-                            <button
-                              onClick={() => {
-                                handleDeleteRegistration(registration.id);
-                                setOpenDropdown(null);
-                              }}
-                              className="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left"
-                            >
-                              Eliminar
-                            </button>
+        <div className="bg-white shadow-lg rounded-lg">
+          <ul className="divide-y divide-gray-200">
+            {registrations.map((registration) => (
+              <li key={registration.id} className="hover:bg-gray-50 transition-colors duration-150">
+                <div className="block">
+                  <div className="flex items-center px-6 py-5">
+                    <div className="min-w-0 flex-1 flex items-center">
+                      <div className="min-w-0 flex-1 md:grid md:grid-cols-2 gap-6">
+                        <div>
+                          <div className="flex items-center">
+                            <div className="flex-shrink-0 h-12 w-12 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold">
+                              {registration.clubMember.user.name.charAt(0)}{registration.clubMember.user.lastName?.charAt(0) || ''}
+                            </div>
+                            <div className="ml-4">
+                              <p className="text-base font-bold text-gray-900">
+                                {registration.clubMember.user.name} {registration.clubMember.user.lastName}
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                <span className="font-medium">Código:</span> {registration.clubMember.memberCode || 'N/A'}
+                              </p>
+                              <p className="text-sm text-gray-500 flex items-center mt-1">
+                                <svg className="h-4 w-4 text-gray-400 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                {registration.clubMember.user.email}
+                              </p>
+                              <p className="text-sm text-gray-500 flex items-center mt-1">
+                                <svg className="h-4 w-4 text-gray-400 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                Fecha: {formatDate(registration.createdAt || registration.updatedAt)}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      )}
+
+                        <div className="flex items-center justify-between md:justify-end">
+                          <div className="flex items-center bg-gradient-to-r from-green-50 to-green-100 rounded-lg px-4 py-2 mr-4">
+                            <svg className="h-5 w-5 text-green-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            <span className="text-lg font-bold text-gray-900">{registration.totalRegistrations}</span>
+                            <span className="text-sm text-gray-600 ml-1">registrado{registration.totalRegistrations !== 1 ? 's' : ''}</span>
+                          </div>
+
+                          <div className="relative inline-block text-left">
+                            <button
+                              onClick={() => toggleDropdown(registration.id)}
+                              className="inline-flex justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary items-center justify-center transition-colors duration-150"
+                            >
+                              <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6a2 2 0 110-4 2 2 0 010 4zM12 14a2 2 0 110-4 2 2 0 010 4zM12 22a2 2 0 110-4 2 2 0 010 4z" />
+                              </svg>
+                            </button>
+                            {openDropdown === registration.id && (
+                              <div className="origin-bottom-right absolute right-0 bottom-full mb-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50 border border-gray-200">
+                                <div className="py-1" role="none">
+                                  <button
+                                    onClick={() => {
+                                      handleUpdateRegistrations(registration);
+                                      setOpenDropdown(null);
+                                    }}
+                                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left transition-colors duration-150"
+                                  >
+                                    <svg className="h-4 w-4 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                    Actualizar número de inscripciones
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      handleDeleteRegistration(registration.id);
+                                      setOpenDropdown(null);
+                                    }}
+                                    className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left transition-colors duration-150"
+                                  >
+                                    <svg className="h-4 w-4 mr-2 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                    Eliminar
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       ) : (
         <div className="text-center py-12">
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No hay registros</h3>
-          <p className="mt-1 text-sm text-gray-500">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h3 className="mt-2 text-lg font-medium text-gray-900">No hay registros</h3>
+          <p className="mt-1 text-gray-500">
             Este evento aún no tiene registros de socios.
           </p>
         </div>
@@ -249,20 +406,126 @@ const EventRegistrations = ({
       {/* Add Member Modal */}
       {showAddMemberModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="mt-3 text-center">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mt-4">Agregar socio</h3>
-              <div className="mt-2 px-7 py-3">
-                <p className="text-sm text-gray-500">
-                  Funcionalidad pendiente
-                </p>
+          <div className="relative top-20 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <div className="text-center">
+                <h3 className="text-lg leading-6 font-medium text-gray-900 mt-4">Agregar socio</h3>
               </div>
-              <div className="items-center px-4 py-3">
+
+              {/* Search section */}
+              <div className="mt-6 px-7">
+                <div className="mb-4">
+                  <label htmlFor="memberSearch" className="block text-sm font-medium text-gray-700 mb-1">
+                    Buscar socio
+                  </label>
+                  <input
+                    type="text"
+                    id="memberSearch"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Buscar socio por nombre..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                  />
+                </div>
+
+                {loadingMembers && (
+                  <div className="text-center py-4">
+                    <div className="inline-block animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-primary"></div>
+                  </div>
+                )}
+
+                {/* Members list */}
+                {!loadingMembers && (
+                  <div className="border rounded-lg max-h-60 overflow-y-auto">
+                    {members.map((member) => (
+                      <div
+                        key={member.id}
+                        className={`p-3 border-b hover:bg-gray-50 cursor-pointer ${
+                          selectedMember?.id === member.id ? 'bg-blue-50' : ''
+                        }`}
+                        onClick={() => handleMemberSelect(member)}
+                      >
+                        <div className="flex items-center">
+                          <span className="font-semibold">{member.memberCode || 'N/A'}</span>
+                          <span className="ml-2">{member.user.name} {member.user.lastName}</span>
+                        </div>
+                      </div>
+                    ))}
+                    {members.length === 0 && !loadingMembers && (
+                      <div className="p-3 text-center text-gray-500">
+                        No se encontraron socios
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Guest selection section (shown after member selection) */}
+              {selectedMember && (
+                <div className="mt-6 px-7">
+                  <h4 className="text-md font-medium text-gray-900 mb-3">
+                    Seleccionar invitados para {selectedMember.user.name} {selectedMember.user.lastName}
+                  </h4>
+
+                  {/* Member with checkbox */}
+                  <div className="mb-3 p-3 border rounded-md bg-gray-50">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={true} // Member is always selected
+                        disabled={true}
+                        className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                      />
+                      <span className="ml-2">
+                        {selectedMember.user.name} {selectedMember.user.lastName} (Socio)
+                      </span>
+                    </label>
+                  </div>
+
+                  {/* Guests list */}
+                  {memberGuests.length > 0 ? (
+                    <div className="space-y-2 max-h-60 overflow-y-auto">
+                      {memberGuests.map((guest) => (
+                        <div key={guest.id} className="p-3 border rounded-md">
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={selectedGuests.includes(guest.id)}
+                              onChange={(e) => handleGuestSelect(guest.id, e.target.checked)}
+                              className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                            />
+                            <span className="ml-2">
+                              {guest.user.name} {guest.user.lastName}
+                            </span>
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-4 text-gray-500">
+                      No hay invitados registrados para este socio
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="items-center px-4 py-6 flex justify-between">
                 <button
                   onClick={() => setShowAddMemberModal(false)}
                   className="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300"
                 >
-                  Cerrar
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSaveRegistration}
+                  disabled={!selectedMember}
+                  className={`px-4 py-2 text-white text-base font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary ${
+                    !selectedMember
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-primary hover:bg-primary-dark'
+                  }`}
+                >
+                  Guardar
                 </button>
               </div>
             </div>
@@ -341,6 +604,36 @@ const EventRegistrations = ({
                 <button
                   onClick={handleDeleteConfirm}
                   className="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 ml-2"
+                >
+                  Aceptar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal for Registration */}
+      {showConfirmationModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="mt-3 text-center">
+              <h3 className="text-lg leading-6 font-medium text-gray-900 mt-4">Confirmar registro</h3>
+              <div className="mt-2 px-7 py-3">
+                <p className="text-sm text-gray-500">
+                  ¿Estás seguro de que deseas registrar a {registrationToSubmit?.totalRegistrations} persona(s) para este evento?
+                </p>
+              </div>
+              <div className="items-center px-4 py-3 flex justify-between">
+                <button
+                  onClick={() => setShowConfirmationModal(false)}
+                  className="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={confirmRegistration}
+                  className="px-4 py-2 bg-primary text-white text-base font-medium rounded-md shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   Aceptar
                 </button>

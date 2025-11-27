@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { eventService } from '../services';
 import { EventTypes } from '../interfaces';
-import { useContext } from 'react';
 import { AppContext } from '../../../shared/context/AppContext';
 
 export const useEvents = () => {
@@ -172,6 +171,91 @@ export const useEvents = () => {
     }
   };
 
+  // Create event registration
+  const createEventRegistration = async (eventId, registrationData) => {
+    try {
+      setLoading(true);
+      const result = await eventService.createEventRegistration(eventId, registrationData);
+      if (result.success) {
+        return result.data;
+      } else {
+        addToast(result.error, 'error');
+        return null;
+      }
+    } catch (err) {
+      addToast(err.message || 'Error desconocido', 'error');
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Get club member by ID with guests
+  const getClubMemberById = async (memberId) => {
+    try {
+      setLoading(true);
+      const result = await eventService.getClubMemberById(memberId);
+      if (result.success) {
+        return result.data;
+      } else {
+        addToast(result.error, 'error');
+        return null;
+      }
+    } catch (err) {
+      addToast(err.message || 'Error desconocido', 'error');
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Search club members
+  const searchClubMembers = async (search = '') => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("authToken");
+
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/club-members?page=1&limit=10&search=${search}&orderBy=name&active=true`,
+        {
+          headers: {
+            "accept": "*/*",
+            "Authorization": `Bearer ${token}`
+          }
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        let errorMessage = "Error al obtener miembros";
+
+        // Manejar códigos de error específicos
+        if (response.status === 500) {
+          errorMessage = 'Error del servidor';
+        } else {
+          errorMessage = errorData.message || "Error al obtener miembros";
+        }
+
+        addToast(errorMessage, 'error');
+        return [];
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        return result.data.members || [];
+      } else {
+        addToast(result.message || 'Error al obtener miembros', 'error');
+        return [];
+      }
+    } catch (error) {
+      addToast(error.message || 'Error de red al obtener miembros', 'error');
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Reset filters to defaults
   const resetFilters = () => {
     setSearch('');
@@ -209,6 +293,9 @@ export const useEvents = () => {
     deleteEvent,
     updateEventRegistration,
     deleteEventRegistration,
+    createEventRegistration,
+    getClubMemberById,
+    searchClubMembers,
     resetFilters,
     updateFilters,
     addLog,
