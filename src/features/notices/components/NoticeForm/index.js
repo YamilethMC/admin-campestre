@@ -19,7 +19,8 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
     visibleUntil: notice ? formatDateForInput(notice.visibleUntil) : '',
     type: notice?.type || '',
   });
-  
+
+  const [errors, setErrors] = useState({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [showSaveConfirmationModal, setShowSaveConfirmationModal] = useState(false);
@@ -71,15 +72,35 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
 
 
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Validate title (required)
+    if (!formData.title.trim()) {
+      newErrors.title = 'Título es requerido';
+    }
+
+    // Validate message (required)
+    if (!formData.message.trim()) {
+      newErrors.message = 'Descripción es requerida';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Prepare the data for submission
-    const submitData = {
-      ...formData,
-    };
-    setPendingSaveData(submitData);
-    setPendingNavigationAction(isEdit ? 'update' : 'create'); // Track if it's an update or create action
-    setShowSaveConfirmationModal(true);
+
+    if (validateForm()) {
+      // Prepare the data for submission
+      const submitData = {
+        ...formData,
+      };
+      setPendingSaveData(submitData);
+      setPendingNavigationAction(isEdit ? 'update' : 'create'); // Track if it's an update or create action
+      setShowSaveConfirmationModal(true);
+    }
   };
 
   // Confirmation before navigating away if there are unsaved changes
@@ -122,12 +143,14 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
   };
 
   const handleConfirmSave = () => {
-    setShowSaveConfirmationModal(false);
-    if (pendingSaveData) {
-      onSave(pendingSaveData);
-      setPendingSaveData(null);
+    if (validateForm()) {
+      setShowSaveConfirmationModal(false);
+      if (pendingSaveData) {
+        onSave(pendingSaveData);
+        setPendingSaveData(null);
+      }
+      setPendingNavigationAction(null);
     }
-    setPendingNavigationAction(null);
   };
 
   const handleCancelSave = () => {
@@ -160,10 +183,16 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
             <input
               type="text"
               value={formData.title}
-              onChange={(e) => handleInputChange('title', e.target.value)}
-              className={formStyles.input}
-              required
+              onChange={(e) => {
+                handleInputChange('title', e.target.value);
+                // Clear error when user starts typing
+                if (errors.title) {
+                  setErrors(prev => ({ ...prev, title: '' }));
+                }
+              }}
+              className={`${formStyles.input} ${errors.title ? 'border-red-500' : ''}`}
             />
+            {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
           </div>
 
 
@@ -187,11 +216,17 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
             <label className={formStyles.label}>Descripción <span className="text-red-500">*</span></label>
             <textarea
               value={formData.message}
-              onChange={(e) => handleInputChange('message', e.target.value)}
+              onChange={(e) => {
+                handleInputChange('message', e.target.value);
+                // Clear error when user starts typing
+                if (errors.message) {
+                  setErrors(prev => ({ ...prev, message: '' }));
+                }
+              }}
               rows="4"
-              className={formStyles.textarea}
-              required
+              className={`${formStyles.textarea} ${errors.message ? 'border-red-500' : ''}`}
             ></textarea>
+            {errors.message && <p className="mt-1 text-sm text-red-600">{errors.message}</p>}
           </div>
 
           <div>

@@ -43,6 +43,7 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
       : [{ id: Date.now(), question: '', type: SurveyQuestionType.TEXT, options: [''], required: false }]
   });*/
   
+  const [errors, setErrors] = useState({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [showSaveConfirmationModal, setShowSaveConfirmationModal] = useState(false);
@@ -203,14 +204,17 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Prepare the data for submission
-    const submitData = {
-      ...formData,
-      // If there's an image file, use its data URL; otherwise keep the existing imageUrl
-      imageUrl: formData.imageFile ? formData.imageUrl : formData.imageUrl
-    };
-    setPendingSaveData(submitData);
-    setShowSaveConfirmationModal(true);
+
+    if (validateForm()) {
+      // Prepare the data for submission
+      const submitData = {
+        ...formData,
+        // If there's an image file, use its data URL; otherwise keep the existing imageUrl
+        imageUrl: formData.imageFile ? formData.imageUrl : formData.imageUrl
+      };
+      setPendingSaveData(submitData);
+      setShowSaveConfirmationModal(true);
+    }
   };
 
   // Confirmation before navigating away if there are unsaved changes
@@ -240,11 +244,38 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
     setPendingNavigationCallback(null);
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Validate title (required)
+    if (!formData.title.trim()) {
+      newErrors.title = 'Título es requerido';
+    }
+
+    // Validate questions (at least one question with text)
+    if (!formData.questions || formData.questions.length === 0) {
+      newErrors.questions = 'Al menos una pregunta es requerida';
+    } else {
+      const hasValidQuestion = formData.questions.some(q => q.question && q.question.trim() !== '');
+      if (!hasValidQuestion) {
+        newErrors.questions = 'Al menos una pregunta es requerida';
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleConfirmSave = () => {
-    setShowSaveConfirmationModal(false);
-    if (pendingSaveData) {
-      onSave(pendingSaveData);
-      setPendingSaveData(null);
+    if (validateForm()) {
+      setShowSaveConfirmationModal(false);
+      if (pendingSaveData) {
+        onSave(pendingSaveData);
+        setPendingSaveData(null);
+      }
+    } else {
+      // If validation fails, don't close the modal
+      return;
     }
   };
 
@@ -288,14 +319,24 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre de la encuesta</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Nombre de la encuesta <span className="text-red-500">*</span>
+            </label>
             <input
               type="text"
               value={formData.title}
-              onChange={(e) => handleInputChange('title', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-              required
+              onChange={(e) => {
+                handleInputChange('title', e.target.value);
+                // Clear error when user starts typing
+                if (errors.title) {
+                  setErrors(prev => ({ ...prev, title: '' }));
+                }
+              }}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${
+                errors.title ? 'border-red-500' : 'border-gray-300'
+              }`}
             />
+            {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
           </div>
 
           <div>
@@ -306,7 +347,6 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
               onChange={(e) => handleInputChange('estimatedTime', e.target.value)}
               placeholder="ej. 3-5 min"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-              required
             />
           </div>
 
@@ -352,7 +392,6 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
               onChange={(e) => handleInputChange('description', e.target.value)}
               rows="3"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-              required
             />
           </div>
 
@@ -395,7 +434,8 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
         </div>
 
         <div className="mb-6">
-          <h3 className="text-lg font-medium text-gray-800 mb-4">Preguntas</h3>
+          <h3 className="text-lg font-medium text-gray-800 mb-4">Preguntas <span className="text-red-500">*</span></h3>
+          {errors.questions && <p className="mt-1 text-sm text-red-600 mb-2">{errors.questions}</p>}
 
           {formData.questions.map((question, index) => (
             <div key={question.id} className="bg-gray-50 p-4 rounded-lg mb-4 border border-gray-200">
@@ -416,13 +456,20 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
               </div>
 
               <div className="mb-3">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Texto de la pregunta</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Texto de la pregunta <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   value={question.question}
-                  onChange={(e) => handleQuestionChange(index, 'question', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                  required
+                  onChange={(e) => {
+                    handleQuestionChange(index, 'question', e.target.value);
+                    // Clear error when user starts typing
+                    if (errors.questions) {
+                      setErrors(prev => ({ ...prev, questions: '' }));
+                    }
+                  }}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${
+                    errors.questions ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 />
               </div>
 
@@ -478,7 +525,6 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
                         onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}
                         className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                         placeholder={`Opción ${optionIndex + 1}`}
-                        required
                       />
                       {question.options.length > 2 && (
                         <button

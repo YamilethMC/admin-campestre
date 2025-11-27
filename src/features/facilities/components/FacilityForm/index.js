@@ -191,7 +191,7 @@ const FacilityForm = ({ facility, onSave, onCancel }) => {
           {/* Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Nombre *
+              Nombre <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -209,7 +209,7 @@ const FacilityForm = ({ facility, onSave, onCancel }) => {
           {/* Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Tipo *
+              Tipo <span className="text-red-500">*</span>
             </label>
             <select
               name="type"
@@ -232,7 +232,7 @@ const FacilityForm = ({ facility, onSave, onCancel }) => {
           {/* Status */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Estado *
+              Estado <span className="text-red-500">*</span>
             </label>
             <select
               name="status"
@@ -271,7 +271,7 @@ const FacilityForm = ({ facility, onSave, onCancel }) => {
             {/* Open Time */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Hora de apertura *
+                Hora de apertura <span className="text-red-500">*</span>
               </label>
               <input
                 type="time"
@@ -288,7 +288,7 @@ const FacilityForm = ({ facility, onSave, onCancel }) => {
             {/* Close Time */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Hora de cierre *
+                Hora de cierre <span className="text-red-500">*</span>
               </label>
               <input
                 type="time"
@@ -306,7 +306,7 @@ const FacilityForm = ({ facility, onSave, onCancel }) => {
           {/* Max Duration */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Duración máxima (minutos) *
+              Duración máxima (minutos) <span className="text-red-500">*</span>
             </label>
             <input
               type="number"

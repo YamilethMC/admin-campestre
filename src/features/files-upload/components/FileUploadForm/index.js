@@ -7,6 +7,7 @@ const FileUploadForm = ({ file: currentFile, onSave, onCancel }) => {
   const [fileName, setFileName] = useState('');
   const [fileDescription, setFileDescription] = useState('');
   const [fileType, setFileType] = useState('');
+  const [errors, setErrors] = useState({});
   const [isUploading, setIsUploading] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [modalAction, setModalAction] = useState(null);
@@ -46,19 +47,29 @@ const FileUploadForm = ({ file: currentFile, onSave, onCancel }) => {
     if (fileInput) fileInput.value = '';
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Validate file (required for new files)
+    if (!currentFile && !file) {
+      newErrors.file = 'Archivo es requerido';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Show confirmation modal before saving
-    confirmAction('save');
+    if (validateForm()) {
+      // Show confirmation modal before saving
+      confirmAction('save');
+    }
   };
 
   const handleSaveConfirm = async () => {
-    if (!currentFile && !file) {
-      return;
-    }
-
-    if (!fileName.trim()) {
+    if (!validateForm()) {
       return;
     }
 
@@ -180,7 +191,9 @@ const FileUploadForm = ({ file: currentFile, onSave, onCancel }) => {
 
             <div className="flex items-center space-x-4">
               <label className="flex-1 cursor-pointer">
-                <div className="flex items-center justify-center px-4 py-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary transition-colors">
+                <div className={`flex items-center justify-center px-4 py-6 border-2 border-dashed rounded-lg hover:border-primary transition-colors ${
+                  errors.file ? 'border-red-500' : 'border-gray-300'
+                }`}>
                   {file ? (
                     <div className="flex items-center space-x-2">
                       <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -201,10 +214,15 @@ const FileUploadForm = ({ file: currentFile, onSave, onCancel }) => {
                 <input
                   id="file-input"
                   type="file"
-                  onChange={handleFileChange}
+                  onChange={(e) => {
+                    handleFileChange(e);
+                    // Clear error when user selects a file
+                    if (errors.file) {
+                      setErrors(prev => ({ ...prev, file: '' }));
+                    }
+                  }}
                   className="hidden"
                   accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.jpg,.jpeg,.png"
-                  required={!currentFile}
                 />
               </label>
 
@@ -218,6 +236,7 @@ const FileUploadForm = ({ file: currentFile, onSave, onCancel }) => {
                 </button>
               )}
             </div>
+            {errors.file && <p className="mt-1 text-sm text-red-600">{errors.file}</p>}
 
             {isUploading && (
               <div className="mt-4">
@@ -242,7 +261,7 @@ const FileUploadForm = ({ file: currentFile, onSave, onCancel }) => {
             type="text"
             id="fileName"
             value={fileName}
-            onChange={(e) => setFileName(e.target.value)}
+            onChange={(e) => setFileName(e.target.value)} 
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             placeholder="Ingresa el nombre del documento"
           />
