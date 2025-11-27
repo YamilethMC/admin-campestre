@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const EventRegistrations = ({
   event,
@@ -15,7 +15,19 @@ const EventRegistrations = ({
 
   // Function to open the add member modal and fetch initial members
   const handleViewMembers = () => {
+    // Clear any pending search timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
     setShowAddMemberModal(true);
+    // Reset selected member and other states when modal opens
+    setSelectedMember(null);
+    setSelectedGuests([]);
+    setMemberGuests([]);
+    setIsMemberSelected(false); // Default to not having the member selected
+    setExpandedMemberId(null); // Reset expanded member state
+    setSearchTerm('');
     // Fetch initial members when modal opens
     fetchMembers('');
   };
@@ -29,6 +41,9 @@ const EventRegistrations = ({
   const [selectedMember, setSelectedMember] = useState(null);
   const [memberGuests, setMemberGuests] = useState([]);
   const [selectedGuests, setSelectedGuests] = useState([]);
+  const [isMemberSelected, setIsMemberSelected] = useState(false); // Whether the member themselves is selected (default to false)
+  const [expandedMemberId, setExpandedMemberId] = useState(null); // Track which member ID is expanded in the list
+  const searchTimeoutRef = useRef(null); // For debouncing search requests
   const [searchTerm, setSearchTerm] = useState('');
   const [loadingMembers, setLoadingMembers] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
@@ -48,21 +63,34 @@ const EventRegistrations = ({
   };
 
 
-  // Handle member selection
+  // Handle member selection with expandable functionality
   const handleMemberSelect = async (member) => {
-    setSelectedMember(member);
-    setSelectedGuests([]); // Reset selected guests when selecting a new member
+    // If clicking on an already expanded member, collapse it
+    if (expandedMemberId === member.id) {
+      // Collapse the member
+      setExpandedMemberId(null);
+      setSelectedMember(null);
+      setSelectedGuests([]);
+      setMemberGuests([]);
+      setIsMemberSelected(false);
+    } else {
+      // Expand this member and load their guests
+      setExpandedMemberId(member.id);
+      setSelectedMember(member);
+      setSelectedGuests([]); // Reset selected guests when selecting a new member
+      setIsMemberSelected(false); // Default to not having the member selected
 
-    try {
-      const memberDetails = await getClubMemberById(member.id);
-      if (memberDetails) {
-        setMemberGuests(memberDetails.guests || []);
-      } else {
+      try {
+        const memberDetails = await getClubMemberById(member.id);
+        if (memberDetails) {
+          setMemberGuests(memberDetails.guests || []);
+        } else {
+          setMemberGuests([]);
+        }
+      } catch (error) {
+        // The error will be handled by the hook and already shown as a toast
         setMemberGuests([]);
       }
-    } catch (error) {
-      // The error will be handled by the hook and already shown as a toast
-      setMemberGuests([]);
     }
   };
 
@@ -86,12 +114,23 @@ const EventRegistrations = ({
     }
   };
 
+  // Handle member selection (for the main member checkbox)
+  const handleMemberCheckboxSelect = (checked) => {
+    setIsMemberSelected(checked);
+  };
+
   // Handle saving registration
   const handleSaveRegistration = () => {
     if (!selectedMember) return;
 
-    // The total registrations is 1 (member) + number of selected guests
-    const totalRegistrations = 1 + selectedGuests.length;
+    // The total registrations is the member (if selected) + number of selected guests
+    const totalRegistrations = (isMemberSelected ? 1 : 0) + selectedGuests.length;
+
+    // We need at least one registration (member or guest)
+    if (totalRegistrations === 0) {
+      // Optionally show an error message here
+      return;
+    }
 
     // Prepare the data to submit
     const registrationData = {
@@ -114,12 +153,18 @@ const EventRegistrations = ({
         if (onRefreshEvent) {
           await onRefreshEvent(event.id);
         }
+        // Clear any pending search timeout
+        if (searchTimeoutRef.current) {
+          clearTimeout(searchTimeoutRef.current);
+        }
         // Close the modal
         setShowAddMemberModal(false);
         // Reset states
         setSelectedMember(null);
         setSelectedGuests([]);
         setMemberGuests([]);
+        setIsMemberSelected(false);
+        setExpandedMemberId(null);
         setSearchTerm('');
         setRegistrationToSubmit(null);
       }
@@ -136,6 +181,10 @@ const EventRegistrations = ({
   const availableSpots = Math.max(0, totalSpots - ocupedSpots);
 
   const handleAddMemberAccept = () => {
+    // Clear any pending search timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
     setShowAddMemberModal(false);
   };
 
@@ -422,42 +471,83 @@ const EventRegistrations = ({
                   <label htmlFor="memberSearch" className="block text-sm font-medium text-gray-700 mb-1">
                     Buscar socio
                   </label>
-                  <div className="flex">
-                    <input
-                      type="text"
-                      id="memberSearch"
-                      value={searchTerm}
-                      onChange={(e) => handleSearchChange(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
-                      placeholder="Buscar socio por nombre..."
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleSearch}
-                      className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-r-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary"
-                    >
-                      Buscar
-                    </button>
-                  </div>
+                  <input
+                    type="text"
+                    id="memberSearch"
+                    value={searchTerm}
+                    onChange={(e) => {
+                      handleSearchChange(e.target.value);
+                      // Automatically trigger search after a short delay to avoid too many API calls
+                      clearTimeout(searchTimeoutRef.current);
+                      searchTimeoutRef.current = setTimeout(() => {
+                        fetchMembers(e.target.value);
+                      }, 300); // 300ms delay
+                    }}
+                    placeholder="Buscar socio por nombre..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                  />
                 </div>
 
-                {/* Members list */}
+                {/* Members list with expandable guest selection */}
                 {!loadingMembers && (
                   <div className="border rounded-lg max-h-60 overflow-y-auto">
                     {members.map((member) => (
-                      <div
-                        key={member.id}
-                        className={`p-3 border-b hover:bg-gray-50 cursor-pointer ${
-                          selectedMember?.id === member.id ? 'bg-blue-50' : ''
-                        }`}
-                        onClick={() => handleMemberSelect(member)}
-                      >
-                        <div className="flex items-center">
-                          <span className="font-semibold">{member.memberCode || 'N/A'}</span>
-                          <span className="ml-2">{member.user.name} {member.user.lastName}</span>
+                      <React.Fragment key={member.id}>
+                        <div
+                          className={`p-3 border-b hover:bg-gray-50 cursor-pointer ${
+                            expandedMemberId === member.id ? 'bg-blue-50' : ''
+                          }`}
+                          onClick={() => handleMemberSelect(member)}
+                        >
+                          <div className="flex items-center">
+                            <span className="font-semibold">{member.memberCode || 'N/A'}</span>
+                            <span className="ml-2">{member.user.name} {member.user.lastName}</span>
+                          </div>
                         </div>
-                      </div>
+
+                        {/* Expanded guest selection for this specific member */}
+                        {expandedMemberId === member.id && (
+                          <div className="bg-gray-50 border-b pl-4 pr-4 pt-2 pb-2">
+                            <div className="mb-3">
+                              {/* Member with checkbox */}
+                              <div className="mb-3 p-3 border rounded-md bg-white">
+                                <label className="flex items-center">
+                                  <input
+                                    type="checkbox"
+                                    checked={isMemberSelected}
+                                    onChange={(e) => handleMemberCheckboxSelect(e.target.checked)}
+                                    className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                                  />
+                                  <span className="ml-2">
+                                    {member.user.name} {member.user.lastName} (Socio)
+                                  </span>
+                                </label>
+                              </div>
+
+                              {/* Guests list for this specific member */}
+                              {memberGuests.length > 0 && (
+                                <div className="space-y-2 ml-4">
+                                  {memberGuests.map((guest) => (
+                                    <div key={guest.id} className="p-3 border rounded-md bg-white">
+                                      <label className="flex items-center">
+                                        <input
+                                          type="checkbox"
+                                          checked={selectedGuests.includes(guest.id)}
+                                          onChange={(e) => handleGuestSelect(guest.id, e.target.checked)}
+                                          className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                                        />
+                                        <span className="ml-2">
+                                          {guest.user.name} {guest.user.lastName}
+                                        </span>
+                                      </label>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </React.Fragment>
                     ))}
                     {members.length === 0 && !loadingMembers && (
                       <div className="p-3 text-center text-gray-500">
@@ -468,56 +558,8 @@ const EventRegistrations = ({
                 )}
               </div>
 
-              {/* Guest selection section (shown after member selection) */}
-              {selectedMember && (
-                <div className="mt-6 px-7">
-                  <h4 className="text-md font-medium text-gray-900 mb-3">
-                    Seleccionar invitados para {selectedMember.user.name} {selectedMember.user.lastName}
-                  </h4>
 
-                  {/* Member with checkbox */}
-                  <div className="mb-3 p-3 border rounded-md bg-gray-50">
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={true} // Member is always selected
-                        disabled={true}
-                        className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                      />
-                      <span className="ml-2">
-                        {selectedMember.user.name} {selectedMember.user.lastName} (Socio)
-                      </span>
-                    </label>
-                  </div>
-
-                  {/* Guests list */}
-                  {memberGuests.length > 0 ? (
-                    <div className="space-y-2 max-h-60 overflow-y-auto">
-                      {memberGuests.map((guest) => (
-                        <div key={guest.id} className="p-3 border rounded-md">
-                          <label className="flex items-center">
-                            <input
-                              type="checkbox"
-                              checked={selectedGuests.includes(guest.id)}
-                              onChange={(e) => handleGuestSelect(guest.id, e.target.checked)}
-                              className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                            />
-                            <span className="ml-2">
-                              {guest.user.name} {guest.user.lastName}
-                            </span>
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-4 text-gray-500">
-                      No hay invitados registrados para este socio
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <div className="items-center px-4 py-6 flex justify-between">
+              <div className="items-center px-4 py-6 flex justify-end space-x-3">
                 <button
                   onClick={() => setShowAddMemberModal(false)}
                   className="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300"
@@ -526,9 +568,9 @@ const EventRegistrations = ({
                 </button>
                 <button
                   onClick={handleSaveRegistration}
-                  disabled={!selectedMember}
+                  disabled={!selectedMember || (isMemberSelected === false && selectedGuests.length === 0)}
                   className={`px-4 py-2 text-white text-base font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary ${
-                    !selectedMember
+                    (!selectedMember || (isMemberSelected === false && selectedGuests.length === 0))
                       ? 'bg-gray-400 cursor-not-allowed'
                       : 'bg-primary hover:bg-primary-dark'
                   }`}
@@ -665,7 +707,7 @@ const EventRegistrations = ({
                   ¿Estás seguro de que deseas registrar a {registrationToSubmit?.totalRegistrations} persona(s) para este evento?
                 </p>
               </div>
-              <div className="items-center px-4 py-3 flex justify-between">
+              <div className="items-center px-4 py-3 flex justify-center space-x-3">
                 <button
                   onClick={() => setShowConfirmationModal(false)}
                   className="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300"
