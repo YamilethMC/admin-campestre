@@ -49,6 +49,88 @@ export function useFacilities(initialFilters = {}) {
     setPage(1);
   };
 
+  // Get a specific facility by ID with reservations
+  const getFacilityById = async (id) => {
+    try {
+      const result = await facilityService.getFacilityById(id);
+
+      if (result.success) {
+        return result.data;
+      } else {
+        addToast(result.error || 'Error al cargar la instalación', 'error');
+        return null;
+      }
+    } catch (error) {
+      addToast(error.message || 'Error desconocido al cargar la instalación', 'error');
+      return null;
+    }
+  };
+
+  // Create new facility
+  const createFacility = async (facilityData) => {
+    try {
+      const result = await facilityService.createFacility(facilityData);
+
+      if (result.success) {
+        return result.data;
+      } else {
+        addToast(result.error || 'Error al crear instalación', 'error');
+        return null;
+      }
+    } catch (error) {
+      addToast(error.message || 'Error desconocido al crear instalación', 'error');
+      return null;
+    }
+  };
+
+  // Update existing facility
+  const updateFacility = async (id, facilityData) => {
+    try {
+      const result = await facilityService.updateFacility(id, facilityData);
+
+      if (result.success) {
+        return result.data;
+      } else {
+        addToast(result.error || 'Error al actualizar instalación', 'error');
+        return null;
+      }
+    } catch (error) {
+      addToast(error.message || 'Error desconocido al actualizar instalación', 'error');
+      return null;
+    }
+  };
+
+  // Delete a facility
+  const deleteFacility = async (id) => {
+    try {
+      const result = await facilityService.deleteFacility(id);
+
+      if (result.success) {
+        return true;
+      } else {
+        addToast(result.error || 'Error al eliminar instalación', 'error');
+        return false;
+      }
+    } catch (error) {
+      addToast(error.message || 'Error desconocido al eliminar instalación', 'error');
+      return false;
+    }
+  };
+
+  // Delete a reservation (placeholder for future implementation)
+  const deleteReservation = async (facilityId, reservationId) => {
+    try {
+      // Placeholder for deleting reservation - in the future this would call a service method
+      console.log('Deleting reservation:', reservationId, 'from facility:', facilityId);
+
+      // Show success toast for the placeholder implementation
+      return true;
+    } catch (error) {
+      addToast(error.message || 'Error al eliminar la reservación', 'error');
+      return false;
+    }
+  };
+
   return {
     facilities,
     meta,
@@ -64,6 +146,11 @@ export function useFacilities(initialFilters = {}) {
     date,
     setDate,
     loadFacilities,
-    resetFilters
+    resetFilters,
+    getFacilityById,
+    createFacility,
+    updateFacility,
+    deleteFacility,
+    deleteReservation
   };
 }

@@ -1,64 +1,41 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { AppContext } from '../../../../shared/context/AppContext';
-import { facilityService } from '../../services';
+import React, { useState, useEffect } from 'react';
+import { useFacilities } from '../../hooks/useFacilities';
 
 const FacilityReservations = ({ facility, onBack }) => {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [reservationToDelete, setReservationToDelete] = useState(null);
+  const { getFacilityById, deleteReservation } = useFacilities();
+
   const [facilityData, setFacilityData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [reservationToDelete, setReservationToDelete] = useState(null);
-
-  const { toasts, setToasts } = useContext(AppContext);
 
   useEffect(() => {
     loadFacilityWithReservations();
   }, [facility.id]);
 
   const loadFacilityWithReservations = async () => {
-    try {
-      setLoading(true);
-      const data = await facilityService.getFacilityById(facility.id);
+    setLoading(true);
+    setError(null);
+
+    const data = await getFacilityById(facility.id);
+    if (data) {
       setFacilityData(data);
-    } catch (err) {
-      setError(err.message || 'Error al cargar las reservaciones');
-      setToasts(prev => [...prev, {
-        id: Date.now(),
-        message: err.message || 'Error al cargar las reservaciones',
-        type: 'error'
-      }]);
-    } finally {
-      setLoading(false);
+    } else {
+      setError('No se pudo cargar la instalación');
     }
+    setLoading(false);
   };
 
   const handleDeleteReservation = async () => {
     if (!reservationToDelete) return;
+    await deleteReservation(facility.id, reservationToDelete.id);
 
-    try {
-      // Placeholder for deleting reservation
-      // In the future, implement the actual API call for deleting a specific reservation
-      console.log('Deleting reservation:', reservationToDelete);
-      
-      // Show success toast
-      setToasts(prev => [...prev, {
-        id: Date.now(),
-        message: 'Reservación eliminada exitosamente',
-        type: 'success'
-      }]);
-      
-      // Reload the facility data
-      loadFacilityWithReservations();
-    } catch (err) {
-      setToasts(prev => [...prev, {
-        id: Date.now(),
-        message: err.message || 'Error al eliminar la reservación',
-        type: 'error'
-      }]);
-    } finally {
-      setShowDeleteModal(false);
-      setReservationToDelete(null);
-    }
+    // Reload the facility data
+    loadFacilityWithReservations();
+
+    setShowDeleteModal(false);
+    setReservationToDelete(null);
   };
 
   const confirmDeleteReservation = (reservation) => {
