@@ -147,7 +147,7 @@ const EventRegistrations = ({
         </div>
         <div className="bg-gray-50 p-4 rounded-lg">
           <h3 className="text-sm font-medium text-gray-500">Fecha</h3>
-          <p className="text-lg font-semibold text-gray-900">{formatDate(event?.dateISO)}</p>
+          <p className="text-lg font-semibold text-gray-900">{formatDate(event?.date)}</p>
         </div>
         <div className="bg-gray-50 p-4 rounded-lg">
           <h3 className="text-sm font-medium text-gray-500">Lugar</h3>
@@ -171,13 +171,10 @@ const EventRegistrations = ({
             <thead className="bg-gray-50">
               <tr>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Socio ID
+                  Código
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Nombre
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Código
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Registros
@@ -191,13 +188,10 @@ const EventRegistrations = ({
               {registrations.map((registration) => (
                 <tr key={registration.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{registration.clubMemberId}</div>
+                    <div className="text-sm font-medium text-gray-900">{registration.clubMember.memberCode}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">Nombre del socio</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">SOCIO-{registration.clubMemberId}</div>
+                    <div className="text-sm text-gray-900">{registration.clubMember.user.name} {registration.clubMember.user.lastName}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{registration.totalRegistrations}</div>
