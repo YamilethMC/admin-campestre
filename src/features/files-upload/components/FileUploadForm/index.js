@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useFileUpload } from '../../hooks/useFileUpload';
-import { useContext } from 'react';
-import { AppContext } from '../../../../shared/context/AppContext';
 
 const FileUploadForm = ({ file: currentFile, onSave, onCancel }) => {
   const { uploadFile } = useFileUpload();
-  const { setToasts } = useContext(AppContext);
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState('');
   const [fileDescription, setFileDescription] = useState('');
@@ -51,27 +48,17 @@ const FileUploadForm = ({ file: currentFile, onSave, onCancel }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Show confirmation modal before saving
     confirmAction('save');
   };
 
   const handleSaveConfirm = async () => {
     if (!currentFile && !file) {
-      setToasts(prev => [...prev, {
-        id: Date.now(),
-        message: 'Por favor selecciona un archivo',
-        type: 'error'
-      }]);
       return;
     }
 
     if (!fileName.trim()) {
-      setToasts(prev => [...prev, {
-        id: Date.now(),
-        message: 'Por favor ingresa un nombre para el archivo',
-        type: 'error'
-      }]);
       return;
     }
 
@@ -93,25 +80,14 @@ const FileUploadForm = ({ file: currentFile, onSave, onCancel }) => {
         await onSave(fileData);
       }
 
-      setToasts(prev => [...prev, {
-        id: Date.now(),
-        message: currentFile ? 'Documento actualizado correctamente' : 'Documento guardado correctamente',
-        type: 'success'
-      }]);
-
       // Reset form
       handleClearForm();
-      
+
       // Call onCancel to go back to the list view after successful save/update
       if (onCancel) {
         onCancel();
       }
     } catch (error) {
-      setToasts(prev => [...prev, {
-        id: Date.now(),
-        message: currentFile ? 'Error al actualizar el documento' : 'Error al guardar el documento',
-        type: 'error'
-      }]);
     } finally {
       setIsUploading(false);
       setShowConfirmationModal(false);

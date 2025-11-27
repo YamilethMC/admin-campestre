@@ -42,7 +42,6 @@ export const useFileUpload = () => {
     const response = await fileUploadService.uploadFile(fileData);
 
     if (response.success) {
-      addToast(response.message || 'Archivo subido exitosamente', 'success');
       setUploading(false);
       return response;
     } else {
@@ -69,7 +68,6 @@ export const useFileUpload = () => {
     if (response.success) {
       // Refresh the list after update
       await loadFiles();
-      addToast(response.message || 'Archivo actualizado exitosamente', 'success');
       return response;
     } else {
       addToast(response.error || 'Error al actualizar archivo', 'error');
@@ -89,7 +87,6 @@ export const useFileUpload = () => {
       } else {
         await loadFiles();
       }
-      addToast(response.message, 'success');
       return response;
     } else {
       addToast(response.error || 'Error al eliminar archivo', 'error');

@@ -68,11 +68,13 @@ const FileCard = ({ file, onEdit, onDelete }) => {
           </p>
           
           {/* File type */}
+          {file.type && (
           <div className="mt-2 flex items-center">
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
               {file.type?.toUpperCase() || 'TIPO'}
             </span>
           </div>
+          )}
         </div>
 
         {/* Actions dropdown */}
