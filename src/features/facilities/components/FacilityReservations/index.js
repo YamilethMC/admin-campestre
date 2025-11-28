@@ -156,7 +156,7 @@ const FacilityReservations = ({ facility, onBack }) => {
     };
     // Update reservation to cancelled status
     const result = await updateFacilityReservation(
-      facility.id,
+      reservationToCancel.id,
       reservationToCancel.clubMember.id,
       cancellationData
     );
