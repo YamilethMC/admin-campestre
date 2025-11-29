@@ -14,6 +14,7 @@ import FileUploadContainer from './features/files-upload';
 import NoticesContainer from './features/notices';
 import FacilitiesContainer from './features/facilities';
 import EventsContainer from './features/events/container';
+import HelpCenterContainer from './features/help-center/container';
 
 function App() {
   return (
@@ -129,6 +130,7 @@ function MainApplication() {
           {activeView === 'instalaciones' && <FacilitiesContainer />}
           {activeView === 'events' && <EventsContainer />}
           {activeView === 'logs' && <LogPanel />}
+          {activeView === 'helpCenter' && <HelpCenterContainer />}
         </main>
       </div>
     </div>

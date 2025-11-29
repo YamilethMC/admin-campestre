@@ -139,3 +139,10 @@ export const EventsIcon = ({ className = "w-5 h-5" }) => (
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
   </svg>
 );
+
+// Help Center Icon
+export const HelpCenterIcon = ({ className = "w-5 h-5" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{width: '1em', height: '1em', display: 'inline', verticalAlign: 'middle'}}>
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M12 14a4 4 0 10-4-4m4 8v-4m0-4a4 4 0 014-4" />
+  </svg>
+);
