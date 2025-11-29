@@ -31,7 +31,7 @@ const Navigation = ({ activeView, setActiveView }) => {
     { id: 'notices', label: 'Avisos', icon: NoticesIcon },
     { id: 'filesUpload', label: 'Carga de archivos', icon: FileUploadIcon },
     { id: 'instalaciones', label: 'Instalaciones', icon: FacilitiesIcon },
-    { id: 'helpCenter', label: 'Ayuda', icon: HelpCenterIcon },
+    { id: 'helpCenter', label: 'Centro de ayuda', icon: HelpCenterIcon },
     // { id: 'logs', label: 'Panel de Logs', icon: LogIcon } // Comentado temporalmente
   ];
 
