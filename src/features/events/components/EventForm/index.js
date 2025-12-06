@@ -6,11 +6,15 @@ const EventForm = ({ event, onSave, onCancel }) => {
     type: '',
     name: '',
     description: '',
+    image: '',
+    showInscribedCount: true,
+    showProgress: true,
     date: '',
     totalSpots: 0,
     location: ''
   });
-  
+
+  const [imageFile, setImageFile] = useState(null);
   const [errors, setErrors] = useState({});
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -27,6 +31,9 @@ const EventForm = ({ event, onSave, onCancel }) => {
         type: event.type || '',
         name: event.name || '',
         description: event.description || '',
+        image: event.image || '',
+        showInscribedCount: event.showInscribedCount !== undefined ? event.showInscribedCount : true,
+        showProgress: event.showProgress !== undefined ? event.showProgress : true,
         date: formattedDate,
         totalSpots: event.totalSpots || 0,
         location: event.location || ''
@@ -36,6 +43,9 @@ const EventForm = ({ event, onSave, onCancel }) => {
         type: '',
         name: '',
         description: '',
+        image: '',
+        showInscribedCount: true,
+        showProgress: true,
         date: '',
         totalSpots: 0,
         location: ''
@@ -44,12 +54,12 @@ const EventForm = ({ event, onSave, onCancel }) => {
   }, [event]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'totalSpots' ? parseInt(value) || 0 : value
+      [name]: type === 'checkbox' ? checked : (name === 'totalSpots' ? parseInt(value) || 0 : value)
     }));
-    
+
     // Clear error when field is modified
     if (errors[name]) {
       setErrors(prev => ({
@@ -59,9 +69,24 @@ const EventForm = ({ event, onSave, onCancel }) => {
     }
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({
+          ...prev,
+          image: reader.result // This will be a base64 string
+        }));
+        setImageFile(file);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.type) newErrors.type = 'Tipo de evento es requerido';
     if (!formData.name.trim()) newErrors.name = 'Nombre es requerido';
     if (!formData.description.trim()) newErrors.description = 'Descripción es requerida';
@@ -103,7 +128,7 @@ const EventForm = ({ event, onSave, onCancel }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 mb-6">
+    <div className="bg-white rounded-lg shadow p-6 max-w-4xl mx-auto">
       <div className="flex items-center mb-6">
         <button
           onClick={handleCancelConfirm}
@@ -153,6 +178,100 @@ const EventForm = ({ event, onSave, onCancel }) => {
             placeholder="Descripción del evento"
           />
           {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
+        </div>
+
+        {/* Image Upload - Full width */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Imagen
+          </label>
+          <label
+            htmlFor="image-upload"
+            className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors"
+          >
+            <div className="space-y-1 text-center">
+              {formData.image ? (
+                <div className="mb-4">
+                  <img
+                    src={formData.image}
+                    alt="Preview"
+                    className="mx-auto max-h-40 object-contain rounded-md"
+                  />
+                </div>
+              ) : (
+                <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                  <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+              <div>
+                <span className="relative cursor-pointer bg-white rounded-md font-medium text-primary hover:text-primary-dark">
+                  <span>Seleccionar imagen</span>
+                </span>
+              </div>
+              <p className="text-xs text-gray-500">PNG, JPG hasta 10MB</p>
+            </div>
+            <input
+              id="image-upload"
+              name="image-upload"
+              type="file"
+              className="sr-only"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+          </label>
+        </div>
+
+        {/* Switches for showing inscribed count and progress */}
+        <div className="md:col-span-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Show Inscribed Count Toggle */}
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div>
+                <p className="text-sm font-medium text-gray-900">Mostrar contador de inscritos</p>
+                <p className="text-sm text-gray-500">Habilita el contador de personas inscritas</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setFormData(prev => ({ ...prev, showInscribedCount: !prev.showInscribedCount }))}
+                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+                  formData.showInscribedCount ? 'bg-primary' : 'bg-gray-200'
+                }`}
+                role="switch"
+                aria-checked={formData.showInscribedCount}
+              >
+                <span
+                  aria-hidden="true"
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                    formData.showInscribedCount ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Show Progress Toggle */}
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div>
+                <p className="text-sm font-medium text-gray-900">Mostrar progreso</p>
+                <p className="text-sm text-gray-500">Habilita la barra de progreso del evento</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setFormData(prev => ({ ...prev, showProgress: !prev.showProgress }))}
+                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+                  formData.showProgress ? 'bg-primary' : 'bg-gray-200'
+                }`}
+                role="switch"
+                aria-checked={formData.showProgress}
+              >
+                <span
+                  aria-hidden="true"
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                    formData.showProgress ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Type and Total Spots - Two per line */}

@@ -339,12 +339,20 @@ const EventRegistrations = ({
 
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold text-gray-800">Registros</h2>
-        <button
-          onClick={handleViewMembers}
-          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-        >
-          Agregar socio
-        </button>
+        <div className="flex space-x-3">
+          <button
+            onClick={handleViewMembers}
+            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+          >
+            Agregar socio
+          </button>
+          <button
+            onClick={() => alert('Funcionalidad de ver lista no implementada aún')}
+            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+          >
+            Ver lista
+          </button>
+        </div>
       </div>
 
       {registrations.length > 0 ? (

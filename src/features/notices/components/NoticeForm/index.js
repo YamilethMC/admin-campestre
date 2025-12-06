@@ -11,10 +11,12 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
 
   // Original data to compare for changes
   const [originalData, setOriginalData] = useState(null);
-  
+  const [imageFile, setImageFile] = useState(null);
+
   const [formData, setFormData] = useState({
     title: notice?.title || '',
     message: notice?.message || '',
+    image: notice?.image || '', // Add image field
     active: notice ? notice.active : true,
     visibleUntil: notice ? formatDateForInput(notice.visibleUntil) : '',
     type: notice?.type || '',
@@ -36,6 +38,7 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
       setOriginalData({
         title: notice.title,
         message: notice.message,
+        image: notice.image || '',
         active: notice.active,
         visibleUntil: notice ? formatDateForInput(notice.visibleUntil) : '',
         type: notice.type,
@@ -45,6 +48,7 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
       setOriginalData({
         title: '',
         message: '',
+        image: '',
         active: true,
         visibleUntil: '',
         type: '',
@@ -68,6 +72,21 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({
+          ...prev,
+          image: reader.result // This will be a base64 string
+        }));
+        setImageFile(file);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
 
@@ -227,6 +246,45 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
               className={`${formStyles.textarea} ${errors.message ? 'border-red-500' : ''}`}
             ></textarea>
             {errors.message && <p className="mt-1 text-sm text-red-600">{errors.message}</p>}
+          </div>
+
+          {/* Image Upload - Full width */}
+          <div className="col-span-2">
+            <label className={formStyles.label}>Imagen</label>
+            <label
+              htmlFor="notice-image-upload"
+              className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors"
+            >
+              <div className="space-y-1 text-center w-full">
+                {formData.image ? (
+                  <div className="mb-4">
+                    <img
+                      src={formData.image}
+                      alt="Preview"
+                      className="mx-auto max-h-40 object-contain rounded-md"
+                    />
+                  </div>
+                ) : (
+                  <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+                <div>
+                  <span className="relative cursor-pointer bg-white rounded-md font-medium text-primary hover:text-primary-dark">
+                    <span>Seleccionar imagen</span>
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500">PNG, JPG hasta 10MB</p>
+              </div>
+              <input
+                id="notice-image-upload"
+                name="notice-image-upload"
+                type="file"
+                className="sr-only"
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+            </label>
           </div>
 
           <div>

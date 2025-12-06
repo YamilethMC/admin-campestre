@@ -17,9 +17,10 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
     priority: survey?.priority || '',
     estimatedTime: survey?.timeStimed || '',
     imageUrl: survey?.imageUrl || '',
+    showResponseCount: survey?.showResponseCount !== undefined ? survey.showResponseCount : true, // Add new field
     imageFile: null, // For handling local file
     isActive: survey ? survey.active : true,
-    questions: survey?.surveyQuestions && Array.isArray(survey.surveyQuestions) && survey.surveyQuestions.length > 0 
+    questions: survey?.surveyQuestions && Array.isArray(survey.surveyQuestions) && survey.surveyQuestions.length > 0
       ? survey.surveyQuestions.map(q => ({
         id: q.id,
         question: q.question,
@@ -61,9 +62,10 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
         priority: survey.priority,
         estimatedTime: survey.timeStimed,
         imageUrl: survey.imageUrl,
+        showResponseCount: survey.showResponseCount !== undefined ? survey.showResponseCount : true,
         imageFile: null, // No file selected initially when editing
         isActive: survey.active,
-        questions: survey.surveyQuestions 
+        questions: survey.surveyQuestions
           ? survey.surveyQuestions.map(q => ({ ...q }))
           : [{ id: Date.now(), question: '', type: SurveyQuestionType.TEXT, options: [''], required: false }]
       });
@@ -76,6 +78,7 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
         priority: SurveyPriority.NORMAL,
         estimatedTime: '',
         imageUrl: '',
+        showResponseCount: true,
         imageFile: null,
         isActive: true,
         questions: [{ id: Date.now(), question: '', type: SurveyQuestionType.TEXT, options: [''], required: false }]
@@ -93,6 +96,13 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
   }, [formData, originalData]);
 
   const handleInputChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleToggleChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -395,40 +405,68 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
             />
           </div>
 
+          {/* Image Upload - Full width */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Imagen (opcional)</label>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center justify-center w-16 h-16 border border-gray-300 rounded-md overflow-hidden bg-gray-100">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Imagen</label>
+            <label
+              htmlFor="survey-image-upload"
+              className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors w-full"
+            >
+              <div className="space-y-1 text-center w-full">
                 {formData.imageUrl ? (
-                  <img 
-                    src={formData.imageUrl} 
-                    alt="Previsualización" 
-                    className="w-full h-full object-cover"
-                  />
+                  <div className="mb-4">
+                    <img
+                      src={formData.imageUrl}
+                      alt="Preview"
+                      className="mx-auto max-h-40 object-contain rounded-md"
+                    />
+                  </div>
                 ) : (
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 )}
+                <div>
+                  <span className="relative cursor-pointer bg-white rounded-md font-medium text-primary hover:text-primary-dark">
+                    <span>Seleccionar imagen</span>
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500">PNG, JPG hasta 10MB</p>
               </div>
-              <label className="cursor-pointer bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors">
-                Seleccionar imagen
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
+              <input
+                id="survey-image-upload"
+                name="survey-image-upload"
+                type="file"
+                className="sr-only"
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+            </label>
+          </div>
+
+          {/* Show Response Count Toggle - Full width */}
+          <div className="md:col-span-2">
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div>
+                <p className="text-sm font-medium text-gray-900">Mostrar contador de respuestas</p>
+                <p className="text-sm text-gray-500">Habilita el contador de personas que han contestado la encuesta</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleToggleChange('showResponseCount', !formData.showResponseCount)}
+                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+                  formData.showResponseCount ? 'bg-primary' : 'bg-gray-200'
+                }`}
+                role="switch"
+                aria-checked={formData.showResponseCount}
+              >
+                <span
+                  aria-hidden="true"
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                    formData.showResponseCount ? 'translate-x-5' : 'translate-x-0'
+                  }`}
                 />
-              </label>
-              {formData.imageFile && (
-                <button
-                  type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, imageFile: null, imageUrl: '' }))}
-                  className="text-red-600 hover:text-red-800"
-                >
-                  Eliminar
-                </button>
-              )}
+              </button>
             </div>
           </div>
         </div>
