@@ -14,7 +14,8 @@ import {
   FileUploadIcon,
   FacilitiesIcon,
   EventsIcon,
-  HelpCenterIcon
+  HelpCenterIcon,
+  BannerIcon
 } from '../shared/components/icons/icons';
 
 const Navigation = ({ activeView, setActiveView }) => {
@@ -29,6 +30,7 @@ const Navigation = ({ activeView, setActiveView }) => {
     { id: 'events', label: 'Eventos', icon: EventsIcon },
     { id: 'surveys', label: 'Encuestas', icon: SurveysIcon },
     { id: 'notices', label: 'Avisos', icon: NoticesIcon },
+    { id: 'banner', label: 'Banner', icon: BannerIcon },
     { id: 'filesUpload', label: 'Carga de archivos', icon: FileUploadIcon },
     { id: 'instalaciones', label: 'Instalaciones', icon: FacilitiesIcon },
     { id: 'helpCenter', label: 'Centro de ayuda', icon: HelpCenterIcon },

@@ -15,6 +15,7 @@ import NoticesContainer from './features/notices';
 import FacilitiesContainer from './features/facilities';
 import EventsContainer from './features/events/container';
 import HelpCenterContainer from './features/help-center/container';
+import BannerContainer from './features/banner/container';
 
 function App() {
   return (
@@ -127,6 +128,7 @@ function MainApplication() {
           {activeView === 'surveys' && <SurveysContainer />}
           {activeView === 'filesUpload' && <FileUploadContainer />}
           {activeView === 'notices' && <NoticesContainer />}
+          {activeView === 'banner' && <BannerContainer />}
           {activeView === 'instalaciones' && <FacilitiesContainer />}
           {activeView === 'events' && <EventsContainer />}
           {activeView === 'logs' && <LogPanel />}
