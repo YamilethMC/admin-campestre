@@ -41,9 +41,19 @@ export const useEvents = () => {
     }
   };
 
-  // Load initial data
+  // Set up auto-refresh every 30 minutes (1800000 ms)
   useEffect(() => {
+    const autoRefreshInterval = setInterval(() => {
+      loadEvents({page, search, type, date});
+    }, 1800000); // 30 minutes = 1800000 ms
+
+    // Initial load
     loadEvents({page, search, type, date});
+
+    // Cleanup interval on unmount
+    return () => {
+      clearInterval(autoRefreshInterval);
+    };
   }, [addLog, addToast, page, search, type, date]);
 
   // Create new event
@@ -54,14 +64,15 @@ export const useEvents = () => {
       if (result.success) {
         // Reload events after creation
         loadEvents();
+        addToast(result.message || 'Evento creado exitosamente', 'success');
         return result.data;
       } else {
         addToast(result.error, 'error');
-        return null;
+        throw new Error(result.error); // Throw error to be caught in container
       }
     } catch (err) {
       addToast(err.message || 'Error desconocido', 'error');
-      return null;
+      throw err; // Re-throw error to be caught in container
     } finally {
       setLoading(false);
     }
@@ -75,14 +86,15 @@ export const useEvents = () => {
       if (result.success) {
         // Reload events after update
         loadEvents();
+        addToast(result.message || 'Evento actualizado exitosamente', 'success');
         return result.data;
       } else {
         addToast(result.error, 'error');
-        return null;
+        throw new Error(result.error); // Throw error to be caught in container
       }
     } catch (err) {
       addToast(err.message || 'Error desconocido', 'error');
-      return null;
+      throw err; // Re-throw error to be caught in container
     } finally {
       setLoading(false);
     }

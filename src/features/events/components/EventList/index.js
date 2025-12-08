@@ -142,13 +142,24 @@ const EventList = ({
             <div key={event.id} className="bg-white p-6 rounded-lg shadow border border-gray-200">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <h3 className="text-lg font-medium text-gray-900">{event.name}</h3>
+                  <div className="flex items-start gap-3 mb-2">
+                    {/* Event Image */}
+                    {event.image && (
+                      <div className="shrink-0">
+                        <img
+                          src={event.image}
+                          alt={event.name}
+                          className="w-16 h-16 object-cover rounded-md"
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <h3 className="text-lg font-medium text-gray-900">{event.name}</h3>
+                      {event.description && (
+                        <p className="text-gray-600 text-sm mb-1">{event.description}</p>
+                      )}
+                    </div>
                   </div>
-
-                  {event.description && (
-                    <p className="text-gray-600 text-sm mb-2">{event.description}</p>
-                  )}
 
                   <div className="flex items-center text-sm text-gray-600 mb-3">
                     <div className="flex items-center mr-4">

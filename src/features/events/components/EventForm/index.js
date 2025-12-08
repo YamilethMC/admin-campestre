@@ -7,14 +7,15 @@ const EventForm = ({ event, onSave, onCancel }) => {
     name: '',
     description: '',
     image: '',
-    showInscribedCount: true,
-    showProgress: true,
+    inscritedShow: true,  // Changed from showInscribedCount
+    progressShow: true,   // Changed from showProgress
     date: '',
     totalSpots: 0,
     location: ''
   });
 
   const [imageFile, setImageFile] = useState(null);
+  const [imageChanged, setImageChanged] = useState(false); // Track if image has been changed
   const [errors, setErrors] = useState({});
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -32,8 +33,8 @@ const EventForm = ({ event, onSave, onCancel }) => {
         name: event.name || '',
         description: event.description || '',
         image: event.image || '',
-        showInscribedCount: event.showInscribedCount !== undefined ? event.showInscribedCount : true,
-        showProgress: event.showProgress !== undefined ? event.showProgress : true,
+        inscritedShow: event.inscritedShow !== undefined ? event.inscritedShow : true,
+        progressShow: event.progressShow !== undefined ? event.progressShow : true,
         date: formattedDate,
         totalSpots: event.totalSpots || 0,
         location: event.location || ''
@@ -44,8 +45,8 @@ const EventForm = ({ event, onSave, onCancel }) => {
         name: '',
         description: '',
         image: '',
-        showInscribedCount: true,
-        showProgress: true,
+        inscritedShow: true,
+        progressShow: true,
         date: '',
         totalSpots: 0,
         location: ''
@@ -79,6 +80,7 @@ const EventForm = ({ event, onSave, onCancel }) => {
           image: reader.result // This will be a base64 string
         }));
         setImageFile(file);
+        setImageChanged(true); // Mark that image has been changed
       };
       reader.readAsDataURL(file);
     }
@@ -110,11 +112,29 @@ const EventForm = ({ event, onSave, onCancel }) => {
   }
 
   const handleSaveConfirm = () => {
-    const adjustedData = {
-    ...formData,
-    date: toUTC(formData.date)
+    // Prepare the data for submission
+    let adjustedData = {
+      ...formData,
+      date: toUTC(formData.date)
     };
+
+    // Only include image in adjustedData if it has been changed
+    if (imageChanged && adjustedData.image) {
+      // Validate image format if it has been changed
+      if (!adjustedData.image.startsWith('data:image/')) {
+        // If not in correct format, we may need to handle error or conversion
+        // For now, we'll just pass it as is since handleImageChange already creates base64
+      }
+    } else {
+      // Remove image from adjustedData if it hasn't been changed
+      delete adjustedData.image;
+    }
+
     onSave(adjustedData);
+    // Reset imageChanged after successful save
+    if (imageChanged) {
+      setImageChanged(false);
+    }
     setShowSaveModal(false);
   };
 
@@ -123,6 +143,10 @@ const EventForm = ({ event, onSave, onCancel }) => {
   };
 
   const handleCancelAccept = () => {
+    // Reset imageChanged when canceling
+    if (imageChanged) {
+      setImageChanged(false);
+    }
     onCancel();
     setShowCancelModal(false);
   };
@@ -232,17 +256,17 @@ const EventForm = ({ event, onSave, onCancel }) => {
               </div>
               <button
                 type="button"
-                onClick={() => setFormData(prev => ({ ...prev, showInscribedCount: !prev.showInscribedCount }))}
+                onClick={() => setFormData(prev => ({ ...prev, inscritedShow: !prev.inscritedShow }))}
                 className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
-                  formData.showInscribedCount ? 'bg-primary' : 'bg-gray-200'
+                  formData.inscritedShow ? 'bg-primary' : 'bg-gray-200'
                 }`}
                 role="switch"
-                aria-checked={formData.showInscribedCount}
+                aria-checked={formData.inscritedShow}
               >
                 <span
                   aria-hidden="true"
                   className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                    formData.showInscribedCount ? 'translate-x-5' : 'translate-x-0'
+                    formData.inscritedShow ? 'translate-x-5' : 'translate-x-0'
                   }`}
                 />
               </button>
@@ -256,17 +280,17 @@ const EventForm = ({ event, onSave, onCancel }) => {
               </div>
               <button
                 type="button"
-                onClick={() => setFormData(prev => ({ ...prev, showProgress: !prev.showProgress }))}
+                onClick={() => setFormData(prev => ({ ...prev, progressShow: !prev.progressShow }))}
                 className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
-                  formData.showProgress ? 'bg-primary' : 'bg-gray-200'
+                  formData.progressShow ? 'bg-primary' : 'bg-gray-200'
                 }`}
                 role="switch"
-                aria-checked={formData.showProgress}
+                aria-checked={formData.progressShow}
               >
                 <span
                   aria-hidden="true"
                   className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                    formData.showProgress ? 'translate-x-5' : 'translate-x-0'
+                    formData.progressShow ? 'translate-x-5' : 'translate-x-0'
                   }`}
                 />
               </button>

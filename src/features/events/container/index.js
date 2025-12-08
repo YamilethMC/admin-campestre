@@ -111,7 +111,8 @@ const EventsContainer = () => {
       // Reload events to ensure latest data is shown
       loadEvents();
     } catch (err) {
-      // Error is handled in the create/update functions
+      // Error is handled in the create/update functions, form remains open
+      console.error('Error saving event:', err);
     }
   };
 
