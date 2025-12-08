@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Modal from '../../../../shared/components/modal';
+import { AppContext } from '../../../../shared/context/AppContext';
 
 const BannerForm = ({ banner = null, onSave, onCancel }) => {
   const isEdit = !!banner;
+  const { addToast } = useContext(AppContext);
 
   const formatDateForInput = (isoString) => {
     return isoString?.slice(0, 10) || "";
@@ -30,6 +32,7 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
   });
   
   const [imageFile, setImageFile] = useState(null);
+  const [imageChanged, setImageChanged] = useState(false); // Track if image has been changed
   const [errors, setErrors] = useState({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
@@ -38,6 +41,12 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
   const [pendingNavigationAction, setPendingNavigationAction] = useState(null);
   const [pendingSaveData, setPendingSaveData] = useState(null);
   const [isCreatingNew, setIsCreatingNew] = useState(!banner);
+
+  // Simple function to validate image format
+  const validateImageFormat = (image) => {
+    // Check if the image is in the correct data URL format
+    return image && image.startsWith('data:image/');
+  };
 
   // Set original data when component mounts
   useEffect(() => {
@@ -92,6 +101,7 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
           image: reader.result // This will be a base64 string
         }));
         setImageFile(file);
+        setImageChanged(true); // Mark that image has been changed
       };
       reader.readAsDataURL(file);
     }
@@ -114,17 +124,33 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (validateForm()) {
-      // Prepare the data for submission - dates should already be in correct format
-      const submitData = {
-        ...formData
-      };
-      setPendingSaveData(submitData);
-      setPendingNavigationAction(isEdit ? 'update' : 'create');
-      setShowSaveConfirmationModal(true);
+      try {
+        // Prepare the data for submission
+        let submitData = { ...formData };
+
+        // Only include image in submitData if it has been changed
+        if (imageChanged && submitData.image) {
+          // Validate image format if it has been changed
+          if (!validateImageFormat(submitData.image)) {
+            addToast('Formato de imagen inválido. Debe ser un archivo de imagen válido.', 'error');
+            return;
+          }
+        } else {
+          // Remove image from submitData if it hasn't been changed
+          delete submitData.image;
+        }
+
+        setPendingSaveData(submitData);
+        setPendingNavigationAction(isEdit ? 'update' : 'create');
+        setShowSaveConfirmationModal(true);
+      } catch (error) {
+        console.error('Error in handleSubmit:', error);
+        addToast('Error al procesar los datos del banner', 'error');
+      }
     }
   };
 
@@ -143,11 +169,23 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
   };
 
   const handleCancel = () => {
-    confirmLeave(onCancel, 'cancel');
+    confirmLeave(() => {
+      setImageChanged(false);
+      onCancel();
+    }, 'cancel');
   };
 
   const handleBack = () => {
-    confirmLeave(onCancel, 'back');
+    confirmLeave(() => {
+      setImageChanged(false);
+      onCancel();
+    }, 'back');
+  };
+
+  // Custom onCancel function that also resets imageChanged state
+  const handleFormCancel = () => {
+    setImageChanged(false);
+    onCancel();
   };
 
   const handleConfirmLeave = () => {
@@ -172,6 +210,10 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
         try {
           await onSave(pendingSaveData);
           setPendingSaveData(null);
+          // Reset image changed flag after successful save
+          if (imageChanged) {
+            setImageChanged(false);
+          }
         } catch (error) {
           // Stay on the form if there's an error
           console.error('Save failed:', error);
@@ -185,6 +227,10 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
     setShowSaveConfirmationModal(false);
     setPendingSaveData(null);
     setPendingNavigationAction(null);
+    // Reset image changed flag when canceling save
+    if (imageChanged) {
+      setImageChanged(false);
+    }
   };
 
   return (

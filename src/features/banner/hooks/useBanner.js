@@ -48,7 +48,6 @@ export const useBanner = () => {
     if (result.success) {
       // Refresh the list
       await loadBanners();
-      addToast(result.message, 'success');
     } else {
       addToast(result.error || 'Error al registrar banner', 'error');
       // Don't navigate away on error - let the form handle navigation
@@ -66,7 +65,6 @@ export const useBanner = () => {
     if (result.success) {
       // Refresh the list to maintain consistency
       await loadBanners();
-      addToast(result.message, 'success');
     } else {
       addToast(result.error || 'Error al actualizar banner', 'error');
       // Don't navigate away on error - let the form handle navigation
@@ -99,16 +97,25 @@ export const useBanner = () => {
       } else {
         await loadBanners();
       }
-      addToast(result.message, 'success');
       return true;
     } else {
       addToast(result.error || 'Error al eliminar el banner', 'error');
     }
   };
 
-  // Load initial data when filters or page changes
+  // Set up auto-refresh every 30 minutes (1800000 ms)
   useEffect(() => {
+    const autoRefreshInterval = setInterval(() => {
+      loadBanners();
+    }, 1800000); // 30 minutes = 1800000 ms
+
+    // Initial load
     loadBanners();
+
+    // Cleanup interval on unmount
+    return () => {
+      clearInterval(autoRefreshInterval);
+    };
   }, [page, status, search]);
 
   return {

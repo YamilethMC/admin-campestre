@@ -89,57 +89,54 @@ const BannerCard = ({ banner, onEdit, onDelete }) => {
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <div className="flex flex-col md:flex-row">
         {/* Banner Image */}
-        <div className="md:w-1/3">
+        <div className="md:w-1/5">
           {banner.image ? (
-            <img 
-              src={banner.image} 
-              alt={banner.title} 
-              className="w-full h-full object-cover max-h-48 md:max-h-full"
+            <img
+              src={banner.image}
+              alt={banner.title}
+              className="w-full h-full object-cover max-h-24 md:max-h-28"
             />
           ) : (
-            <div className="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48 flex items-center justify-center text-gray-500">
+            <div className="bg-gray-200 border-2 border-dashed rounded-xl w-full h-24 md:h-28 flex items-center justify-center text-gray-500">
               Sin imagen
             </div>
           )}
         </div>
 
         {/* Banner Content */}
-        <div className="p-6 md:w-2/3">
+        <div className="p-3 md:w-4/5">
           <div className="flex justify-between items-start">
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">{banner.title}</h3>
-              <p className="text-gray-600 mb-4 line-clamp-2">{banner.description}</p>
+              <h3 className="text-base font-semibold text-gray-800 mb-1">{banner.title}</h3>
+              <p className="text-sm text-gray-600 mb-3 line-clamp-3">{banner.description}</p>
 
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <p className="text-sm text-gray-500">Inicio</p>
-                  <p className="text-sm font-medium">{formatDateForInput(banner.startDate)}</p>
+              <div className="flex flex-wrap gap-3 mb-3">
+                <div className="flex items-center">
+                  <p className="text-xs text-gray-500 mr-1">Inicio:</p>
+                  <p className="text-xs font-medium">{formatDateForInput(banner.startDate)}</p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Fin</p>
-                  <p className="text-sm font-medium">{formatDateForInput(banner.endDate)}</p>
+                <div className="flex items-center">
+                  <p className="text-xs text-gray-500 mr-1">Fin:</p>
+                  <p className="text-xs font-medium">{formatDateForInput(banner.endDate)}</p>
                 </div>
-              </div>
-
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(banner.active)}`}>
+                <span className={`px-2 py-0.5 text-xs rounded ${getStatusColor(banner.active)}`}>
                   {banner.active ? 'Activo' : 'Inactivo'}
                 </span>
-                <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                <span className="px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded">
                   {getActionTypeLabel(banner.typeActionId)}
                 </span>
               </div>
             </div>
 
             {/* Options menu */}
-            <div className="relative ml-4">
+            <div className="relative ml-2">
               <button
                 ref={buttonRef}
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100 transition-colors"
+                className="p-1 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100 transition-colors"
                 aria-label="Opciones"
               >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                 </svg>
               </button>
@@ -147,7 +144,7 @@ const BannerCard = ({ banner, onEdit, onDelete }) => {
               {isMenuOpen && (
                 <div
                   ref={menuRef}
-                  className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200"
+                  className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200"
                   style={{
                     top: '100%',
                     right: '0'
@@ -155,14 +152,14 @@ const BannerCard = ({ banner, onEdit, onDelete }) => {
                 >
                   <button
                     onClick={handleEdit}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="block w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     Editar
                   </button>
                   {onDelete && (
                     <button
                       onClick={handleDeleteClick}
-                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                      className="block w-full text-left px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
                     >
                       Eliminar
                     </button>
