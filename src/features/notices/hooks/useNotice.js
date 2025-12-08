@@ -54,29 +54,114 @@ export const useNotice = () => {
 
   // Create new notice
   const createNotice = async (noticeData) => {
-    setLoading(true);
-    const result = await noticeService.createNotice(noticeData);
+    try {
+      setLoading(true);
 
-    if (result.success) {
-      // Refresh the list
-      await loadNotices();
-    } else {
-      addToast(result.error || 'Error al registrar aviso', 'error');
-      //setLoading(false);
+      // Check if there's an image to convert
+      if (noticeData.image && noticeData.image.startsWith('data:image')) {
+        // Convert to FormData and send as base64
+        const formData = new FormData();
+
+        // Add the notice data as JSON string
+        const noticeFields = {
+          title: noticeData.title,
+          message: noticeData.message,
+          active: noticeData.active,
+          visibleUntil: noticeData.visibleUntil,
+          type: noticeData.type,
+          sentDate: new Date().toISOString(),
+        };
+
+        formData.append('noticeData', JSON.stringify(noticeFields));
+
+        // Convert image to base64 and add to form data
+        const base64Image = noticeData.image.split(',')[1]; // Remove data:image/jpeg;base64, prefix
+        formData.append('image', base64Image);
+
+        const result = await noticeService.createNotice(formData);
+
+        if (result.success) {
+          // Refresh the list
+          await loadNotices();
+          return result.data;
+        } else {
+          addToast(result.error || 'Error al registrar aviso', 'error');
+          return null;
+        }
+      } else {
+        // No image to convert, send as JSON data
+        const result = await noticeService.createNotice(noticeData);
+
+        if (result.success) {
+          // Refresh the list
+          await loadNotices();
+          return result.data;
+        } else {
+          addToast(result.error || 'Error al registrar aviso', 'error');
+          return null;
+        }
+      }
+    } catch (err) {
+      addToast(err.message || 'Error desconocido al registrar aviso', 'error');
+      return null;
+    } finally {
+      setLoading(false);
     }
   };
 
   // Update existing notice
   const updateNotice = async (id, noticeData) => {
-    setLoading(true);
-    const result = await noticeService.updateNotice(id, noticeData);
+    try {
+      setLoading(true);
 
-    if (result.success) {
-      // Refresh the list to maintain consistency
-      await loadNotices();
-    } else {
-      addToast(result.error || 'Error al actualizar aviso', 'error');
-      //setLoading(false);
+      // Check if there's an image to convert
+      if (noticeData.image && noticeData.image.startsWith('data:image')) {
+        // Image has changed, send as FormData
+        const formData = new FormData();
+
+        // Add the notice data as JSON string
+        const noticeFields = {
+          title: noticeData.title,
+          message: noticeData.message,
+          active: noticeData.active,
+          visibleUntil: noticeData.visibleUntil,
+          type: noticeData.type,
+        };
+
+        formData.append('noticeData', JSON.stringify(noticeFields));
+
+        // Convert image to base64 and add to form data
+        const base64Image = noticeData.image.split(',')[1]; // Remove data:image/jpeg;base64, prefix
+        formData.append('image', base64Image);
+
+        const result = await noticeService.updateNotice(id, formData);
+
+        if (result.success) {
+          // Refresh the list to maintain consistency
+          await loadNotices();
+          return result.data;
+        } else {
+          addToast(result.error || 'Error al actualizar aviso', 'error');
+          return null;
+        }
+      } else {
+        // No image change, send as JSON data
+        const result = await noticeService.updateNotice(id, noticeData);
+
+        if (result.success) {
+          // Refresh the list to maintain consistency
+          await loadNotices();
+          return result.data;
+        } else {
+          addToast(result.error || 'Error al actualizar aviso', 'error');
+          return null;
+        }
+      }
+    } catch (err) {
+      addToast(err.message || 'Error desconocido al actualizar aviso', 'error');
+      return null;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -109,9 +194,19 @@ export const useNotice = () => {
     }
   };
 
-  // Load initial data when filters or page changes
+  // Set up auto-refresh every 30 minutes (1800000 ms)
   useEffect(() => {
+    const autoRefreshInterval = setInterval(() => {
+      loadNotices();
+    }, 1800000); // 30 minutes = 1800000 ms
+
+    // Initial load
     loadNotices();
+
+    // Cleanup interval on unmount
+    return () => {
+      clearInterval(autoRefreshInterval);
+    };
   }, [page, status, search]);
 
   return {

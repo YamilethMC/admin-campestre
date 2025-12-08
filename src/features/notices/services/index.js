@@ -120,18 +120,38 @@ export const noticeService = {
   },
 
   // Create a new notice
-  createNotice: async (noticeData) => {
+  createNotice: async (data) => {
     const token = localStorage.getItem("authToken");
-    noticeData.sentDate = new Date().toISOString();
-    noticeData.visibleUntil = new Date(noticeData.visibleUntil).toISOString();
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/notify`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(noticeData),
-    });
+
+    let response;
+    if (data instanceof FormData) {
+      // When sending FormData (with image), don't set Content-Type header
+      // The browser will set it with the proper boundary
+      response = await fetch(`${process.env.REACT_APP_API_URL}/notify`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: data
+      });
+    } else {
+      // When sending JSON data (without image)
+      // Format dates for API
+      const formattedData = {
+        ...data,
+        sentDate: new Date().toISOString(),
+        visibleUntil: data.visibleUntil ? new Date(data.visibleUntil).toISOString() : null
+      };
+
+      response = await fetch(`${process.env.REACT_APP_API_URL}/notify`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formattedData),
+      });
+    }
 
     if (!response.ok) {
       const error = await response.json();
@@ -177,17 +197,37 @@ export const noticeService = {
   },
 
   // Update a notice
-  updateNotice: async (id, noticeData) => {
+  updateNotice: async (id, data) => {
     const token = localStorage.getItem("authToken");
-    noticeData.visibleUntil = new Date(noticeData.visibleUntil).toISOString();
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/notify/${id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(noticeData),
-    });
+
+    let response;
+    if (data instanceof FormData) {
+      // When sending FormData (with image), don't set Content-Type header
+      // The browser will set it with the proper boundary
+      response = await fetch(`${process.env.REACT_APP_API_URL}/notify/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: data
+      });
+    } else {
+      // When sending JSON data (without image)
+      // Format dates for API
+      const formattedData = {
+        ...data,
+        visibleUntil: data.visibleUntil ? new Date(data.visibleUntil).toISOString() : null
+      };
+
+      response = await fetch(`${process.env.REACT_APP_API_URL}/notify/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formattedData),
+      });
+    }
 
     if (!response.ok) {
       const error = await response.json();
