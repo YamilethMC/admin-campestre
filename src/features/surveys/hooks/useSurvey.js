@@ -46,8 +46,13 @@ export const useSurvey = () => {
     }
   };
 
-  // Load initial data
+  // Set up auto-refresh every 30 minutes (1800000 ms)
   useEffect(() => {
+    const autoRefreshInterval = setInterval(() => {
+      loadSurveys({page, status, category, search});
+    }, 1800000); // 30 minutes = 1800000 ms
+
+    // Load initial data
     const loadSurveyCategoryOptions = async () => {
       try {
         setLoadingSurveyCategory(true);
@@ -75,6 +80,11 @@ export const useSurvey = () => {
     loadSurveyCategoryOptions();
     loadSurveyPriorityOptions();
     loadSurveys({page, status, category, search});
+
+    // Cleanup interval on unmount
+    return () => {
+      clearInterval(autoRefreshInterval);
+    };
   }, [addLog, addToast, status, page, category, search]);
 
   // Toggle survey status
@@ -102,6 +112,7 @@ export const useSurvey = () => {
       priority: formData.priority,
       category: formData.category,
       timeStimed: formData.estimatedTime,
+      showResponseCount: formData.showResponseCount, // Include showResponseCount in update
       questions: formData.questions.map((q, qIndex) => {
         // Se construye la pregunta base
         const question = {
@@ -150,7 +161,7 @@ export const useSurvey = () => {
       category: formData.category,
       priority: formData.priority,
       estimatedTime: formData.estimatedTime,
-      //imageUrl: formData.imageUrl,
+      showResponseCount: formData.showResponseCount,
       isActive: true,
       questions: formData.questions.map((q, qIndex) => ({
         surveyId: 0,
@@ -172,10 +183,60 @@ export const useSurvey = () => {
 
   // Create new survey
   const createSurvey = async (surveyData) => {
-    const surveyDataF = buildSurveyData(surveyData);
     try {
       setLoading(true);
-      const result = await surveyService.createSurvey(surveyDataF);
+
+      // Convert image to base64 if it exists
+      const formData = new FormData();
+
+      // Add all survey fields except imageFile
+      const surveyFields = {
+        title: surveyData.title,
+        description: surveyData.description,
+        category: surveyData.category,
+        priority: surveyData.priority,
+        estimatedTime: surveyData.estimatedTime,
+        isActive: true,
+        showResponseCount: surveyData.showResponseCount,
+        questions: surveyData.questions.map((q, qIndex) => ({
+          surveyId: 0,
+          question: q.question,
+          type: q.type,
+          required: q.required,
+          order: qIndex,
+          options: (q.type === "SELECT" || q.type === "BOOLEAN")
+            ? q.options.map((opt, optIndex) => ({
+                surveyQuestionId: 0,
+                option: opt.option,
+                value: opt.option,
+                order: opt.id
+              }))
+            : []
+        }))
+      };
+
+      // Add survey fields as JSON string to formData
+      formData.append('surveyData', JSON.stringify(surveyFields));
+
+      // Add image if it exists
+      if (surveyData.imageFile) {
+        // Convert image to base64 string
+        const base64Image = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const result = reader.result.split(',')[1]; // Remove data:image/jpeg;base64, prefix
+            resolve(result);
+          };
+          reader.onerror = () => {
+            reject(new Error('Error al leer la imagen'));
+          };
+          reader.readAsDataURL(surveyData.imageFile);
+        });
+
+        formData.append('image', base64Image);
+      }
+
+      const result = await surveyService.createSurvey(formData);
 
       if (result.success) {
         loadSurveys();
@@ -194,17 +255,105 @@ export const useSurvey = () => {
 
   // Update existing survey
   const updateSurvey = async (id, surveyData) => {
-    const surveyDataF = buildUpdateSurveyData(surveyData);
     try {
       setLoading(true);
-      const result = await surveyService.updateSurvey(id, surveyDataF);
 
-      if (result.success) {
-        loadSurveys();
-        return result.data;
+      // Check if image has changed
+      if (surveyData.imageFile) {
+        // Image has changed, send as FormData
+        const formData = new FormData();
+
+        // Build update survey data excluding imageFile
+        const surveyFields = {
+          title: surveyData.title,
+          description: surveyData.description,
+          active: surveyData.active,
+          priority: surveyData.priority,
+          category: surveyData.category,
+          timeStimed: surveyData.estimatedTime,
+          showResponseCount: surveyData.showResponseCount,
+          questions: surveyData.questions.map((q, qIndex) => {
+            // Se construye la pregunta base
+            const question = {
+              question: q.question,
+              type: q.type,
+              required: q.required,
+              order: qIndex,
+            };
+
+            // Solo se agrega id si es > 0
+            if (q.id && q.id > 0) {
+              question.id = q.id;
+            }
+
+            // Verifica si el tipo de pregunta requiere opciones
+            if (["SELECT", "CHECKBOX", "BOOLEAN", "YES_NO"].includes(q.type)) {
+              question.options = q.options.map((opt, optIndex) => {
+
+                const optionText = typeof opt === "string" ? opt : opt.option;
+
+                const option = {
+                  option: optionText,
+                  value: optionText.toLowerCase().replace(/\s/g, ""),
+                  order: optIndex,
+                };
+
+                // Solo se agrega id si es > 0
+                if (opt.id && opt.id > 0) {
+                  option.id = opt.id;
+                }
+
+                return option;
+              });
+            } else {
+              question.options = [];
+            }
+            return question;
+          }),
+        };
+
+        // Add survey fields as JSON string to formData
+        formData.append('surveyData', JSON.stringify(surveyFields));
+
+        // Add image if it exists
+        if (surveyData.imageFile) {
+          // Convert image to base64 string
+          const base64Image = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              const result = reader.result.split(',')[1]; // Remove data:image/jpeg;base64, prefix
+              resolve(result);
+            };
+            reader.onerror = () => {
+              reject(new Error('Error al leer la imagen'));
+            };
+            reader.readAsDataURL(surveyData.imageFile);
+          });
+
+          formData.append('image', base64Image);
+        }
+
+        const result = await surveyService.updateSurvey(id, formData);
+
+        if (result.success) {
+          loadSurveys();
+          return result.data;
+        } else {
+          addToast(result.error || 'Error desconocido', 'error');
+          return null;
+        }
       } else {
-        addToast(result.error || 'Error desconocido', 'error');
-        return null;
+        // No image change, use regular update
+        const surveyDataF = buildUpdateSurveyData(surveyData);
+        const result = await surveyService.updateSurvey(id, surveyDataF);
+
+        if (result.success) {
+          loadSurveys();
+          return result.data;
+        } else {
+          addToast(result.error || 'Error desconocido', 'error');
+          return null;
+        }
       }
     } catch (err) {
       addToast(err.message || 'Error desconocido', 'error');

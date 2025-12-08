@@ -16,7 +16,7 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
     category: survey?.category || '',
     priority: survey?.priority || '',
     estimatedTime: survey?.timeStimed || '',
-    imageUrl: survey?.imageUrl || '',
+    image: survey?.image || survey?.imageUrl || '', // Use image field (with fallback to imageUrl for compatibility)
     showResponseCount: survey?.showResponseCount !== undefined ? survey.showResponseCount : true, // Add new field
     imageFile: null, // For handling local file
     isActive: survey ? survey.active : true,
@@ -61,7 +61,7 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
         category: survey.category,
         priority: survey.priority,
         estimatedTime: survey.timeStimed,
-        imageUrl: survey.imageUrl,
+        image: survey.image || survey.imageUrl, // Use image field (with fallback to imageUrl for compatibility)
         showResponseCount: survey.showResponseCount !== undefined ? survey.showResponseCount : true,
         imageFile: null, // No file selected initially when editing
         isActive: survey.active,
@@ -119,7 +119,7 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
           setFormData(prev => ({
             ...prev,
             imageFile: file, // Store the actual file
-            imageUrl: reader.result // Store the data URL for preview
+            image: reader.result // Store the data URL for preview
           }));
         };
         reader.readAsDataURL(file);
@@ -218,9 +218,7 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
     if (validateForm()) {
       // Prepare the data for submission
       const submitData = {
-        ...formData,
-        // If there's an image file, use its data URL; otherwise keep the existing imageUrl
-        imageUrl: formData.imageFile ? formData.imageUrl : formData.imageUrl
+        ...formData
       };
       setPendingSaveData(submitData);
       setShowSaveConfirmationModal(true);
@@ -413,10 +411,10 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
               className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors w-full"
             >
               <div className="space-y-1 text-center w-full">
-                {formData.imageUrl ? (
+                {formData.image ? (
                   <div className="mb-4">
                     <img
-                      src={formData.imageUrl}
+                      src={formData.image}
                       alt="Preview"
                       className="mx-auto max-h-40 object-contain rounded-md"
                     />

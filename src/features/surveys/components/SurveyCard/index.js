@@ -127,9 +127,21 @@ const SurveyCard = ({ survey, onEdit, onViewResponses, onToggleStatus, onDelete 
   return (
     <div className="bg-white rounded-lg shadow p-4 mb-4 border border-gray-200 hover:shadow-md transition-shadow">
       <div className="flex justify-between items-center">
-        {/* Survey image placeholder */}
-        <div className="w-16 h-16 bg-gray-200 rounded-lg mr-4 flex-shrink-0 flex items-center justify-center">
-          <span className="text-gray-500 text-xs">Imagen</span>
+        {/* Survey image */}
+        <div className="w-16 h-16 bg-gray-200 rounded-lg mr-4 flex-shrink-0 flex items-center justify-center overflow-hidden">
+          {survey.image ? (
+            <img
+              src={survey.image}
+              alt={survey.title}
+              className="w-full h-full object-cover rounded-lg"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24"><rect width="24" height="24" fill="%23d1d5db"/><text x="12" y="16" font-family="Arial" font-size="8" fill="%239ca3af" text-anchor="middle">IMG</text></svg>';
+              }}
+            />
+          ) : (
+            <span className="text-gray-500 text-xs">Sin imagen</span>
+          )}
         </div>
 
         <div className="flex-1 min-w-0">

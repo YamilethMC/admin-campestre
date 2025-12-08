@@ -63,16 +63,32 @@ export const surveyService = {
     };
   },
 
-  createSurvey: async (surveyData) => {
+  createSurvey: async (data) => {
     const token = localStorage.getItem('authToken');
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/survey`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify(surveyData)
-    });
+
+    let response;
+    if (data instanceof FormData) {
+      // When sending FormData (with image), don't set Content-Type header
+      // The browser will set it with the proper boundary
+      response = await fetch(`${process.env.REACT_APP_API_URL}/survey`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        },
+        body: data
+      });
+    } else {
+      // When sending JSON data (without image)
+      response = await fetch(`${process.env.REACT_APP_API_URL}/survey`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      });
+    }
+
     if (!response.ok) {
       const err = await response.json();
       let errorMessage = err.message || 'Error desconocido';
@@ -106,16 +122,32 @@ export const surveyService = {
     };
   },
 
-  updateSurvey: async (id, surveyData) => {
+  updateSurvey: async (id, data) => {
     const token = localStorage.getItem('authToken');
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/survey/${id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify(surveyData)
-    });
+
+    let response;
+    if (data instanceof FormData) {
+      // When sending FormData (with image), don't set Content-Type header
+      // The browser will set it with the proper boundary
+      response = await fetch(`${process.env.REACT_APP_API_URL}/survey/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        },
+        body: data
+      });
+    } else {
+      // When sending JSON data (without image)
+      response = await fetch(`${process.env.REACT_APP_API_URL}/survey/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      });
+    }
+
     if (!response.ok) {
       const err = await response.json();
       let errorMessage = err.message || 'Error desconocido';
