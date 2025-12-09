@@ -12,6 +12,7 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
   // Original data to compare for changes
   const [originalData, setOriginalData] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+  const [imageChanged, setImageChanged] = useState(false);
 
   const [formData, setFormData] = useState({
     title: notice?.title || '',
@@ -84,6 +85,7 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
           image: reader.result // This will be a base64 string
         }));
         setImageFile(file);
+        setImageChanged(true);
       };
       reader.readAsDataURL(file);
     }
@@ -116,6 +118,17 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
       const submitData = {
         ...formData,
       };
+
+      if (imageChanged && submitData.image) {
+        // Validate image format if it has been changed
+        if (!submitData.image.startsWith('data:image/')) {
+          return;
+        }
+      } else {
+        // Remove image from submitData if it hasn't been changed
+        delete submitData.image;
+      }
+
       setPendingSaveData(submitData);
       setPendingNavigationAction(isEdit ? 'update' : 'create'); // Track if it's an update or create action
       setShowSaveConfirmationModal(true);
@@ -140,9 +153,11 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
 
   const handleCancel = () => {
     confirmLeave(onCancel, 'cancel');
+    setImageChanged(false);
   };
 
   const handleBack = () => {
+    setImageChanged(false);
     confirmLeave(onCancel, 'back');
   };
 
@@ -151,6 +166,11 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
     if (pendingNavigationCallback) {
       pendingNavigationCallback();
       setPendingNavigationCallback(null);
+
+      // Reset image changed flag after successful save
+      if (imageChanged) {
+        setImageChanged(false);
+      }
     }
     setPendingNavigationAction(null);
   };
@@ -176,6 +196,10 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
     setShowSaveConfirmationModal(false);
     setPendingSaveData(null);
     setPendingNavigationAction(null);
+
+    if (imageChanged) {
+      setImageChanged(false);
+    }
   };
 
   return (

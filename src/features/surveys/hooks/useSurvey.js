@@ -46,6 +46,10 @@ export const useSurvey = () => {
     }
   };
 
+  const loadSurveyData = () => {
+    loadSurveys({ page, status, category, search });
+  };
+
   // Load initial data
   useEffect(() => {
     const loadSurveyCategoryOptions = async () => {
@@ -74,8 +78,16 @@ export const useSurvey = () => {
     };
     loadSurveyCategoryOptions();
     loadSurveyPriorityOptions();
-    loadSurveys({page, status, category, search});
+    loadSurveyData();
   }, [addLog, addToast, status, page, category, search]);
+
+  useEffect(() => {
+    const autoRefreshInterval = setInterval(() => {
+      loadSurveyData();
+    }, 1800000); // 30 minutos
+
+    return () => clearInterval(autoRefreshInterval);
+  }, [page, status, category, search]);
 
   // Toggle survey status
   const toggleSurveyStatus = async (id) => {

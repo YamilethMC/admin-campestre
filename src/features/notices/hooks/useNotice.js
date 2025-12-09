@@ -111,7 +111,11 @@ export const useNotice = () => {
 
   // Load initial data when filters or page changes
   useEffect(() => {
+    const autoRefreshInterval = setInterval(() => {
+      loadNotices();
+    }, 1800000);
     loadNotices();
+    return () => clearInterval(autoRefreshInterval);
   }, [page, status, search]);
 
   return {
