@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { SurveyCategory, SurveyPriority, SurveyQuestionType } from '../../interfaces';
 import Modal from '../../../../shared/components/modal';
 import { useSurvey } from '../../hooks/useSurvey';
+import { AppContext } from '../../../../shared/context/AppContext';
 
 const SurveyForm = ({ survey = null, onSave, onCancel }) => {
   const isEdit = !!survey;
-  
+  const { addToast } = useContext(AppContext);
   const { surveyCategoryOptions, surveyPriorityOptions, loadingSurveyCategory, loadingSurveyPriority } = useSurvey();
   // Original data to compare for changes
   const [originalData, setOriginalData] = useState(null);
@@ -16,9 +17,8 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
     category: survey?.category || '',
     priority: survey?.priority || '',
     estimatedTime: survey?.timeStimed || '',
-    imageUrl: survey?.imageUrl || '',
-    showResponseCount: survey?.showResponseCount !== undefined ? survey.showResponseCount : true, // Add new field
-    imageFile: null, // For handling local file
+    image: survey?.image || '',
+    responsesShow: survey?.responsesShow !== undefined ? survey.responsesShow : true,
     isActive: survey ? survey.active : true,
     questions: survey?.surveyQuestions && Array.isArray(survey.surveyQuestions) && survey.surveyQuestions.length > 0
       ? survey.surveyQuestions.map(q => ({
@@ -50,7 +50,15 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
   const [showSaveConfirmationModal, setShowSaveConfirmationModal] = useState(false);
   const [pendingNavigationCallback, setPendingNavigationCallback] = useState(null);
   const [pendingSaveData, setPendingSaveData] = useState(null);
-  
+  const [imageFile, setImageFile] = useState(null);
+  const [imageChanged, setImageChanged] = useState(false); 
+
+  // Simple function to validate image format
+  const validateImageFormat = (image) => {
+    // Check if the image is in the correct data URL format
+    return image && image.startsWith('data:image/');
+  };
+
   // Set original data when component mounts
   useEffect(() => {
     if (survey) {
@@ -61,9 +69,8 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
         category: survey.category,
         priority: survey.priority,
         estimatedTime: survey.timeStimed,
-        imageUrl: survey.imageUrl,
-        showResponseCount: survey.showResponseCount !== undefined ? survey.showResponseCount : true,
-        imageFile: null, // No file selected initially when editing
+        image: survey.image,
+        responsesShow: survey.responsesShow !== undefined ? survey.responsesShow : true,
         isActive: survey.active,
         questions: survey.surveyQuestions
           ? survey.surveyQuestions.map(q => ({ ...q }))
@@ -77,9 +84,8 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
         category: SurveyCategory.SERVICES,
         priority: SurveyPriority.NORMAL,
         estimatedTime: '',
-        imageUrl: '',
-        showResponseCount: true,
-        imageFile: null,
+        image: '',
+        responsesShow: true,
         isActive: true,
         questions: [{ id: Date.now(), question: '', type: SurveyQuestionType.TEXT, options: [''], required: false }]
       });
@@ -112,20 +118,16 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Check if the file is an image
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setFormData(prev => ({
-            ...prev,
-            imageFile: file, // Store the actual file
-            imageUrl: reader.result // Store the data URL for preview
-          }));
-        };
-        reader.readAsDataURL(file);
-      } else {
-        alert('Por favor selecciona un archivo de imagen válido (JPEG, PNG, etc.)');
-      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({
+          ...prev,
+          image: reader.result // This will be a base64 string
+        }));
+        setImageFile(file);
+        setImageChanged(true); // Mark that image has been changed
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -217,11 +219,19 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
 
     if (validateForm()) {
       // Prepare the data for submission
-      const submitData = {
-        ...formData,
-        // If there's an image file, use its data URL; otherwise keep the existing imageUrl
-        imageUrl: formData.imageFile ? formData.imageUrl : formData.imageUrl
-      };
+        let submitData = { ...formData };
+
+        // Only include image in submitData if it has been changed
+        if (imageChanged && submitData.image) {
+          // Validate image format if it has been changed
+          if (!validateImageFormat(submitData.image)) {
+            addToast('Formato de imagen inválido. Debe ser un archivo de imagen válido.', 'error');
+            return;
+          }
+        } else {
+          // Remove image from submitData if it hasn't been changed
+          delete submitData.image;
+        }
       setPendingSaveData(submitData);
       setShowSaveConfirmationModal(true);
     }
@@ -239,6 +249,7 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
 
   const handleCancel = () => {
     confirmLeave(onCancel);
+    setImageChanged(false);
   };
 
   const handleConfirmLeave = () => {
@@ -246,6 +257,11 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
     if (pendingNavigationCallback) {
       pendingNavigationCallback();
       setPendingNavigationCallback(null);
+
+      // Reset image changed flag after successful save
+      if (imageChanged) {
+        setImageChanged(false);
+      }
     }
   };
 
@@ -292,6 +308,10 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
   const handleCancelSave = () => {
     setShowSaveConfirmationModal(false);
     setPendingSaveData(null);
+
+    if (imageChanged) {
+      setImageChanged(false);
+    }
   };
 
   const getQuestionTypeName = (type) => {
@@ -413,10 +433,10 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
               className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors w-full"
             >
               <div className="space-y-1 text-center w-full">
-                {formData.imageUrl ? (
+                {formData.image ? (
                   <div className="mb-4">
                     <img
-                      src={formData.imageUrl}
+                      src={formData.image}
                       alt="Preview"
                       className="mx-auto max-h-40 object-contain rounded-md"
                     />
@@ -453,17 +473,17 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
               </div>
               <button
                 type="button"
-                onClick={() => handleToggleChange('showResponseCount', !formData.showResponseCount)}
+                onClick={() => handleToggleChange('responsesShow', !formData.responsesShow)}
                 className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
-                  formData.showResponseCount ? 'bg-primary' : 'bg-gray-200'
+                  formData.responsesShow ? 'bg-primary' : 'bg-gray-200'
                 }`}
                 role="switch"
-                aria-checked={formData.showResponseCount}
+                aria-checked={formData.responsesShow}
               >
                 <span
                   aria-hidden="true"
                   className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                    formData.showResponseCount ? 'translate-x-5' : 'translate-x-0'
+                    formData.responsesShow ? 'translate-x-5' : 'translate-x-0'
                   }`}
                 />
               </button>

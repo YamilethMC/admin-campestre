@@ -127,11 +127,15 @@ const SurveyCard = ({ survey, onEdit, onViewResponses, onToggleStatus, onDelete 
   return (
     <div className="bg-white rounded-lg shadow p-4 mb-4 border border-gray-200 hover:shadow-md transition-shadow">
       <div className="flex justify-between items-center">
-        {/* Survey image placeholder */}
-        <div className="w-16 h-16 bg-gray-200 rounded-lg mr-4 flex-shrink-0 flex items-center justify-center">
-          <span className="text-gray-500 text-xs">Imagen</span>
-        </div>
-
+        {survey.image && (
+          <div className="shrink-0 mr-4">
+            <img
+              src={survey.image}
+              alt={survey.title}
+              className="w-16 h-16 object-cover rounded-md"
+            />
+          </div>
+        )}
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-gray-800 text-lg mb-1 truncate">{survey.title}</h3>
           <p className="text-gray-600 text-sm mb-3 line-clamp-2">{survey.description}</p>

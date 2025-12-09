@@ -99,6 +99,8 @@ export const useSurvey = () => {
       title: formData.title,
       description: formData.description,
       active: formData.active,
+      image: formData.image,
+      responsesShow: formData.responsesShow,
       priority: formData.priority,
       category: formData.category,
       timeStimed: formData.estimatedTime,
@@ -144,30 +146,33 @@ export const useSurvey = () => {
   };
 
  const buildSurveyData = (formData) => {
-    return {
+    const surveyData = {
       title: formData.title,
       description: formData.description,
       category: formData.category,
       priority: formData.priority,
-      estimatedTime: formData.estimatedTime,
-      //imageUrl: formData.imageUrl,
-      isActive: true,
-      questions: formData.questions.map((q, qIndex) => ({
-        surveyId: 0,
-        question: q.question,
-        type: q.type,
-        required: q.required,
-        order: qIndex,
-        options: (q.type === "SELECT" || q.type === "BOOLEAN")
-          ? q.options.map((opt, optIndex) => ({
-              surveyQuestionId: 0,
-              option: opt.option,
-              value: opt.option,
-              order: opt.id
-            }))
-          : []
-      }))
+      timeStimed: formData.estimatedTime,
+      image: formData.image,
+      responsesShow: formData.responsesShow,
+      isActive: formData.isActive !== undefined ? formData.isActive : true,
     };
+    surveyData.questions = formData.questions.map((q, qIndex) => ({
+      surveyId: 0,
+      question: q.question,
+      type: q.type,
+      required: q.required,
+      order: qIndex,
+      options: (q.type === "SELECT" || q.type === "BOOLEAN")
+        ? q.options.map((opt, optIndex) => ({
+            surveyQuestionId: 0,
+            option: opt.option,
+            value: opt.option,
+            order: opt.id
+          }))
+        : []
+    }));
+
+    return surveyData;
   };
 
   // Create new survey
