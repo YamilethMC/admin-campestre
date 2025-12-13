@@ -16,6 +16,7 @@ import FacilitiesContainer from './features/facilities';
 import EventsContainer from './features/events/container';
 import HelpCenterContainer from './features/help-center/container';
 import BannerContainer from './features/banner/container';
+import logoImg from './assets/images/logo.png';
 
 function App() {
   return (
@@ -117,8 +118,12 @@ function MainApplication() {
         <main className="flex-1 p-6">
           <ToastContainer />
           {activeView === 'dashboard' && (
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              
+            <div className="bg-white p-8 rounded-lg shadow-md flex items-center justify-center">
+              <img
+                src={logoImg}
+                alt="Logo"
+                className="w-100 h-100 object-contain"
+              />
             </div>
           )}
           {activeView === 'addMember' && <IndividualMemberForm />}

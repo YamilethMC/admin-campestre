@@ -22,7 +22,7 @@ const Navigation = ({ activeView, setActiveView }) => {
   const { logout } = useContext(AppContext);
   
   const menuItems = [
-    { id: 'dashboard', label: 'Inicio', icon: HomeIcon },
+    //{ id: 'dashboard', label: 'Inicio', icon: HomeIcon },
     { id: 'memberList', label: 'Socios', icon: MemberListIcon },
     //{ id: 'addMember', label: 'Agregar socio', icon: AddMemberIcon },
     //{ id: 'bulkMembers', label: 'Carga masiva socios', icon: BulkUploadIcon },
