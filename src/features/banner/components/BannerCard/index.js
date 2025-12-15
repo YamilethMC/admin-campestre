@@ -89,12 +89,12 @@ const BannerCard = ({ banner, onEdit, onDelete }) => {
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <div className="flex flex-col md:flex-row">
         {/* Banner Image */}
-        <div className="md:w-1/5">
+        <div className="flex items-center gap-3 mb-2 ml-3">
           {banner.image ? (
             <img
               src={banner.image}
               alt={banner.title}
-              className="w-full h-full object-cover max-h-24 md:max-h-28"
+              className="w-16 h-16 object-cover rounded-md"
             />
           ) : (
             <div className="bg-gray-200 border-2 border-dashed rounded-xl w-full h-24 md:h-28 flex items-center justify-center text-gray-500">
