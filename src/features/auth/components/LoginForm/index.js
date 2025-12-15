@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { UserIcon, LockIcon } from '../../../../shared/components/icons/icons';
+import { UserIcon, LockIcon, RefreshIcon } from '../../../../shared/components/icons/icons';
 
 const LoginForm = () => {
   const {
@@ -82,12 +82,19 @@ const LoginForm = () => {
               type="submit"
               disabled={loading}
               className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-                loading 
-                  ? 'bg-gray-400 cursor-not-allowed' 
+                loading
+                  ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-primary hover:bg-primary-dark'
               } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary`}
             >
-              {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
+              {loading ? (
+                <span className="flex items-center">
+                  <RefreshIcon className="animate-spin h-4 w-4 mr-2" />
+                  Iniciando sesión...
+                </span>
+              ) : (
+                'Iniciar sesión'
+              )}
             </button>
           </div>
         </form>
