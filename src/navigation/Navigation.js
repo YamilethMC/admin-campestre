@@ -1,14 +1,11 @@
 import React, { useContext } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 import { AppContext } from '../shared/context/AppContext';
 import { 
-  DashboardIcon, 
-  AddMemberIcon, 
-  BulkUploadIcon, 
   AccountStatementIcon, 
   MemberListIcon, 
   SurveysIcon,
   NoticesIcon,
-  LogIcon, 
   LogoutIcon,
   HomeIcon,
   FileUploadIcon,
@@ -18,45 +15,69 @@ import {
   BannerIcon
 } from '../shared/components/icons/icons';
 
-const Navigation = ({ activeView, setActiveView }) => {
+const Navigation = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const { logout } = useContext(AppContext);
+  const location = useLocation();
   
   const menuItems = [
-    //{ id: 'dashboard', label: 'Inicio', icon: HomeIcon },
-    { id: 'memberList', label: 'Socios', icon: MemberListIcon },
-    //{ id: 'addMember', label: 'Agregar socio', icon: AddMemberIcon },
-    //{ id: 'bulkMembers', label: 'Carga masiva socios', icon: BulkUploadIcon },
-    { id: 'accountStatements', label: 'Estados de cuenta (ZIP)', icon: AccountStatementIcon },
-    { id: 'events', label: 'Eventos', icon: EventsIcon },
-    { id: 'surveys', label: 'Encuestas', icon: SurveysIcon },
-    { id: 'notices', label: 'Avisos', icon: NoticesIcon },
-    { id: 'banner', label: 'Banner', icon: BannerIcon },
-    { id: 'filesUpload', label: 'Carga de archivos', icon: FileUploadIcon },
-    { id: 'instalaciones', label: 'Instalaciones', icon: FacilitiesIcon },
-    { id: 'helpCenter', label: 'Centro de ayuda', icon: HelpCenterIcon },
-    // { id: 'logs', label: 'Panel de Logs', icon: LogIcon } // Comentado temporalmente
+    { path: '/', label: 'Inicio', icon: HomeIcon, exact: true },
+    { path: '/socios', label: 'Socios', icon: MemberListIcon },
+    { path: '/estados-cuenta', label: 'Estados de cuenta', icon: AccountStatementIcon },
+    { path: '/eventos', label: 'Eventos', icon: EventsIcon },
+    { path: '/encuestas', label: 'Encuestas', icon: SurveysIcon },
+    { path: '/avisos', label: 'Avisos', icon: NoticesIcon },
+    { path: '/banner', label: 'Banner', icon: BannerIcon },
+    { path: '/archivos', label: 'Carga de archivos', icon: FileUploadIcon },
+    { path: '/instalaciones', label: 'Instalaciones', icon: FacilitiesIcon },
+    { path: '/ayuda', label: 'Centro de ayuda', icon: HelpCenterIcon },
   ];
 
+  const handleNavClick = () => {
+    if (isMobileMenuOpen) {
+      setIsMobileMenuOpen(false);
+    }
+  };
+
+  const isActiveRoute = (path, exact) => {
+    if (exact) {
+      return location.pathname === path;
+    }
+    return location.pathname.startsWith(path);
+  };
+
   return (
-    <nav className="w-64 bg-white shadow-lg h-screen sticky top-0 border-r border-gray-200">
+    <aside className={`
+      bg-white shadow-lg border-r border-gray-200 overflow-y-auto
+      fixed lg:static inset-y-0 left-0 z-40
+      w-64 flex-shrink-0
+      transform transition-transform duration-300 ease-in-out lg:transform-none
+      ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+    `}>
       <div className="p-4">
-        <h2 className="text-lg font-semibold text-gray-800 mb-6 border-b border-gray-200 pb-3">Menú Principal</h2>
+        <h2 className="text-lg font-semibold text-gray-800 mb-6 border-b border-gray-200 pb-3 hidden lg:block">
+          Menú Principal
+        </h2>
         <ul className="space-y-1">
           {menuItems.map(item => {
             const IconComponent = item.icon;
+            const isActive = isActiveRoute(item.path, item.exact);
+            
             return (
-              <li key={item.id}>
-                <button
-                  onClick={() => setActiveView(item.id)}
+              <li key={item.path}>
+                <NavLink
+                  to={item.path}
+                  onClick={handleNavClick}
                   className={`w-full text-left px-4 py-3 rounded-md flex items-center space-x-3 transition-colors ${
-                    activeView === item.id
+                    isActive
                       ? 'bg-primary text-white shadow-sm'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
-                  <IconComponent className={`${activeView === item.id ? 'text-white' : 'text-gray-600'}`} />
-                  <span className={`${activeView === item.id ? 'text-white' : 'text-gray-700'}`}>{item.label}</span>
-                </button>
+                  <IconComponent className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-600'}`} />
+                  <span className={`truncate ${isActive ? 'text-white' : 'text-gray-700'}`}>
+                    {item.label}
+                  </span>
+                </NavLink>
               </li>
             );
           })}
@@ -64,15 +85,18 @@ const Navigation = ({ activeView, setActiveView }) => {
         
         <div className="mt-8 pt-4 border-t border-gray-200">
           <button
-            onClick={logout}
+            onClick={() => {
+              handleNavClick();
+              logout();
+            }}
             className="w-full text-left px-4 py-3 rounded-md flex items-center space-x-3 text-red-600 hover:bg-red-50 transition-colors"
           >
-            <LogoutIcon className="text-red-600" />
+            <LogoutIcon className="text-red-600 flex-shrink-0" />
             <span>Cerrar sesión</span>
           </button>
         </div>
       </div>
-    </nav>
+    </aside>
   );
 };
 

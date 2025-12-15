@@ -1,2 +1,8 @@
 /node_modules
 .env
+.yarn
+build
+estados_cuenta_ejemplo
+estados_cuenta_ejemplo.zip
+Lista de Socios de negocios ejemplo.xlsx
+socios_ejemplo.csv
