@@ -90,10 +90,6 @@ const LoginForm = () => {
               {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
             </button>
           </div>
-
-          <div className="text-center text-sm text-gray-500 mt-4">
-            <p>Credenciales de prueba: admin@campestre.com / 123456</p>
-          </div>
         </form>
         <div className="text-center text-xs text-gray-500 border-t pt-4 mt-6">
           <p>Sistema de Gestión de Socios</p>
