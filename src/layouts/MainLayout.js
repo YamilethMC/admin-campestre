@@ -60,9 +60,8 @@ const MainLayout = () => {
         />
       )}
 
-      {/* CAMBIO 3: Wrapper de la Derecha (Columna) */}
-      {/* Contiene el Header arriba y el Main abajo */}
-      <div className="flex flex-1 flex-col min-w-0">
+      {/* Contenedor del contenido principal con margen automático cuando el menú está abierto */}
+      <div className={`flex flex-1 flex-col min-w-0 transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'ml-64' : 'ml-0'} lg:ml-64`}>
         
         {/* Header: Ahora vive DENTRO de la columna derecha */}
         {/* Quitamos 'sticky' porque flexbox ya lo mantiene arriba */}
