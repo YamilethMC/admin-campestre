@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { AppContext } from '../../../shared/context/AppContext';
 import IndividualMemberForm from '../components/IndividualMemberForm';
 
-const IndividualMember = ({ onCancel, loadMembers }) => {
+const IndividualMember = ({ onCancel, loadMembers, initialData = null, memberId = null, isDependent = false }) => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [pendingNavigationCallback, setPendingNavigationCallback] = useState(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
@@ -36,6 +36,9 @@ const IndividualMember = ({ onCancel, loadMembers }) => {
     }
   };
 
+  const isEditMode = !!initialData;
+  const isAddingDependent = isDependent && !isEditMode;
+
   return (
     <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
       <div className="flex items-center mb-4">
@@ -48,10 +51,18 @@ const IndividualMember = ({ onCancel, loadMembers }) => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <h2 className="text-2xl font-bold text-gray-800">Agregar socio</h2>
+        <h2 className="text-2xl font-bold text-gray-800">
+          {isEditMode ? "Editar socio" : isAddingDependent ? "Agregar dependiente" : "Agregar socio"}
+        </h2>
       </div>
 
-      <IndividualMemberForm onCancel={handleFormSuccess} loadMembers={loadMembers} />
+      <IndividualMemberForm
+        onCancel={handleFormSuccess}
+        loadMembers={loadMembers}
+        initialData={initialData}
+        memberId={memberId}
+        isDependent={isDependent}
+      />
 
       {/* Confirmation Modal */}
       {showConfirmationModal && (

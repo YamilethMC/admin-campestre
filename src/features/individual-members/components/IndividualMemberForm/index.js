@@ -1,9 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useIndividualMember } from '../../hooks/useIndividualMember';
 
-const IndividualMemberForm = ({ onCancel, loadMembers }) => {
-  const { formData, genderOptions, loadingGender, tituloOptions, loadingTitulo, paymentMethodOptions, loadingPaymentMethod, handleChange, handleSubmit } = useIndividualMember();
+const IndividualMemberForm = ({ onCancel, loadMembers, initialData = null, memberId = null, isDependent = false }) => {
+  const { formData, genderOptions, loadingGender, tituloOptions, loadingTitulo, paymentMethodOptions, loadingPaymentMethod, handleChange, handleSubmit, setFormData } = useIndividualMember();
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+
+  useEffect(() => {
+    if (initialData) {
+      // Prellenar formulario con los datos del socio existente
+      const formattedData = {
+        code_socio: initialData.memberCode || '',
+        nombre: initialData.user?.name || '',
+        apellidos: initialData.user?.lastName || '',
+        sexo: initialData.user?.gender || '',
+        rfc: initialData.user?.RFC || '',
+        fecha_nacimiento: initialData.user?.birthDate ? new Date(initialData.user.birthDate).toISOString().split('T')[0] : '',
+        email: initialData.user?.email || '',
+        telefono_movil: initialData.user?.phone?.find(p => p.type === 'MOVIL')?.number || '',
+        alias_movil: initialData.user?.phone?.find(p => p.type === 'MOVIL')?.alias || '',
+        telefono_fijo: initialData.user?.phone?.find(p => p.type === 'PHONE')?.number || '',
+        alias_fijo: initialData.user?.phone?.find(p => p.type === 'PHONE')?.alias || '',
+        telefono_emergencia: initialData.user?.phone?.find(p => p.type === 'EMERGENCY')?.number || '',
+        alias_emergencia: initialData.user?.phone?.find(p => p.type === 'EMERGENCY')?.alias || '',
+        foraneo: initialData.user?.foraneo || false,
+        calle: initialData.user?.address?.street || '',
+        numero_exterior: initialData.user?.address?.externalNumber || '',
+        numero_interior: initialData.user?.address?.internalNumber || '',
+        codigo_postal: initialData.user?.address?.zipCode || '',
+        colonia: initialData.user?.address?.suburb || '',
+        ciudad: initialData.user?.address?.city || '',
+        estado: initialData.user?.address?.state || '',
+        pais: initialData.user?.address?.country || '',
+        titulo: initialData.title || '',
+        profesion: initialData.profession || '',
+        metodo_pago: initialData.paymentMethod || '',
+        fecha_admision: initialData.dateOfAdmission ? new Date(initialData.dateOfAdmission).toISOString().split('T')[0] : '',
+      };
+      setFormData(formattedData);
+    }
+  }, [initialData, setFormData]);
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -12,12 +47,22 @@ const IndividualMemberForm = ({ onCancel, loadMembers }) => {
 
   const handleConfirmSubmit = async () => {
     // Perform the actual submission by calling the handleSubmit from the hook
-    const success = await handleSubmit({ preventDefault: () => {} });
+    // If isDependent is true, we're adding a dependent (and memberId is the parent member ID)
+    // If initialData?.id exists, we're editing an existing member
+    // Otherwise, we're adding a new member
+    let submissionSuccess;
+    if (isDependent) {
+      // Adding a dependent to a member
+      submissionSuccess = await handleSubmit({ preventDefault: () => {} }, null, memberId);
+    } else {
+      // Editing or adding a regular member
+      submissionSuccess = await handleSubmit({ preventDefault: () => {} }, initialData?.id);
+    }
     setShowSubmitModal(false);
 
     // If submission was successful and we have loadMembers function, reload the list and go back
-    if (success && loadMembers) {
-      loadMembers(); // Reload the members list to show the new member
+    if (submissionSuccess && loadMembers) {
+      loadMembers(); // Reload the members list to show the updated member
       // Delay calling onCancel to allow UI updates to complete
       setTimeout(() => {
         if (onCancel) {
@@ -459,7 +504,7 @@ const IndividualMemberForm = ({ onCancel, loadMembers }) => {
           type="submit"
           className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary"
         >
-          Agregar Socio
+          {initialData ? "Editar socio" : "Agregar socio"}
         </button>
       </div>
 

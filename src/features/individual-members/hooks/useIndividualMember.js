@@ -139,7 +139,7 @@ export const useIndividualMember = () => {
     };
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e, memberId = null, parentMemberId = null) => {
     e.preventDefault();
     // Validación de campos requeridos
     if (!validateFormData()) {
@@ -149,10 +149,28 @@ export const useIndividualMember = () => {
     const memberData = buildMemberData();
 
     try {
-      const result = await memberService.addMember(memberData);
+      let result;
+      if (memberId) {
+        // Si se proporciona un ID, estamos actualizando un socio existente
+        result = await memberService.updateMember(memberId, memberData);
+      } else if (parentMemberId) {
+        // Si se proporciona parentMemberId, estamos creando un dependiente para un socio existente
+        result = await memberService.addDependent(parentMemberId, memberData);
+      } else {
+        // Si no se proporciona ID, estamos creando un nuevo socio
+        result = await memberService.addMember(memberData);
+      }
 
       if(result.success){
-        addLog(`Socio agregado: ${formData.nombre} ${formData.apellidos}`);
+        let action;
+        if (parentMemberId) {
+          action = 'agregado como dependiente';
+        } else if (memberId) {
+          action = 'actualizado';
+        } else {
+          action = 'agregado';
+        }
+        addLog(`Socio ${action}: ${formData.nombre} ${formData.apellidos}`);
         if(result){
           resetForm();
         }
@@ -161,7 +179,7 @@ export const useIndividualMember = () => {
         addToast(result.error, "error");
         return false;
       }
-      
+
     } catch (err) {
       console.error(err);
       addToast(err.message, "error");
@@ -393,6 +411,7 @@ export const useIndividualMember = () => {
     addLog,
     addToast,
     formData,
+    setFormData, // Exponemos la función para poder actualizar el formulario desde afuera
     genderOptions,
     loadingGender,
     tituloOptions,

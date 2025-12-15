@@ -13,6 +13,7 @@ const MemberList = () => {
   });
   const [editingMember, setEditingMember] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [isAddingDependent, setIsAddingDependent] = useState(false);
   const [showBulkForm, setShowBulkForm] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [modalAction, setModalAction] = useState(null);
@@ -67,10 +68,20 @@ const MemberList = () => {
     }
   };
 
-  const handleFormMember = (member) => {
+  const handleFormMember = (member = null) => {
+    console.log('handleFormMember called with member:', member);
     setEditingMember(member);
+    setIsAddingDependent(false); // Estamos editando, no agregando dependiente
     setShowForm(true);
-    setDropdownOpen(null); 
+    setDropdownOpen(null);
+  };
+
+  const handleAddDependent = (member) => {
+    console.log('handleAddDependent called with member:', member);
+    setEditingMember(member); // Pasamos el socio principal para tener su ID
+    setIsAddingDependent(true); // Indicamos que estamos agregando un dependiente
+    setShowForm(true);
+    setDropdownOpen(null);
   };
 
   const handleBulkMember = () => {
@@ -138,10 +149,12 @@ const MemberList = () => {
   if (showForm) {
     return (
         <IndividualMember
-          initialData={editingMember}
+          initialData={isAddingDependent ? null : editingMember} // Solo pasar datos si es edición
           onAddMember={handleSaveMember}
           onCancel={handleBack}
           loadMembers={loadMembers}
+          memberId={isAddingDependent ? editingMember?.id : null} // ID del socio principal si es dependiente
+          isDependent={isAddingDependent} // Indicar si es dependiente
         />
     );
   }
@@ -236,13 +249,20 @@ const MemberList = () => {
                         {dropdownOpen === member.id && (
                           <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
                             <div className="py-1" role="menu">
-                              {/*<button
-                                onClick={() => handleEditMember(member)}
+                              <button
+                                onClick={() => handleFormMember(member)}
                                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                                 role="menuitem"
                               >
                                 Editar
-                              </button>*/}
+                              </button>
+                              <button
+                                onClick={() => handleAddDependent(member)}
+                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                                role="menuitem"
+                              >
+                                Agregar dependiente
+                              </button>
                               <button
                                 onClick={() => {
                                   confirmAction('delete', member.id);
