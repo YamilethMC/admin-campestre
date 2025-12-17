@@ -4,7 +4,7 @@ import { memberService } from '../services';
 
 export const useIndividualMember = () => {
   const { members, setMembers, addLog, addToast } = useContext(AppContext);
-  
+
   const [formData, setFormData] = useState({
     code_socio: '',
     nombre: '',
@@ -32,6 +32,7 @@ export const useIndividualMember = () => {
     profesion: '',
     metodo_pago: '',
     fecha_admision: '',
+    relationship: '', // Campo para la relación cuando se agrega un dependiente
   });
   
   const [genderOptions, setGenderOptions] = useState([]);
@@ -102,8 +103,8 @@ export const useIndividualMember = () => {
   ].filter(p => p.number && p.number.trim() !== "");
 
 
-  const buildMemberData = () => {
-    return {
+  const buildMemberData = (parentMemberId = null) => {
+    const memberData = {
       email: formData.email,
       //roleId: 1,
       active: true,
@@ -132,32 +133,36 @@ export const useIndividualMember = () => {
       title: formData.titulo,
       profession: formData.profesion,
       paymentMethod: formData.metodo_pago,
-      dateOfAdmission: new Date().toISOString(),
+      dateOfAdmission: new Date(formData.fecha_admision).toISOString(), // Use the form date instead of current date
       memberCode: formData.code_socio,
-      //invitedById: Number(formData.invitedById || 1),
-      //relationship: "WIFE"
     };
+
+    // Si se está agregando un dependiente, incluimos los campos de relación e invitado por
+    if (parentMemberId) {
+      memberData.invitedById = Number(parentMemberId);
+      memberData.relationship = formData.relationship;
+    }
+
+    return memberData;
   };
 
-  const handleSubmit = async (e, memberId = null, parentMemberId = null) => {
+  const handleSubmit = async (e, memberId = null, parentMemberId = null, initialData = null, isDependent = false) => {
     e.preventDefault();
     // Validación de campos requeridos
-    if (!validateFormData()) {
+    if (!validateFormData(isDependent, initialData)) {
       return false;
     }
 
-    const memberData = buildMemberData();
+    const memberData = buildMemberData(parentMemberId);
 
     try {
       let result;
       if (memberId) {
         // Si se proporciona un ID, estamos actualizando un socio existente
         result = await memberService.updateMember(memberId, memberData);
-      } else if (parentMemberId) {
-        // Si se proporciona parentMemberId, estamos creando un dependiente para un socio existente
-        result = await memberService.addDependent(parentMemberId, memberData);
       } else {
-        // Si no se proporciona ID, estamos creando un nuevo socio
+        // Si no se proporciona memberId pero sí parentMemberId, estamos creando un dependiente
+        // Si no se proporciona ninguno, estamos creando un nuevo socio estándar
         result = await memberService.addMember(memberData);
       }
 
@@ -215,17 +220,18 @@ export const useIndividualMember = () => {
       profesion: '',
       metodo_pago: '',
       fecha_admision: '',
+      relationship: '',
     });
   };
 
-  const validateFormData = () => {
+  const validateFormData = (isDependent = false, initialData = null) => {
     // Aquí puedes agregar validaciones adicionales si es necesario
     if (!formData.code_socio) {
       addLog('Error: El código de socio es obligatorio');
       addToast('Error: El código de socio es obligatorio', 'error');
       return false;
     }
-    
+
     if (!formData.nombre) {
       addLog('Error: El nombre es obligatorio');
       addToast('Error: El nombre es obligatorio', 'error');
@@ -327,7 +333,14 @@ export const useIndividualMember = () => {
       addToast('Error: La fecha de admisión es obligatoria', 'error');
       return false;
     }
-    
+
+    // Validar relación si es un dependiente
+    if (isDependent && !initialData?.id && !formData.relationship) {
+      addLog('Error: La relación es obligatoria para dependientes');
+      addToast('Error: La relación es obligatoria para dependientes', 'error');
+      return false;
+    }
+
     // Validar formato de email si se proporciona
     if (formData.email && !/^\S+@\S+\.\S+$/.test(formData.email)) {
       addLog('Error: Email inválido');

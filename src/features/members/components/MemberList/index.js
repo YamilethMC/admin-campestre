@@ -149,11 +149,11 @@ const MemberList = () => {
   if (showForm) {
     return (
         <IndividualMember
-          initialData={isAddingDependent ? null : editingMember} // Solo pasar datos si es edición
+          initialData={null} // Always pass null to trigger API fetch for editing
           onAddMember={handleSaveMember}
           onCancel={handleBack}
           loadMembers={loadMembers}
-          memberId={isAddingDependent ? editingMember?.id : null} // ID del socio principal si es dependiente
+          memberId={isAddingDependent ? editingMember?.id : editingMember?.id} // ID del socio para editar o del socio principal si es dependiente
           isDependent={isAddingDependent} // Indicar si es dependiente
         />
     );
@@ -209,12 +209,12 @@ const MemberList = () => {
         </>
       ) : (
         <>
-        <div className="border border-gray-200 rounded-lg">
-          <div className="">
+        <div className="border border-gray-200 rounded-lg overflow-x-auto">
+          <div className="min-w-full">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50 sticky top-0 z-10">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Número de acción</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellidos</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>

@@ -36,8 +36,8 @@ const IndividualMember = ({ onCancel, loadMembers, initialData = null, memberId 
     }
   };
 
-  const isEditMode = !!initialData;
-  const isAddingDependent = isDependent && !isEditMode;
+  const isEditMode = !isDependent && !!memberId; // If we have a memberId and it's not a dependent, then we're editing
+  const isAddingDependent = isDependent && !!memberId; // If it's a dependent and we have a memberId, then we're adding a dependent
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
