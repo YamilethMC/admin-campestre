@@ -32,6 +32,7 @@ export const useIndividualMember = () => {
     profesion: '',
     metodo_pago: '',
     fecha_admision: '',
+    notificationMethod: 'email',
   });
   
   const [genderOptions, setGenderOptions] = useState([]);
@@ -134,6 +135,7 @@ export const useIndividualMember = () => {
       paymentMethod: formData.metodo_pago,
       dateOfAdmission: new Date().toISOString(),
       memberCode: formData.code_socio,
+      notificationMethod: formData.notificationMethod,
       //invitedById: Number(formData.invitedById || 1),
       //relationship: "WIFE"
     };
@@ -197,6 +199,7 @@ export const useIndividualMember = () => {
       profesion: '',
       metodo_pago: '',
       fecha_admision: '',
+      notificationMethod: 'email',
     });
   };
 
