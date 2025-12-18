@@ -33,6 +33,7 @@ export const useIndividualMember = () => {
     metodo_pago: '',
     fecha_admision: '',
     relationship: '', // Campo para la relación cuando se agrega un dependiente
+    notificationMethod: 'email',
   });
   
   const [genderOptions, setGenderOptions] = useState([]);
@@ -135,6 +136,9 @@ export const useIndividualMember = () => {
       paymentMethod: formData.metodo_pago,
       dateOfAdmission: new Date(formData.fecha_admision).toISOString(), // Use the form date instead of current date
       memberCode: formData.code_socio,
+      notificationMethod: formData.notificationMethod,
+      //invitedById: Number(formData.invitedById || 1),
+      //relationship: "WIFE"
     };
 
     // Si se está agregando un dependiente, incluimos los campos de relación e invitado por
@@ -221,6 +225,7 @@ export const useIndividualMember = () => {
       metodo_pago: '',
       fecha_admision: '',
       relationship: '',
+      notificationMethod: 'email',
     });
   };
 

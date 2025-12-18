@@ -311,6 +311,26 @@ const IndividualMemberForm = ({ onCancel, loadMembers, initialData = null, membe
             </div>
           )}
           
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Enviar credenciales por <span className="text-red-500">*</span>
+            </label>
+            <select
+              name="notificationMethod"
+              value={formData.notificationMethod}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+              required
+            >
+              <option value="email">📧 Email</option>
+              <option value="whatsapp">📱 WhatsApp</option>
+            </select>
+            <p className="text-xs text-gray-500 mt-1">
+              El usuario recibirá sus credenciales de acceso por este medio
+            </p>
+          </div>
+
           <div className="flex items-center md:col-span-2 pt-4">
             <input
               type="checkbox"
