@@ -320,7 +320,7 @@ const IndividualMemberForm = ({ onCancel, loadMembers, initialData = null, membe
             </div>
           )}
           
-
+          {!isEditing && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Enviar credenciales por <span className="text-red-500">*</span>
@@ -339,6 +339,7 @@ const IndividualMemberForm = ({ onCancel, loadMembers, initialData = null, membe
               El usuario recibirá sus credenciales de acceso por este medio
             </p>
           </div>
+          )}
 
           <div className="flex items-center md:col-span-2 pt-4">
             <input

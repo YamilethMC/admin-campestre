@@ -226,7 +226,7 @@ const MemberList = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredMembers.map((member) => (
+                {filteredMembers.map((member, index) => (
                   <tr key={member.id} className={member.id % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                     <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{member.memberCode}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.user.name}</td>
@@ -249,8 +249,8 @@ const MemberList = () => {
                         return `${day}-${month}-${year}`;
                       })() : ''}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                      <div className="relative">
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 relative">
+                      <div className="relative inline-block text-left">
                         <button
                           onClick={() => setDropdownOpen(dropdownOpen === member.id ? null : member.id)}
                           className="text-gray-500 hover:text-gray-700 focus:outline-none"
@@ -260,7 +260,7 @@ const MemberList = () => {
                           </svg>
                         </button>
                         {dropdownOpen === member.id && (
-                          <div className="origin-top-right absolute right-0 bottom-full mb-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+                          <div className={`origin-top-right absolute right-0 ${index === 0 ? 'top-full mt-2' : 'bottom-full mb-2'} w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50 max-h-60 overflow-y-auto`}>
                             <div className="py-1" role="menu">
                               <button
                                 onClick={() => handleFormMember(member)}
