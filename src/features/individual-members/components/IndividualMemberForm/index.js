@@ -175,24 +175,33 @@ const IndividualMemberForm = ({ onCancel, loadMembers, initialData = null, membe
   };
 
   return (
-    <form onSubmit={handleFormSubmit} className="space-y-6">
-      {/* Datos del Socio */}
-      <div className="border border-gray-200 rounded-lg p-4 shadow-sm">
-        <h3 className="text-lg font-medium text-gray-500 mb-4 uppercase tracking-wide">Datos del socio</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Número de acción <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="code_socio"
-              value={formData.code_socio}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-              required
-            />
-          </div>
+    <div>
+      {/* Show spinner while loading member data */}
+      {isLoadingMember && (
+        <div className="flex justify-center items-center py-10">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      )}
+
+      {!isLoadingMember && (
+        <form onSubmit={handleFormSubmit} className="space-y-6">
+          {/* Datos del Socio */}
+          <div className="border border-gray-200 rounded-lg p-4 shadow-sm">
+            <h3 className="text-lg font-medium text-gray-500 mb-4 uppercase tracking-wide">Datos del socio</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Número de acción <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="code_socio"
+                  value={formData.code_socio}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                  required
+                />
+              </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -717,7 +726,9 @@ const IndividualMemberForm = ({ onCancel, loadMembers, initialData = null, membe
           </div>
         </div>
       )}
-    </form>
+      </form>
+      )}
+    </div>
   );
 };
 
