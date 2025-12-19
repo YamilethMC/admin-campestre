@@ -8,6 +8,7 @@ const MainLayout = () => {
   const { logout, currentUser, toasts, setToasts } = useContext(AppContext);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
   const menuRef = useRef(null);
   const buttonRef = useRef(null);
 
@@ -28,7 +29,10 @@ const MainLayout = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 1024) {
+      const isLarge = window.innerWidth >= 1024;
+      setIsLargeScreen(isLarge);
+
+      if (isLarge) {
         setIsMobileMenuOpen(false);
       }
     };
@@ -60,19 +64,18 @@ const MainLayout = () => {
         />
       )}
 
-      {/* CAMBIO 3: Wrapper de la Derecha (Columna) */}
-      {/* Contiene el Header arriba y el Main abajo */}
-      <div className="flex flex-1 flex-col min-w-0">
+      {/* Contenedor del contenido principal con margen automático cuando el menú está abierto */}
+      <div className={`flex flex-1 flex-col min-w-0 transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'ml-64' : 'ml-0'} lg:ml-64`}>
         
         {/* Header: Ahora vive DENTRO de la columna derecha */}
         {/* Quitamos 'sticky' porque flexbox ya lo mantiene arriba */}
         <header className="bg-gradient-to-r from-primary to-primary-dark text-white p-4 shadow-lg z-20 flex-shrink-0">
           <div className="flex items-center justify-between max-w-full px-2 sm:px-4">
             
-            {/* Botón Hamburguesa (Solo visible en móvil) */}
-            <div className="flex items-center lg:hidden">
+            {/* Botón Hamburguesa (Solo visible cuando el menú no es visible) */}
+            <div className={`${(isLargeScreen || isMobileMenuOpen) ? 'hidden' : 'flex'} items-center`}>
                 <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                onClick={() => setIsMobileMenuOpen(true)}
                 className="p-2 rounded-md hover:bg-primary-dark transition-colors mr-2"
                 aria-label="Toggle menu"
                 >

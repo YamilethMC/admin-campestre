@@ -126,9 +126,9 @@ const SurveyCard = ({ survey, onEdit, onViewResponses, onToggleStatus, onDelete 
 
   return (
     <div className="bg-white rounded-lg shadow p-4 mb-4 border border-gray-200 hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-center">
+      <div className="flex items-cent gap-3 mb-2">
         {survey.image && (
-          <div className="shrink-0 mr-4">
+          <div className="shrink-0">
             <img
               src={survey.image}
               alt={survey.title}

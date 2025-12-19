@@ -13,6 +13,7 @@ const MemberList = () => {
   });
   const [editingMember, setEditingMember] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [isAddingDependent, setIsAddingDependent] = useState(false);
   const [showBulkForm, setShowBulkForm] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [modalAction, setModalAction] = useState(null);
@@ -67,10 +68,20 @@ const MemberList = () => {
     }
   };
 
-  const handleFormMember = (member) => {
+  const handleFormMember = (member = null) => {
+    console.log('handleFormMember called with member:', member);
     setEditingMember(member);
+    setIsAddingDependent(false); // Estamos editando, no agregando dependiente
     setShowForm(true);
-    setDropdownOpen(null); 
+    setDropdownOpen(null);
+  };
+
+  const handleAddDependent = (member) => {
+    console.log('handleAddDependent called with member:', member);
+    setEditingMember(member); // Pasamos el socio principal para tener su ID
+    setIsAddingDependent(true); // Indicamos que estamos agregando un dependiente
+    setShowForm(true);
+    setDropdownOpen(null);
   };
 
   const handleBulkMember = () => {
@@ -138,10 +149,12 @@ const MemberList = () => {
   if (showForm) {
     return (
         <IndividualMember
-          initialData={editingMember}
+          initialData={null} // Always pass null to trigger API fetch for editing
           onAddMember={handleSaveMember}
           onCancel={handleBack}
           loadMembers={loadMembers}
+          memberId={isAddingDependent ? editingMember?.id : editingMember?.id} // ID del socio para editar o del socio principal si es dependiente
+          isDependent={isAddingDependent} // Indicar si es dependiente
         />
     );
   }
@@ -196,12 +209,12 @@ const MemberList = () => {
         </>
       ) : (
         <>
-        <div className="border border-gray-200 rounded-lg">
-          <div className="">
+        <div className="border border-gray-200 rounded-lg overflow-x-auto overflow-y-hidden">
+          <div className="min-w-full">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50 sticky top-0 z-10">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Número de acción</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellidos</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
@@ -213,7 +226,7 @@ const MemberList = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredMembers.map((member) => (
+                {filteredMembers.map((member, index) => (
                   <tr key={member.id} className={member.id % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                     <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{member.memberCode}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.user.name}</td>
@@ -222,9 +235,22 @@ const MemberList = () => {
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.title}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.profession}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.paymentMethod}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.dateOfAdmission}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                      <div className="relative">
+                      {member.dateOfAdmission ? (() => {
+                        const date = new Date(member.dateOfAdmission);
+                        // Check if the date is valid
+                        if (isNaN(date.getTime())) return '';
+
+                        // Extract UTC date components to avoid timezone conversion
+                        const day = String(date.getUTCDate()).padStart(2, '0');
+                        const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+                        const year = date.getUTCFullYear();
+
+                        return `${day}-${month}-${year}`;
+                      })() : ''}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 relative">
+                      <div className="relative inline-block text-left">
                         <button
                           onClick={() => setDropdownOpen(dropdownOpen === member.id ? null : member.id)}
                           className="text-gray-500 hover:text-gray-700 focus:outline-none"
@@ -234,15 +260,22 @@ const MemberList = () => {
                           </svg>
                         </button>
                         {dropdownOpen === member.id && (
-                          <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+                          <div className={`origin-top-right absolute right-0 ${index === 0 ? 'top-full mt-2' : 'bottom-full mb-2'} w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50 max-h-60 overflow-y-auto`}>
                             <div className="py-1" role="menu">
-                              {/*<button
-                                onClick={() => handleEditMember(member)}
+                              <button
+                                onClick={() => handleFormMember(member)}
                                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                                 role="menuitem"
                               >
                                 Editar
-                              </button>*/}
+                              </button>
+                              <button
+                                onClick={() => handleAddDependent(member)}
+                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                                role="menuitem"
+                              >
+                                Agregar dependiente
+                              </button>
                               <button
                                 onClick={() => {
                                   confirmAction('delete', member.id);

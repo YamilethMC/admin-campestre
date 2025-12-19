@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Modal from '../../../../shared/components/modal';
 import { EventTypesOptions } from '../../interfaces';
 
 const EventForm = ({ event, onSave, onCancel }) => {
@@ -392,64 +393,58 @@ const EventForm = ({ event, onSave, onCancel }) => {
       </div>
 
       {/* Cancel Confirmation Modal */}
-      {showCancelModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="mt-3 text-center">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mt-4">¿Estás seguro?</h3>
-              <div className="mt-2 px-7 py-3">
-                <p className="text-sm text-gray-500">
-                  Si cancelas, perderás los cambios realizados. ¿Deseas continuar?
-                </p>
-              </div>
-              <div className="items-center px-4 py-3">
-                <button
-                  onClick={() => setShowCancelModal(false)}
-                  className="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300 mr-2"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleCancelAccept}
-                  className="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 ml-2"
-                >
-                  Aceptar
-                </button>
-              </div>
-            </div>
+      <Modal
+        isOpen={showCancelModal}
+        title="Confirmar salida"
+        onClose={() => setShowCancelModal(false)}
+        footer={
+          <div className="flex justify-end space-x-3">
+            <button
+              type="button"
+              onClick={() => setShowCancelModal(false)}
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={handleCancelAccept}
+              className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md transition-colors"
+            >
+              Aceptar
+            </button>
           </div>
-        </div>
-      )}
+        }
+      >
+        <p>¿Está seguro que quiere salir?</p>
+      </Modal>
 
       {/* Save Confirmation Modal */}
-      {showSaveModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="mt-3 text-center">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mt-4">¿Guardar cambios?</h3>
-              <div className="mt-2 px-7 py-3">
-                <p className="text-sm text-gray-500">
-                  ¿Deseas guardar los cambios realizados en este evento?
-                </p>
-              </div>
-              <div className="items-center px-4 py-3">
-                <button
-                  onClick={() => setShowSaveModal(false)}
-                  className="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300 mr-2"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleSaveConfirm}
-                  className="px-4 py-2 bg-primary text-white text-base font-medium rounded-md shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary ml-2"
-                >
-                  Aceptar
-                </button>
-              </div>
-            </div>
+      <Modal
+        isOpen={showSaveModal}
+        title="Confirmar guardado"
+        onClose={() => setShowSaveModal(false)}
+        footer={
+          <div className="flex justify-end space-x-3">
+            <button
+              type="button"
+              onClick={() => setShowSaveModal(false)}
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={handleSaveConfirm}
+              className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md transition-colors"
+            >
+              Aceptar
+            </button>
           </div>
-        </div>
-      )}
+        }
+      >
+        <p>{event ? '¿Desea guardar los cambios?' : '¿Desea crear el evento?'}</p>
+      </Modal>
     </div>
   );
 };

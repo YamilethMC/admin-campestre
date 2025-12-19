@@ -1,9 +1,143 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useIndividualMember } from '../../hooks/useIndividualMember';
+import { AppContext } from '../../../../shared/context/AppContext';
+import { memberService } from '../../services';
 
-const IndividualMemberForm = ({ onCancel, loadMembers }) => {
-  const { formData, genderOptions, loadingGender, tituloOptions, loadingTitulo, paymentMethodOptions, loadingPaymentMethod, handleChange, handleSubmit } = useIndividualMember();
+const IndividualMemberForm = ({ onCancel, loadMembers, initialData = null, memberId = null, isDependent = false }) => {
+  const { formData, genderOptions, loadingGender, tituloOptions, loadingTitulo, paymentMethodOptions, loadingPaymentMethod, handleChange, handleSubmit, setFormData } = useIndividualMember();
+  const { addToast } = useContext(AppContext);
+  const [isLoadingMember, setIsLoadingMember] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [isEditing, setIsEditing] = useState(false); // Track if we're in edit mode
+  const [editingMemberId, setEditingMemberId] = useState(null); // Store the ID of the member being edited
+
+  useEffect(() => {
+    const fetchMemberData = async () => {
+      if (initialData) {
+        // Prellenar formulario con los datos del socio existente (pasados desde el componente padre)
+        const formattedData = {
+          code_socio: initialData.memberCode || '',
+          nombre: initialData.user?.name || '',
+          apellidos: initialData.user?.lastName || '',
+          sexo: initialData.user?.gender || '',
+          rfc: initialData.user?.RFC || '',
+          fecha_nacimiento: initialData.user?.birthDate ? new Date(initialData.user.birthDate).toISOString().split('T')[0] : '',
+          email: initialData.user?.email || '',
+          telefono_movil: initialData.user?.phone?.find(p => p.type === 'MOVIL')?.number || '',
+          alias_movil: initialData.user?.phone?.find(p => p.type === 'MOVIL')?.alias || '',
+          telefono_fijo: initialData.user?.phone?.find(p => p.type === 'PHONE')?.number || '',
+          alias_fijo: initialData.user?.phone?.find(p => p.type === 'PHONE')?.alias || '',
+          telefono_emergencia: initialData.user?.phone?.find(p => p.type === 'EMERGENCY')?.number || '',
+          alias_emergencia: initialData.user?.phone?.find(p => p.type === 'EMERGENCY')?.alias || '',
+          foraneo: initialData.user?.foraneo || false,
+          calle: initialData.user?.address?.street || '',
+          numero_exterior: initialData.user?.address?.externalNumber || '',
+          numero_interior: initialData.user?.address?.internalNumber || '',
+          codigo_postal: initialData.user?.address?.zipCode || '',
+          colonia: initialData.user?.address?.suburb || '',
+          ciudad: initialData.user?.address?.city || '',
+          estado: initialData.user?.address?.state || '',
+          pais: initialData.user?.address?.country || '',
+          titulo: initialData.title || '',
+          profesion: initialData.profession || '',
+          metodo_pago: initialData.paymentMethod || '',
+          fecha_admision: initialData.dateOfAdmission ? new Date(initialData.dateOfAdmission).toISOString().split('T')[0] : '',
+          relationship: initialData.relationship || '', // Add relationship field
+        };
+        setFormData(formattedData);
+        setIsEditing(true); // Set editing state to true
+        setEditingMemberId(initialData.id); // Store the member ID for editing
+      } else if (!initialData && memberId && !isDependent) {
+        // Si no hay initialData pero hay memberId y no es dependiente, significa que estamos editando
+        // y necesitamos hacer la llamada API para obtener los datos del miembro
+        try {
+          setIsLoadingMember(true);
+          const result = await memberService.getMemberById(memberId);
+
+          if (result.success) {
+            const memberData = result.data;
+            const formattedData = {
+              code_socio: memberData.memberCode || '',
+              nombre: memberData.user?.name || '',
+              apellidos: memberData.user?.lastName || '',
+              sexo: memberData.user?.gender || '',
+              rfc: memberData.user?.RFC || '',
+              fecha_nacimiento: memberData.user?.birthDate ? new Date(memberData.user.birthDate).toISOString().split('T')[0] : '',
+              email: memberData.user?.email || '',
+              telefono_movil: memberData.user?.phone?.find(p => p.type === 'MOVIL')?.number || '',
+              alias_movil: memberData.user?.phone?.find(p => p.type === 'MOVIL')?.alias || '',
+              telefono_fijo: memberData.user?.phone?.find(p => p.type === 'PHONE')?.number || '',
+              alias_fijo: memberData.user?.phone?.find(p => p.type === 'PHONE')?.alias || '',
+              telefono_emergencia: memberData.user?.phone?.find(p => p.type === 'EMERGENCY')?.number || '',
+              alias_emergencia: memberData.user?.phone?.find(p => p.type === 'EMERGENCY')?.alias || '',
+              foraneo: memberData.user?.foraneo || false,
+              calle: memberData.user?.address?.street || '',
+              numero_exterior: memberData.user?.address?.externalNumber || '',
+              numero_interior: memberData.user?.address?.internalNumber || '',
+              codigo_postal: memberData.user?.address?.zipCode || '',
+              colonia: memberData.user?.address?.suburb || '',
+              ciudad: memberData.user?.address?.city || '',
+              estado: memberData.user?.address?.state || '',
+              pais: memberData.user?.address?.country || '',
+              titulo: memberData.title || '',
+              profesion: memberData.profession || '',
+              metodo_pago: memberData.paymentMethod || '',
+              fecha_admision: memberData.dateOfAdmission ? new Date(memberData.dateOfAdmission).toISOString().split('T')[0] : '',
+              relationship: memberData.relationship || '',
+            };
+            setFormData(formattedData);
+            setIsEditing(true); // Set editing state to true after fetching data
+            setEditingMemberId(memberData.id); // Store the member ID for editing
+          } else {
+            addToast(result.error || 'Error al obtener los datos del socio', 'error');
+          }
+        } catch (error) {
+          console.error('Error fetching member data:', error);
+          addToast('Error al obtener los datos del socio', 'error');
+        } finally {
+          setIsLoadingMember(false);
+        }
+      } else if (isDependent && !initialData) {
+        // Si es dependiente pero no hay datos iniciales, inicializamos los campos necesarios
+        const emptyData = {
+          code_socio: '',
+          nombre: '',
+          apellidos: '',
+          sexo: '',
+          rfc: '',
+          fecha_nacimiento: '',
+          email: '',
+          telefono_movil: '',
+          alias_movil: '',
+          telefono_fijo: '',
+          alias_fijo: '',
+          telefono_emergencia: '',
+          alias_emergencia: '',
+          foraneo: false,
+          calle: '',
+          numero_exterior: '',
+          numero_interior: '',
+          codigo_postal: '',
+          colonia: '',
+          ciudad: '',
+          estado: '',
+          pais: '',
+          titulo: '',
+          profesion: '',
+          metodo_pago: '',
+          fecha_admision: '',
+          relationship: '', // Add relationship field for dependents
+        };
+        setFormData(emptyData);
+        setIsEditing(false); // Not in editing mode for dependents
+      } else {
+        // Regular new member form
+        setIsEditing(false); // Not in editing mode for new members
+      }
+    };
+
+    fetchMemberData();
+  }, [initialData, memberId, isDependent, setFormData, addToast]);
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -12,12 +146,25 @@ const IndividualMemberForm = ({ onCancel, loadMembers }) => {
 
   const handleConfirmSubmit = async () => {
     // Perform the actual submission by calling the handleSubmit from the hook
-    const success = await handleSubmit({ preventDefault: () => {} });
+    // If isDependent is true, we're adding a dependent (and memberId is the parent member ID)
+    // If editingMemberId exists, we're editing an existing member
+    // Otherwise, we're adding a new member
+    let submissionSuccess;
+    if (isDependent && !isEditing) {
+      // Adding a dependent to a member - parent member ID is passed in memberId prop
+      submissionSuccess = await handleSubmit({ preventDefault: () => {} }, null, memberId, initialData, isDependent);
+    } else if (isEditing) {
+      // Editing an existing member - use the stored editingMemberId
+      submissionSuccess = await handleSubmit({ preventDefault: () => {} }, editingMemberId, null, initialData, isDependent);
+    } else {
+      // Adding a new member
+      submissionSuccess = await handleSubmit({ preventDefault: () => {} }, null, null, initialData, isDependent);
+    }
     setShowSubmitModal(false);
 
     // If submission was successful and we have loadMembers function, reload the list and go back
-    if (success && loadMembers) {
-      loadMembers(); // Reload the members list to show the new member
+    if (submissionSuccess && loadMembers) {
+      loadMembers(); // Reload the members list to show the updated member
       // Delay calling onCancel to allow UI updates to complete
       setTimeout(() => {
         if (onCancel) {
@@ -28,24 +175,33 @@ const IndividualMemberForm = ({ onCancel, loadMembers }) => {
   };
 
   return (
-    <form onSubmit={handleFormSubmit} className="space-y-6">
-      {/* Datos del Socio */}
-      <div className="border border-gray-200 rounded-lg p-4 shadow-sm">
-        <h3 className="text-lg font-medium text-gray-500 mb-4 uppercase tracking-wide">Datos del socio</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Código del socio <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="code_socio"
-              value={formData.code_socio}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-              required
-            />
-          </div>
+    <div>
+      {/* Show spinner while loading member data */}
+      {isLoadingMember && (
+        <div className="flex justify-center items-center py-10">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      )}
+
+      {!isLoadingMember && (
+        <form onSubmit={handleFormSubmit} className="space-y-6">
+          {/* Datos del Socio */}
+          <div className="border border-gray-200 rounded-lg p-4 shadow-sm">
+            <h3 className="text-lg font-medium text-gray-500 mb-4 uppercase tracking-wide">Datos del socio</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Número de acción <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="code_socio"
+                  value={formData.code_socio}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                  required
+                />
+              </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -136,7 +292,35 @@ const IndividualMemberForm = ({ onCancel, loadMembers }) => {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
             />
           </div>
-
+          
+          {isDependent && !initialData?.id && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Relación <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="relationship"
+                value={formData.relationship}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                required
+              >
+                <option value="">Seleccione una relación...</option>
+                <option value="WIFE">Esposa</option>
+                <option value="HUSBAND">Esposo</option>
+                <option value="SON">Hijo</option>
+                <option value="DAUGHTER">Hija</option>
+                <option value="FATHER">Padre</option>
+                <option value="MOTHER">Madre</option>
+                <option value="BROTHER">Hermano</option>
+                <option value="SISTER">Hermana</option>
+                <option value="FRIEND">Amigo</option>
+                <option value="OTHER">Otro</option>
+              </select>
+            </div>
+          )}
+          
+          {!isEditing && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Enviar credenciales por <span className="text-red-500">*</span>
@@ -155,6 +339,7 @@ const IndividualMemberForm = ({ onCancel, loadMembers }) => {
               El usuario recibirá sus credenciales de acceso por este medio
             </p>
           </div>
+          )}
 
           <div className="flex items-center md:col-span-2 pt-4">
             <input
@@ -472,13 +657,46 @@ const IndividualMemberForm = ({ onCancel, loadMembers }) => {
           </div>
         </div>
       </div>
-      
+
+      {/* Relationship field for dependents */}
+      {/*{isDependent && !initialData?.id && (
+        <div className="border border-gray-200 rounded-lg p-4 shadow-sm">
+          <h3 className="text-lg font-medium text-gray-500 mb-4 uppercase tracking-wide">Información de dependencia</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Relación <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="relationship"
+                value={formData.relationship}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                required
+              >
+                <option value="">Seleccione una relación...</option>
+                <option value="WIFE">Esposa</option>
+                <option value="HUSBAND">Esposo</option>
+                <option value="SON">Hijo</option>
+                <option value="DAUGHTER">Hija</option>
+                <option value="FATHER">Padre</option>
+                <option value="MOTHER">Madre</option>
+                <option value="BROTHER">Hermano</option>
+                <option value="SISTER">Hermana</option>
+                <option value="FRIEND">Amigo</option>
+                <option value="OTHER">Otro</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      )}*/}
+
       <div className="pt-4">
         <button
           type="submit"
           className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary"
         >
-          Agregar Socio
+          {isDependent && !initialData?.id ? "Agregar dependiente" : isEditing ? "Editar socio" : "Agregar socio"}
         </button>
       </div>
 
@@ -509,7 +727,9 @@ const IndividualMemberForm = ({ onCancel, loadMembers }) => {
           </div>
         </div>
       )}
-    </form>
+      </form>
+      )}
+    </div>
   );
 };
 
