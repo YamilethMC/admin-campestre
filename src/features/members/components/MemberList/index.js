@@ -209,7 +209,7 @@ const MemberList = () => {
         </>
       ) : (
         <>
-        <div className="border border-gray-200 rounded-lg overflow-x-auto">
+        <div className="border border-gray-200 rounded-lg overflow-x-auto overflow-y-hidden">
           <div className="min-w-full">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50 sticky top-0 z-10">
@@ -235,7 +235,20 @@ const MemberList = () => {
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.title}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.profession}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.paymentMethod}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.dateOfAdmission}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                      {member.dateOfAdmission ? (() => {
+                        const date = new Date(member.dateOfAdmission);
+                        // Check if the date is valid
+                        if (isNaN(date.getTime())) return '';
+
+                        // Extract UTC date components to avoid timezone conversion
+                        const day = String(date.getUTCDate()).padStart(2, '0');
+                        const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+                        const year = date.getUTCFullYear();
+
+                        return `${day}-${month}-${year}`;
+                      })() : ''}
+                    </td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                       <div className="relative">
                         <button
@@ -247,7 +260,7 @@ const MemberList = () => {
                           </svg>
                         </button>
                         {dropdownOpen === member.id && (
-                          <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+                          <div className="origin-top-right absolute right-0 bottom-full mb-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
                             <div className="py-1" role="menu">
                               <button
                                 onClick={() => handleFormMember(member)}
