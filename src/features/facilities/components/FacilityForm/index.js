@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
+import Modal from '../../../../shared/components/modal';
 import { AppContext } from '../../../../shared/context/AppContext';
 
 const FacilityForm = ({ facility, onSave, onCancel }) => {
@@ -344,35 +345,36 @@ const FacilityForm = ({ facility, onSave, onCancel }) => {
       </div>
 
       {/* Confirmation Modal */}
-      {showConfirmationModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-96">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Confirmar acción</h3>
-            <p className="text-gray-600 mb-4">
-              {modalAction?.action === 'save'
-                ? '¿Estás seguro que deseas guardar los cambios?'
-                : `¿Estás seguro que deseas ${modalAction?.action === 'back' ? 'regresar' : 'cancelar'}?`}
-              {modalAction?.action !== 'save' && ' Los cambios no guardados se perderán.'}
-            </p>
-            <div className="flex justify-end space-x-3">
-              <button
-                type="button"
-                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
-                onClick={handleCancel}
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none"
-                onClick={handleConfirm}
-              >
-                Confirmar
-              </button>
-            </div>
+      <Modal
+        isOpen={showConfirmationModal}
+        title="Confirmar guardado"
+        onClose={handleCancel}
+        footer={
+          <div className="flex justify-end space-x-3">
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirm}
+              className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md transition-colors"
+            >
+              Aceptar
+            </button>
           </div>
-        </div>
-      )}
+        }
+      >
+        <p>
+          {modalAction?.action === 'save'
+            ? (facility ? '¿Desea guardar los cambios?' : '¿Desea crear la instalación?')
+            : `¿Está seguro que quiere ${modalAction?.action === 'back' ? 'salir' : 'cancelar'}?`}
+          {modalAction?.action !== 'save' && ' Los cambios no guardados se perderán.'}
+        </p>
+      </Modal>
     </div>
   );
 };
