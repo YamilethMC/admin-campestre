@@ -18,6 +18,7 @@ import FacilitiesContainer from './features/facilities';
 import EventsContainer from './features/events/container';
 import HelpCenterContainer from './features/help-center/container';
 import BannerContainer from './features/banner/container';
+import VerifyAccess from './pages/VerifyAccess';
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function AppContent() {
 
   return (
     <Routes>
+      <Route path="/verify-access" element={<VerifyAccess />} />
       <Route path="/" element={<MainLayout />}>
         <Route index element={<Dashboard />} />
         <Route path="socios" element={<MembersContainer />} />
