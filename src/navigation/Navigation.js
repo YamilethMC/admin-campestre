@@ -12,7 +12,8 @@ import {
   FacilitiesIcon,
   EventsIcon,
   HelpCenterIcon,
-  BannerIcon
+  BannerIcon,
+  TemporaryPassesIcon
 } from '../shared/components/icons/icons';
 
 const Navigation = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
@@ -22,6 +23,7 @@ const Navigation = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const menuItems = [
     { path: '/', label: 'Inicio', icon: HomeIcon, exact: true },
     { path: '/socios', label: 'Socios', icon: MemberListIcon },
+    { path: '/pases-temporales', label: 'Pases Temporales', icon: TemporaryPassesIcon },
     { path: '/estados-cuenta', label: 'Estados de cuenta', icon: AccountStatementIcon },
     { path: '/eventos', label: 'Eventos', icon: EventsIcon },
     { path: '/encuestas', label: 'Encuestas', icon: SurveysIcon },

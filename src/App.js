@@ -18,6 +18,7 @@ import FacilitiesContainer from './features/facilities';
 import EventsContainer from './features/events/container';
 import HelpCenterContainer from './features/help-center/container';
 import BannerContainer from './features/banner/container';
+import TemporaryPassesContainer from './features/temporary-passes';
 import VerifyAccess from './pages/VerifyAccess';
 
 function App() {
@@ -43,6 +44,7 @@ function AppContent() {
         <Route path="socios" element={<MembersContainer />} />
         <Route path="socios/nuevo" element={<IndividualMemberForm />} />
         <Route path="socios/carga-masiva" element={<BulkMemberUpload />} />
+        <Route path="pases-temporales" element={<TemporaryPassesContainer />} />
         <Route path="estados-cuenta" element={<AccountStatementUpload />} />
         <Route path="eventos" element={<EventsContainer />} />
         <Route path="encuestas" element={<SurveysContainer />} />
