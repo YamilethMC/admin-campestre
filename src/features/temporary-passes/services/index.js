@@ -19,8 +19,8 @@ export const temporaryPassesService = {
       const data = await response.json();
       return {
         success: true,
-        data: data.temporaryPasses || [],
-        total: data.total || 0,
+        data: data.data.temporaryPasses || [],
+        total: data.data.total || 0,
       };
     } catch (error) {
       console.error('Error fetching pending temporary passes:', error);
