@@ -3,11 +3,11 @@ import { SurveyCategory, SurveyStatus } from '../../interfaces';
 import { filterStyles } from './Style';
 
 const SurveyFilters = ({ filters, onFilterChange }) => {
-  const handleSearchChange = (e) => {
+  const handleSearchChange = e => {
     onFilterChange({ search: e.target.value });
   };
 
-  const handleStatusChange = (status) => {
+  const handleStatusChange = status => {
     let statusValue = '';
     if (status === 'activas') {
       statusValue = 'true';
@@ -19,12 +19,12 @@ const SurveyFilters = ({ filters, onFilterChange }) => {
     onFilterChange({ status: statusValue });
   };
 
-  const handleCategoryChange = (category) => {
+  const handleCategoryChange = category => {
     onFilterChange({ category });
   };
 
   // Function to map status values for UI display
-  const getStatusDisplayValue = (status) => {
+  const getStatusDisplayValue = status => {
     if (status === 'true') return 'activas';
     if (status === 'false') return 'inactivas';
     return 'activas'; // default to activas for any other value

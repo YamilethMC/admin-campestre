@@ -31,7 +31,7 @@ const FacilityReservations = ({ facility, onBack }) => {
     deleteReservation,
     createFacilityReservation,
     updateFacilityReservation,
-    searchClubMembers // Need to get this from the hook
+    searchClubMembers, // Need to get this from the hook
   } = useFacilities();
 
   const [facilityData, setFacilityData] = useState(null);
@@ -66,7 +66,7 @@ const FacilityReservations = ({ facility, onBack }) => {
     setReservationToDelete(null);
   };
 
-  const confirmDeleteReservation = (reservation) => {
+  const confirmDeleteReservation = reservation => {
     setReservationToDelete(reservation);
     setShowDeleteModal(true);
   };
@@ -81,7 +81,7 @@ const FacilityReservations = ({ facility, onBack }) => {
   };
 
   // Missing functions that were referenced in the JSX
-  const openMemberSelection = (timeSlot) => {
+  const openMemberSelection = timeSlot => {
     setSelectedTimeSlot(timeSlot);
     setSelectedMember(null); // Reset selected member
     setMemberSearchTerm('');
@@ -89,7 +89,7 @@ const FacilityReservations = ({ facility, onBack }) => {
     setShowMemberModal(true);
   };
 
-  const openCancelReservationModal = (reservation) => {
+  const openCancelReservationModal = reservation => {
     setReservationToCancel(reservation);
     setShowCancelModal(true);
   };
@@ -102,7 +102,7 @@ const FacilityReservations = ({ facility, onBack }) => {
     setMemberLoading(false);
   };
 
-  const handleMemberSearchChange = (value) => {
+  const handleMemberSearchChange = value => {
     setMemberSearchTerm(value);
     // Perform search after a delay to avoid too many API calls
     if (searchTimeoutRef.current) {
@@ -113,7 +113,7 @@ const FacilityReservations = ({ facility, onBack }) => {
     }, 300);
   };
 
-  const handleMemberSelect = (member) => {
+  const handleMemberSelect = member => {
     setSelectedMember(member);
   };
 
@@ -123,9 +123,9 @@ const FacilityReservations = ({ facility, onBack }) => {
     // Prepare reservation data
     const reservationData = {
       startTime: `${selectedDate}T${selectedTimeSlot.startTime}Z`,
-      endTime: `${selectedDate}T${selectedTimeSlot.endTime}Z`
+      endTime: `${selectedDate}T${selectedTimeSlot.endTime}Z`,
     };
-    
+
     // Create reservation
     const result = await createFacilityReservation(facility.id, selectedMember.id, reservationData);
 
@@ -152,13 +152,13 @@ const FacilityReservations = ({ facility, onBack }) => {
     const cancellationData = {
       startTime: `${selectedDate}T${reservationToCancel.startTime}Z`,
       endTime: `${selectedDate}T${reservationToCancel.endTime}Z`,
-      status: "CANCELLED"
+      status: 'CANCELLED',
     };
     // Update reservation to cancelled status
     const result = await updateFacilityReservation(
       reservationToCancel.id,
       reservationToCancel.clubMember.id,
-      cancellationData
+      cancellationData,
     );
 
     if (result) {
@@ -174,18 +174,21 @@ const FacilityReservations = ({ facility, onBack }) => {
     handleCancelReservation();
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     return new Date(dateString).toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
-  const formatTime = (timeString) => {
+  const formatTime = timeString => {
     // Handle both "HH:MM:SS" and ISO format
     if (timeString.includes('T')) {
-      return new Date(timeString).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+      return new Date(timeString).toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
     }
     return timeString.substring(0, 5); // "HH:MM"
   };
@@ -200,7 +203,10 @@ const FacilityReservations = ({ facility, onBack }) => {
 
   if (error) {
     return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+      <div
+        className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+        role="alert"
+      >
         <strong className="font-bold">Error: </strong>
         <span className="block sm:inline">{error}</span>
       </div>
@@ -212,45 +218,83 @@ const FacilityReservations = ({ facility, onBack }) => {
       <div>
         {/* Header with back button */}
         <div className="flex items-start space-x-4 mb-6">
-          <button
-            onClick={onBack}
-            className="text-gray-600 hover:text-gray-900 mt-1"
-          >
+          <button onClick={onBack} className="text-gray-600 hover:text-gray-900 mt-1">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </button>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-800">{facilityData?.name || facility?.name}</h1>
+            <h1 className="text-2xl font-bold text-gray-800">
+              {facilityData?.name || facility?.name}
+            </h1>
             {facilityData?.description && (
               <p className="text-gray-600 mt-2">{facilityData.description}</p>
             )}
             <div className="flex flex-wrap gap-2 mt-3">
               <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                {facilityData?.type === 'PADEL' ? 'Padel' :
-                 facilityData?.type === 'TENNIS' ? 'Tennis' :
-                 facilityData?.type === 'GYM' ? 'Gimnasio' : 'Otro'}
+                {facilityData?.type === 'PADEL'
+                  ? 'Padel'
+                  : facilityData?.type === 'TENNIS'
+                    ? 'Tennis'
+                    : facilityData?.type === 'GYM'
+                      ? 'Gimnasio'
+                      : 'Otro'}
               </span>
               {facilityData?.openTime && (
                 <div className="flex items-center text-sm text-gray-600">
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="w-4 h-4 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                   Abre: {formatTime(facilityData.openTime)}
                 </div>
               )}
               {facilityData?.closeTime && (
                 <div className="flex items-center text-sm text-gray-600">
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="w-4 h-4 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                   Cierra: {formatTime(facilityData.closeTime)}
                 </div>
               )}
               {facilityData?.maxDuration && (
                 <div className="flex items-center text-sm text-gray-600">
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="w-4 h-4 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                   Máx: {facilityData.maxDuration} min
                 </div>
@@ -263,7 +307,7 @@ const FacilityReservations = ({ facility, onBack }) => {
               <input
                 type="date"
                 value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
+                onChange={e => setSelectedDate(e.target.value)}
                 className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             </div>
@@ -289,7 +333,7 @@ const FacilityReservations = ({ facility, onBack }) => {
                   {/* Dropdown menu for available slots */}
                   <div className="mt-3 relative">
                     <button
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation();
                         openMemberSelection(slot);
                       }}
@@ -321,7 +365,8 @@ const FacilityReservations = ({ facility, onBack }) => {
                   <div className="flex-grow">
                     <div className="flex items-center mb-2">
                       <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-sm mr-2">
-                        {reservation.clubMember.user.name.charAt(0)}{reservation.clubMember.user.lastName?.charAt(0) || ''}
+                        {reservation.clubMember.user.name.charAt(0)}
+                        {reservation.clubMember.user.lastName?.charAt(0) || ''}
                       </div>
                       <div className="flex flex-col">
                         <span className="text-sm font-medium text-gray-800">
@@ -345,14 +390,14 @@ const FacilityReservations = ({ facility, onBack }) => {
                   {/* Cancel button */}
                   <div className="mt-3">
                     <button
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation();
                         openCancelReservationModal(reservation);
                       }}
                       className="w-full text-xs bg-gray-500 hover:bg-gray-600 text-white py-1.5 px-2.5 rounded-md transition-colors"
                     >
                       Cancelar
-                  </button>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -372,14 +417,18 @@ const FacilityReservations = ({ facility, onBack }) => {
             <div className="mt-3">
               <div className="text-center">
                 <h3 className="text-lg leading-6 font-medium text-gray-900 mt-4">
-                  Reservar {facility.name} en un horario de {selectedTimeSlot?.startTime} - {selectedTimeSlot?.endTime}
+                  Reservar {facility.name} en un horario de {selectedTimeSlot?.startTime} -{' '}
+                  {selectedTimeSlot?.endTime}
                 </h3>
               </div>
 
               {/* Search section */}
               <div className="mt-6 px-7">
                 <div className="mb-4">
-                  <label htmlFor="memberSearch" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="memberSearch"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Buscar socio
                   </label>
                   <div className="flex">
@@ -387,7 +436,7 @@ const FacilityReservations = ({ facility, onBack }) => {
                       type="text"
                       id="memberSearch"
                       value={memberSearchTerm}
-                      onChange={(e) => handleMemberSearchChange(e.target.value)}
+                      onChange={e => handleMemberSearchChange(e.target.value)}
                       placeholder="Buscar socio por nombre..."
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                     />
@@ -397,7 +446,7 @@ const FacilityReservations = ({ facility, onBack }) => {
                 {/* Members list */}
                 {!memberLoading && (
                   <div className="border rounded-lg max-h-60 overflow-y-auto">
-                    {members.map((member) => (
+                    {members.map(member => (
                       <div
                         key={member.id}
                         className={`p-3 border-b hover:bg-gray-50 cursor-pointer ${
@@ -407,14 +456,14 @@ const FacilityReservations = ({ facility, onBack }) => {
                       >
                         <div className="flex items-center">
                           <span className="font-semibold">{member.memberCode || 'N/A'}</span>
-                          <span className="ml-2">{member.user.name} {member.user.lastName}</span>
+                          <span className="ml-2">
+                            {member.user.name} {member.user.lastName}
+                          </span>
                         </div>
                       </div>
                     ))}
                     {members.length === 0 && !memberLoading && (
-                      <div className="p-3 text-center text-gray-500">
-                        No se encontraron socios
-                      </div>
+                      <div className="p-3 text-center text-gray-500">No se encontraron socios</div>
                     )}
                   </div>
                 )}
@@ -465,7 +514,8 @@ const FacilityReservations = ({ facility, onBack }) => {
                     `${formatTime(reservationToCancel.startTime)} - ${formatTime(reservationToCancel.endTime)}`}
                 </p>
                 <p className="text-sm text-gray-600">
-                  {reservationToCancel?.clubMember?.user?.name} {reservationToCancel?.clubMember?.user?.lastName}
+                  {reservationToCancel?.clubMember?.user?.name}{' '}
+                  {reservationToCancel?.clubMember?.user?.lastName}
                 </p>
               </div>
               <div className="flex justify-center space-x-3 px-4 py-3">
@@ -502,7 +552,8 @@ const FacilityReservations = ({ facility, onBack }) => {
                     `${formatTime(reservationToDelete.startTime)} - ${formatTime(reservationToDelete.endTime)}`}
                 </p>
                 <p className="text-sm text-gray-600">
-                  {reservationToDelete?.clubMember?.user?.name} {reservationToDelete?.clubMember?.user?.lastName}
+                  {reservationToDelete?.clubMember?.user?.name}{' '}
+                  {reservationToDelete?.clubMember?.user?.lastName}
                 </p>
               </div>
               <div className="flex justify-center space-x-3 px-4 py-3">

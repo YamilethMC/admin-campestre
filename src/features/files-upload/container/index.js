@@ -20,7 +20,7 @@ const FileUploadContainer = () => {
     loadFiles,
     getFileById,
     updateFile,
-    deleteFile
+    deleteFile,
   } = useFileUpload();
 
   // Handle adding a new file
@@ -30,7 +30,7 @@ const FileUploadContainer = () => {
   };
 
   // Handle editing a file
-  const handleEditFile = async (file) => {
+  const handleEditFile = async file => {
     try {
       // Get the full file data
       const fullFile = await getFileById(file.id);
@@ -42,7 +42,7 @@ const FileUploadContainer = () => {
   };
 
   // Handle saving a file (create or update)
-  const handleSaveFile = async (fileData) => {
+  const handleSaveFile = async fileData => {
     try {
       if (currentFile) {
         // Update existing file
@@ -67,7 +67,7 @@ const FileUploadContainer = () => {
   };
 
   // Handle deleting a file
-  const handleDeleteFile = async (id) => {
+  const handleDeleteFile = async id => {
     try {
       await deleteFile(id);
       loadFiles();
@@ -78,7 +78,10 @@ const FileUploadContainer = () => {
 
   if (error) {
     return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+      <div
+        className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+        role="alert"
+      >
         <strong className="font-bold">Error: </strong>
         <span className="block sm:inline">{error}</span>
       </div>
@@ -90,11 +93,7 @@ const FileUploadContainer = () => {
     return (
       <div className="max-w-2xl mx-auto">
         <FileUploadHeader />
-        <FileUploadForm
-          file={currentFile}
-          onSave={handleSaveFile}
-          onCancel={handleCancelForm}
-        />
+        <FileUploadForm file={currentFile} onSave={handleSaveFile} onCancel={handleCancelForm} />
       </div>
     );
   }

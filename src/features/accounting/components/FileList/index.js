@@ -7,7 +7,9 @@ const FileList = ({ fileList }) => {
       <div className="bg-gray-50 p-4 rounded-lg max-h-40 overflow-y-auto border border-gray-200">
         <ul className="list-disc pl-5 space-y-1">
           {fileList.map((fileName, index) => (
-            <li key={index} className="text-sm text-gray-700">{fileName}</li>
+            <li key={index} className="text-sm text-gray-700">
+              {fileName}
+            </li>
           ))}
         </ul>
       </div>

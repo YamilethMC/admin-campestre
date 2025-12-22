@@ -1,4 +1,3 @@
-
 import React, { useState, useContext } from 'react';
 import { AppContext } from '../../../shared/context/AppContext';
 import FacilityHeader from '../components/FacilityHeader';
@@ -33,11 +32,11 @@ const FacilitiesContainer = () => {
     getFacilityById,
     createFacility,
     updateFacility,
-    deleteFacility
+    deleteFacility,
   } = useFacilities();
 
   // Update filters
-  const updateFilters = (newFilters) => {
+  const updateFilters = newFilters => {
     if (newFilters.status !== undefined) {
       setStatus(newFilters.status);
       setPage(1);
@@ -52,7 +51,7 @@ const FacilitiesContainer = () => {
     }
   };
 
-  const handleDateChange = (newDate) => {
+  const handleDateChange = newDate => {
     setDate(newDate);
     setPage(1);
   };
@@ -64,7 +63,7 @@ const FacilitiesContainer = () => {
   };
 
   // Handle editing a facility
-  const handleEditFacility = async (facility) => {
+  const handleEditFacility = async facility => {
     // Load the full facility data
     const fullFacility = await getFacilityById(facility.id);
     if (fullFacility) {
@@ -74,18 +73,18 @@ const FacilitiesContainer = () => {
   };
 
   // Handle viewing reservations
-  const handleViewReservations = (facility) => {
+  const handleViewReservations = facility => {
     // Create a new facility object with the current date set
     const facilityWithDate = {
       ...facility,
-      selectedDate: new Date().toISOString().split('T')[0] // Format YYYY-MM-DD
+      selectedDate: new Date().toISOString().split('T')[0], // Format YYYY-MM-DD
     };
     setCurrentFacility(facilityWithDate);
     setView('reservations');
   };
 
   // Handle saving a facility (create or update)
-  const handleSaveFacility = async (facilityData) => {
+  const handleSaveFacility = async facilityData => {
     if (currentFacility) {
       // Update existing facility
       await updateFacility(currentFacility.id, facilityData);
@@ -113,7 +112,7 @@ const FacilitiesContainer = () => {
   };
 
   // Handle deleting a facility
-  const handleDeleteFacility = async (id) => {
+  const handleDeleteFacility = async id => {
     const success = await deleteFacility(id);
     if (success) {
       // If the list is empty and we're not on page 1, go back a page
@@ -135,7 +134,10 @@ const FacilitiesContainer = () => {
 
   if (error) {
     return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+      <div
+        className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+        role="alert"
+      >
         <strong className="font-bold">Error: </strong>
         <span className="block sm:inline">{error}</span>
       </div>
@@ -155,12 +157,7 @@ const FacilitiesContainer = () => {
 
   // Reservations view
   if (view === 'reservations') {
-    return (
-      <FacilityReservations
-        facility={currentFacility}
-        onBack={handleBackFromReservations}
-      />
-    );
+    return <FacilityReservations facility={currentFacility} onBack={handleBackFromReservations} />;
   }
 
   // List view

@@ -3,16 +3,16 @@ export const memberService = {
   // Get gender options (would come from API)
   getGenderOptions: async () => {
     await new Promise(resolve => setTimeout(resolve, 300));
-    
+
     return [
       { value: 'MASCULINO', label: 'Masculino' },
-      { value: 'FEMENINO', label: 'Femenino' }
+      { value: 'FEMENINO', label: 'Femenino' },
     ];
   },
 
   getTituloOptions: async () => {
     await new Promise(resolve => setTimeout(resolve, 300));
-    
+
     return [
       { value: 'C', label: 'Ciudadano' },
       { value: 'DR', label: 'Doctor' },
@@ -25,20 +25,18 @@ export const memberService = {
 
   getPaymentMethodOptions: async () => {
     await new Promise(resolve => setTimeout(resolve, 300));
-    
-    return [
-      { value: 'PPD', label: 'PPD' },
-    ];
+
+    return [{ value: 'PPD', label: 'PPD' }];
   },
-  
+
   // Add a new member
-  addMember: async (memberData) => {
-    const token = localStorage.getItem("authToken");
+  addMember: async memberData => {
+    const token = localStorage.getItem('authToken');
     const response = await fetch(`${process.env.REACT_APP_API_URL}/club-members`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(memberData),
     });
@@ -65,7 +63,7 @@ export const memberService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -76,27 +74,24 @@ export const memberService = {
       success: true,
       data: result,
       message: 'Socio registrado exitosamente',
-      status: response.status
+      status: response.status,
     };
   },
 
   // Get member by ID (for editing)
-  getMemberById: async (id) => {
-    const token = localStorage.getItem("authToken");
+  getMemberById: async id => {
+    const token = localStorage.getItem('authToken');
 
-    const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/club-members/${id}`,
-      {
-        headers: {
-          "accept": "*/*",
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/club-members/${id}`, {
+      headers: {
+        accept: '*/*',
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     if (!response.ok) {
       const errorData = await response.json();
-      let errorMessage = "Error al obtener miembro";
+      let errorMessage = 'Error al obtener miembro';
 
       // Manejar códigos de error específicos en el servicio
       switch (response.status) {
@@ -107,13 +102,13 @@ export const memberService = {
           errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
           break;
         default:
-          errorMessage = errorData.message || "Error al obtener miembro";
+          errorMessage = errorData.message || 'Error al obtener miembro';
       }
 
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -122,13 +117,13 @@ export const memberService = {
     return {
       success: true,
       data: result.data,
-      status: response.status
+      status: response.status,
     };
   },
 
   // Update existing member
   updateMember: async (id, memberData) => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem('authToken');
 
     // Prepare the update payload - we need to separate user data from member data
     // The endpoint expects a PATCH to users/{id}, so we need to update the user data
@@ -149,25 +144,22 @@ export const memberService = {
       memberCode: memberData.memberCode,
       // For invitedBy and relationship, these would only be set when creating dependents
       ...(memberData.invitedById && { invitedById: memberData.invitedById }),
-      ...(memberData.relationship && { relationship: memberData.relationship })
+      ...(memberData.relationship && { relationship: memberData.relationship }),
     };
 
-    const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/users/${id}`,
-      {
-        method: "PATCH",
-        headers: {
-          "accept": "*/*",
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(updatePayload)
-      }
-    );
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/users/${id}`, {
+      method: 'PATCH',
+      headers: {
+        accept: '*/*',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updatePayload),
+    });
 
     if (!response.ok) {
       const errorData = await response.json();
-      let errorMessage = "Error al actualizar socio";
+      let errorMessage = 'Error al actualizar socio';
 
       // Manejar códigos de error específicos en el servicio
       switch (response.status) {
@@ -181,13 +173,13 @@ export const memberService = {
           errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
           break;
         default:
-          errorMessage = errorData.message || "Error al actualizar socio";
+          errorMessage = errorData.message || 'Error al actualizar socio';
       }
 
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -197,13 +189,12 @@ export const memberService = {
       success: true,
       data: result.data,
       message: 'Socio actualizado exitosamente',
-      status: response.status
+      status: response.status,
     };
   },
 
-
   // Validate member data
-  validateMember: (memberData) => {
+  validateMember: memberData => {
     const errors = [];
 
     // Required fields validation
@@ -230,7 +221,7 @@ export const memberService = {
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
-  }
+  },
 };

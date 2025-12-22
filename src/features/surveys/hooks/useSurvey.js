@@ -22,10 +22,22 @@ export const useSurvey = () => {
   const [loadingSurveyPriority, setLoadingSurveyPriority] = useState(false);
   const [error, setError] = useState(null);
 
-  const loadSurveys = async ({page = 1, limit = 10, status: statusParam = status, category: categoryParam = category, search: searchParam = search } = {})=> {
+  const loadSurveys = async ({
+    page = 1,
+    limit = 10,
+    status: statusParam = status,
+    category: categoryParam = category,
+    search: searchParam = search,
+  } = {}) => {
     try {
       setLoading(true);
-      const result = await surveyService.fetchSurveys({ page, limit, status: statusParam, category: categoryParam, search: searchParam });
+      const result = await surveyService.fetchSurveys({
+        page,
+        limit,
+        status: statusParam,
+        category: categoryParam,
+        search: searchParam,
+      });
 
       if (result.success) {
         setSurveys(result.data.surveys);
@@ -90,7 +102,7 @@ export const useSurvey = () => {
   }, [page, status, category, search]);
 
   // Toggle survey status
-  const toggleSurveyStatus = async (id) => {
+  const toggleSurveyStatus = async id => {
     try {
       const result = await surveyService.toggleSurveyStatus(id);
 
@@ -106,7 +118,7 @@ export const useSurvey = () => {
     }
   };
 
-  const buildUpdateSurveyData = (formData) => {
+  const buildUpdateSurveyData = formData => {
     return {
       title: formData.title,
       description: formData.description,
@@ -131,14 +143,13 @@ export const useSurvey = () => {
         }
 
         // Verifica si el tipo de pregunta requiere opciones
-        if (["SELECT", "CHECKBOX", "BOOLEAN", "YES_NO"].includes(q.type)) {
+        if (['SELECT', 'CHECKBOX', 'BOOLEAN', 'YES_NO'].includes(q.type)) {
           question.options = q.options.map((opt, optIndex) => {
-
-            const optionText = typeof opt === "string" ? opt : opt.option;
+            const optionText = typeof opt === 'string' ? opt : opt.option;
 
             const option = {
               option: optionText,
-              value: optionText.toLowerCase().replace(/\s/g, ""),
+              value: optionText.toLowerCase().replace(/\s/g, ''),
               order: optIndex,
             };
 
@@ -157,7 +168,7 @@ export const useSurvey = () => {
     };
   };
 
- const buildSurveyData = (formData) => {
+  const buildSurveyData = formData => {
     const surveyData = {
       title: formData.title,
       description: formData.description,
@@ -174,21 +185,22 @@ export const useSurvey = () => {
       type: q.type,
       required: q.required,
       order: qIndex,
-      options: (q.type === "SELECT" || q.type === "BOOLEAN")
-        ? q.options.map((opt, optIndex) => ({
-            surveyQuestionId: 0,
-            option: opt.option,
-            value: opt.option,
-            order: opt.id
-          }))
-        : []
+      options:
+        q.type === 'SELECT' || q.type === 'BOOLEAN'
+          ? q.options.map((opt, optIndex) => ({
+              surveyQuestionId: 0,
+              option: opt.option,
+              value: opt.option,
+              order: opt.id,
+            }))
+          : [],
     }));
 
     return surveyData;
   };
 
   // Create new survey
-  const createSurvey = async (surveyData) => {
+  const createSurvey = async surveyData => {
     const surveyDataF = buildSurveyData(surveyData);
     try {
       setLoading(true);
@@ -232,7 +244,7 @@ export const useSurvey = () => {
   };
 
   // Get responses for a survey
-  const getSurveyResponses = async (surveyId) => {
+  const getSurveyResponses = async surveyId => {
     try {
       setLoading(true);
       const result = await surveyService.getSurveyResponses(surveyId);
@@ -252,7 +264,7 @@ export const useSurvey = () => {
   };
 
   // Get a single survey by ID
-  const getSurveyById = async (id) => {
+  const getSurveyById = async id => {
     try {
       setLoading(true);
       const result = await surveyService.getSurveyById(id);
@@ -272,7 +284,7 @@ export const useSurvey = () => {
   };
 
   // Delete a survey
-  const deleteSurvey = async (id) => {
+  const deleteSurvey = async id => {
     try {
       const result = await surveyService.deleteSurvey(id);
       if (result.success) {
@@ -319,6 +331,6 @@ export const useSurvey = () => {
     loadingSurveyCategory,
     loadingSurveyPriority,
     addLog,
-    addToast
+    addToast,
   };
 };

@@ -33,9 +33,7 @@ const Step3Domicilio = ({ formData, handleChange }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Número interior
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Número interior</label>
             <input
               type="text"
               name="numero_interior"

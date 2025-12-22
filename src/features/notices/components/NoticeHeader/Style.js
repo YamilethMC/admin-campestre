@@ -1,5 +1,3 @@
-
-
 export const headerStyles = {
   container: `bg-white rounded-lg shadow-lg p-6 mb-6 border border-gray-200`,
   headerContent: `flex flex-col md:flex-row md:items-center md:justify-between gap-4`,

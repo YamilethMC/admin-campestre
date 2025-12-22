@@ -5,18 +5,18 @@ import Step2Telefonos from './Step2Telefonos';
 import Step3Domicilio from './Step3Domicilio';
 import Step4InfoAdicional from './Step4InfoAdicional';
 
-const MultiStepForm = ({ 
-  formData, 
-  handleChange, 
+const MultiStepForm = ({
+  formData,
+  handleChange,
   handleFormSubmit,
-  genderOptions, 
+  genderOptions,
   loadingGender,
   tituloOptions,
   loadingTitulo,
   paymentMethodOptions,
   loadingPaymentMethod,
   isDependent,
-  isEditing
+  isEditing,
 }) => {
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -27,7 +27,7 @@ const MultiStepForm = ({
     { title: 'Información Adicional', component: Step4InfoAdicional },
   ];
 
-  const validateStep = (step) => {
+  const validateStep = step => {
     switch (step) {
       case 1:
         return (
@@ -53,11 +53,7 @@ const MultiStepForm = ({
           formData.pais
         );
       case 4:
-        return (
-          formData.titulo &&
-          formData.metodo_pago &&
-          formData.fecha_admision
-        );
+        return formData.titulo && formData.metodo_pago && formData.fecha_admision;
       default:
         return true;
     }
@@ -79,7 +75,7 @@ const MultiStepForm = ({
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     e.preventDefault();
     if (validateStep(currentStep)) {
       handleFormSubmit(e);
@@ -117,7 +113,7 @@ const MultiStepForm = ({
             Anterior
           </button>
         )}
-        
+
         <div className={currentStep === 1 ? 'ml-auto' : ''}>
           {currentStep < steps.length ? (
             <button
@@ -130,9 +126,9 @@ const MultiStepForm = ({
           ) : (
             <button
               type="submit"
-              className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="px-6 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-green-500"
             >
-              {isDependent ? "Agregar dependiente" : isEditing ? "Editar socio" : "Agregar socio"}
+              {isDependent ? 'Agregar dependiente' : isEditing ? 'Editar socio' : 'Agregar socio'}
             </button>
           )}
         </div>

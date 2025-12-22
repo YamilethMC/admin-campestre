@@ -2,13 +2,7 @@ import React from 'react';
 import { useBulkUpload } from '../../hooks/useBulkUpload';
 
 const BulkMemberForm = () => {
-  const {
-    uploading,
-    uploadResult,
-    handleFileUpload,
-    resetForm,
-    fileInputRef
-  } = useBulkUpload();
+  const { uploading, uploadResult, handleFileUpload, resetForm, fileInputRef } = useBulkUpload();
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
@@ -36,8 +30,8 @@ const BulkMemberForm = () => {
       {uploading && (
         <div className="mb-4">
           <div className="w-full bg-gray-200 rounded-full h-2.5">
-            <div 
-              className="bg-primary h-2.5 rounded-full animate-pulse" 
+            <div
+              className="bg-primary h-2.5 rounded-full animate-pulse"
               style={{ width: '60%' }}
             ></div>
           </div>

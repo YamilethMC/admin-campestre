@@ -4,7 +4,7 @@ export const EventTypes = {
   SPORT: 'SPORT',
   FAMILY: 'FAMILY',
   OTHER: 'OTHER',
-  ALL: 'TODAS'
+  ALL: 'TODAS',
 };
 
 // Event interface
@@ -20,7 +20,7 @@ export const EventInterface = {
   createdAt: '',
   updatedAt: '',
   availableSpots: 0,
-  ocupedSpots: 0
+  ocupedSpots: 0,
 };
 
 // Event registration interface
@@ -30,7 +30,7 @@ export const EventRegistrationInterface = {
   clubMemberId: null,
   totalRegistrations: 0,
   createdAt: '',
-  updatedAt: ''
+  updatedAt: '',
 };
 
 // Event form data interface
@@ -40,7 +40,7 @@ export const EventFormData = {
   description: '',
   date: '', // ISO format date string
   totalSpots: 0,
-  location: ''
+  location: '',
 };
 
 // Event filter interface
@@ -49,7 +49,7 @@ export const EventFilterInterface = {
   type: EventTypes.ALL,
   date: '', // Format: "YYYY-MM"
   page: 1,
-  limit: 10
+  limit: 10,
 };
 
 // Event response interface
@@ -61,12 +61,12 @@ export const EventResponseInterface = {
       total: 0,
       page: 1,
       limit: 10,
-      totalPages: 1
-    }
+      totalPages: 1,
+    },
   },
   timestamp: '',
   messageId: '',
-  traceId: ''
+  traceId: '',
 };
 
 // Event registration response interface
@@ -77,11 +77,11 @@ export const EventRegistrationResponseInterface = {
     eventName: '',
     memberId: null,
     totalRegistrations: 0,
-    availableSpots: 0
+    availableSpots: 0,
   },
   timestamp: '',
   messageId: '',
-  traceId: ''
+  traceId: '',
 };
 
 export const EventTypesOptions = [
@@ -89,5 +89,5 @@ export const EventTypesOptions = [
   { value: EventTypes.SOCIAL, label: 'Social' },
   { value: EventTypes.SPORT, label: 'Deporte' },
   { value: EventTypes.FAMILY, label: 'Familiar' },
-  { value: EventTypes.OTHER, label: 'Otro' }
+  { value: EventTypes.OTHER, label: 'Otro' },
 ];

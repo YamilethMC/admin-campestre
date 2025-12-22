@@ -1,9 +1,18 @@
 import React from 'react';
 
-const Step4InfoAdicional = ({ formData, handleChange, tituloOptions, loadingTitulo, paymentMethodOptions, loadingPaymentMethod }) => {
+const Step4InfoAdicional = ({
+  formData,
+  handleChange,
+  tituloOptions,
+  loadingTitulo,
+  paymentMethodOptions,
+  loadingPaymentMethod,
+}) => {
   return (
     <div className="border border-gray-200 rounded-lg p-6 shadow-sm">
-      <h3 className="text-lg font-medium text-gray-500 mb-4 uppercase tracking-wide">Información adicional</h3>
+      <h3 className="text-lg font-medium text-gray-500 mb-4 uppercase tracking-wide">
+        Información adicional
+      </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -18,21 +27,17 @@ const Step4InfoAdicional = ({ formData, handleChange, tituloOptions, loadingTitu
             disabled={loadingTitulo}
           >
             <option value="">Seleccione una opción...</option>
-            {tituloOptions.map((option) => (
+            {tituloOptions.map(option => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
             ))}
           </select>
-          {loadingTitulo && (
-            <div className="text-xs text-gray-500 mt-1">Cargando opciones...</div>
-          )}
+          {loadingTitulo && <div className="text-xs text-gray-500 mt-1">Cargando opciones...</div>}
         </div>
-        
+
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Profesión
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Profesión</label>
           <input
             type="text"
             name="profesion"
@@ -55,7 +60,7 @@ const Step4InfoAdicional = ({ formData, handleChange, tituloOptions, loadingTitu
             disabled={loadingPaymentMethod}
           >
             <option value="">Seleccione una opción...</option>
-            {paymentMethodOptions.map((option) => (
+            {paymentMethodOptions.map(option => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>

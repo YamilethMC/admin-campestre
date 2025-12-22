@@ -1,0 +1,75 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "actions": "Actions"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "members": "Members",
+    "temporaryPasses": "Temporary Passes",
+    "accountStatements": "Account Statements",
+    "events": "Events",
+    "surveys": "Surveys",
+    "notices": "Notices",
+    "banner": "Banners",
+    "files": "Files",
+    "facilities": "Facilities",
+    "help": "Help",
+    "legalDocuments": "Legal Documents",
+    "logs": "Logs"
+  },
+  "members": {
+    "title": "Member Management",
+    "newMember": "New Member",
+    "bulkUpload": "Bulk Upload",
+    "memberCode": "Member Number",
+    "name": "Name",
+    "email": "Email",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "legal": {
+    "title": "Legal Documents",
+    "newDocument": "New Document",
+    "createDocument": "Create Document",
+    "slug": "Slug",
+    "title_doc": "Title",
+    "versions": "Versions",
+    "newVersion": "New Version",
+    "version": "Version",
+    "content": "Content",
+    "status": "Status",
+    "draft": "Draft",
+    "published": "Published",
+    "archived": "Archived",
+    "publish": "Publish",
+    "viewAcceptances": "View Acceptances",
+    "acceptances": "Acceptances",
+    "user": "User",
+    "acceptedAt": "Accepted At",
+    "ipAddress": "IP Address"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark"
+  }
+}

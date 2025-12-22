@@ -21,7 +21,7 @@ export const useFileUpload = () => {
       limit: 10,
       search: params.search || search,
       order: 'asc',
-      orderBy: 'name'
+      orderBy: 'name',
     });
     if (response.success) {
       setFiles(response.data.data || []);
@@ -35,7 +35,7 @@ export const useFileUpload = () => {
     setLoading(false);
   };
 
-  const uploadFile = async (fileData) => {
+  const uploadFile = async fileData => {
     setUploading(true);
     setError(null);
 
@@ -51,14 +51,14 @@ export const useFileUpload = () => {
     }
   };
 
-  const getFileById = async (id) => {
+  const getFileById = async id => {
     const response = await fileUploadService.getFileById(id);
 
     if (response.success) {
       return response.data;
     } else {
       addToast(response.error || 'Error al obtener archivo', 'error');
-      return
+      return;
     }
   };
 
@@ -75,7 +75,7 @@ export const useFileUpload = () => {
     }
   };
 
-  const deleteFile = async (id) => {
+  const deleteFile = async id => {
     const response = await fileUploadService.deleteFile(id);
 
     if (response.success) {
@@ -113,6 +113,6 @@ export const useFileUpload = () => {
     loadFiles,
     getFileById,
     updateFile,
-    deleteFile
+    deleteFile,
   };
 };

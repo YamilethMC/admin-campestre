@@ -16,7 +16,7 @@ const HelpCenterContainer = () => {
     updateHelpCenter,
     getHelpCenterById,
     deleteHelpCenter,
-    addToast
+    addToast,
   } = useHelpCenter();
 
   // Handle adding a new help center
@@ -26,7 +26,7 @@ const HelpCenterContainer = () => {
   };
 
   // Handle editing a help center
-  const handleEditHelpCenter = async (helpCenter) => {
+  const handleEditHelpCenter = async helpCenter => {
     try {
       // Get the full help center data
       const fullHelpCenter = await getHelpCenterById(helpCenter.id);
@@ -40,7 +40,7 @@ const HelpCenterContainer = () => {
   };
 
   // Handle saving a help center (create or update)
-  const handleSaveHelpCenter = async (helpCenterData) => {
+  const handleSaveHelpCenter = async helpCenterData => {
     try {
       if (currentHelpCenter) {
         // Update existing help center
@@ -62,7 +62,7 @@ const HelpCenterContainer = () => {
   };
 
   // Handle deleting a help center
-  const handleDeleteHelpCenter = async (id) => {
+  const handleDeleteHelpCenter = async id => {
     try {
       await deleteHelpCenter(id);
     } catch (err) {

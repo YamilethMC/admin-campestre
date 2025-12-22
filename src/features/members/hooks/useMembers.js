@@ -10,8 +10,18 @@ export function useMembers() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
 
-  const loadMembers = async ({page = 1, limit = 10, active: activeParam = active, search: searchParam = search  } = {})=> {
-    const data = await memberService.fetchMembers({ page, limit, active: activeParam, search: searchParam });
+  const loadMembers = async ({
+    page = 1,
+    limit = 10,
+    active: activeParam = active,
+    search: searchParam = search,
+  } = {}) => {
+    const data = await memberService.fetchMembers({
+      page,
+      limit,
+      active: activeParam,
+      search: searchParam,
+    });
     console.log('loadMembers data:', data);
     if (data.success) {
       setMembers(data.data.members);
@@ -22,7 +32,7 @@ export function useMembers() {
   };
 
   useEffect(() => {
-    loadMembers({page, active, search});
+    loadMembers({ page, active, search });
   }, [active, page, search, addToast]);
 
   return {
@@ -34,6 +44,6 @@ export function useMembers() {
     setPage,
     loadMembers,
     search,
-    setSearch
-    };
+    setSearch,
+  };
 }

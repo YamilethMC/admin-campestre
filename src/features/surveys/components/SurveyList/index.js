@@ -1,7 +1,19 @@
 import React from 'react';
 import SurveyCard from '../SurveyCard';
 
-const SurveyList = ({ surveys, filters, loading, meta, page, setPage, onEdit, onViewResponses, onToggleStatus, onDelete, onAddSurvey }) => {
+const SurveyList = ({
+  surveys,
+  filters,
+  loading,
+  meta,
+  page,
+  setPage,
+  onEdit,
+  onViewResponses,
+  onToggleStatus,
+  onDelete,
+  onAddSurvey,
+}) => {
   if (loading && surveys.length === 0) {
     // Show a skeleton loading state when loading and no surveys are displayed yet
     return (
@@ -13,7 +25,12 @@ const SurveyList = ({ surveys, filters, loading, meta, page, setPage, onEdit, on
             className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md flex items-center transition-colors"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              />
             </svg>
             Agregar encuesta
           </button>
@@ -45,7 +62,12 @@ const SurveyList = ({ surveys, filters, loading, meta, page, setPage, onEdit, on
           className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md flex items-center transition-colors"
         >
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
           </svg>
           Agregar encuesta
         </button>
@@ -68,7 +90,7 @@ const SurveyList = ({ surveys, filters, loading, meta, page, setPage, onEdit, on
               onDelete={onDelete}
             />
           ))}
-          
+
           {/* Pagination controls */}
           {meta && (
             <div className="flex justify-center items-center gap-3 mt-4">
@@ -89,7 +111,9 @@ const SurveyList = ({ surveys, filters, loading, meta, page, setPage, onEdit, on
                   key={num}
                   onClick={() => setPage(num)}
                   className={`px-3 py-1 rounded border text-sm ${
-                    page === num ? 'bg-primary text-white border-primary' : 'border-gray-300 text-gray-700'
+                    page === num
+                      ? 'bg-primary text-white border-primary'
+                      : 'border-gray-300 text-gray-700'
                   }`}
                 >
                   {num}
@@ -101,7 +125,9 @@ const SurveyList = ({ surveys, filters, loading, meta, page, setPage, onEdit, on
                 disabled={page === meta.totalPages}
                 onClick={() => setPage(page + 1)}
                 className={`px-3 py-1 rounded border text-sm ${
-                  page === meta.totalPages ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
+                  page === meta.totalPages
+                    ? 'text-gray-300 border-gray-200'
+                    : 'text-primary border-primary'
                 }`}
               >
                 Siguiente

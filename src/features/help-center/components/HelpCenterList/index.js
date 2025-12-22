@@ -1,13 +1,7 @@
 import React, { useState } from 'react';
 import Modal from '../../../../shared/components/modal';
 
-const HelpCenterList = ({
-  helpCenters,
-  loading,
-  onAddHelpCenter,
-  onEdit,
-  onDelete
-}) => {
+const HelpCenterList = ({ helpCenters, loading, onAddHelpCenter, onEdit, onDelete }) => {
   const [selectedHelpCenter, setSelectedHelpCenter] = useState(null);
   const [showMenu, setShowMenu] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -60,21 +54,31 @@ const HelpCenterList = ({
           className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md flex items-center transition-colors"
         >
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
           </svg>
           Agregar pregunta
         </button>
       </div>
 
-      {(!helpCenters || helpCenters.length === 0) ? (
+      {!helpCenters || helpCenters.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg shadow">
           <h3 className="text-lg font-medium text-gray-900 mb-1">No se encontraron preguntas</h3>
-          <p className="text-gray-500 mb-6">Aún no hay preguntas y respuestas en el centro de ayuda</p>
+          <p className="text-gray-500 mb-6">
+            Aún no hay preguntas y respuestas en el centro de ayuda
+          </p>
         </div>
       ) : (
         <div className="space-y-4">
-          {helpCenters.map((helpCenter) => (
-            <div key={helpCenter.id} className="bg-white rounded-lg shadow p-6 border border-gray-200">
+          {helpCenters.map(helpCenter => (
+            <div
+              key={helpCenter.id}
+              className="bg-white rounded-lg shadow p-6 border border-gray-200"
+            >
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <h3 className="text-lg font-medium text-gray-900 mb-2">{helpCenter.question}</h3>
@@ -83,7 +87,7 @@ const HelpCenterList = ({
 
                 <div className="relative">
                   <button
-                    onClick={(e) => handleMenuToggle(helpCenter, e)}
+                    onClick={e => handleMenuToggle(helpCenter, e)}
                     className="text-gray-600 hover:text-gray-900 p-1 rounded-md hover:bg-gray-100 transition-colors"
                     aria-label="Menú de opciones"
                   >

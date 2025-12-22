@@ -7,32 +7,29 @@ export const bannerService = {
     orderBy = 'createdAt',
     order = 'asc',
     active = true, // Default to active banners
-    search = ''
+    search = '',
   } = {}) => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem('authToken');
 
     const params = new URLSearchParams({
       page,
       limit,
       search,
       order,
-      orderBy
+      orderBy,
     });
 
     if (typeof active === 'boolean') {
-      params.append("active", active);
+      params.append('active', active);
     }
 
-    const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/banner?${params.toString()}`,
-      {
-        method: "GET",
-        headers: {
-          "accept": "*/*",
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/banner?${params.toString()}`, {
+      method: 'GET',
+      headers: {
+        accept: '*/*',
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -56,7 +53,7 @@ export const bannerService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -65,21 +62,21 @@ export const bannerService = {
       success: true,
       data: {
         data: responseData.data?.data || responseData.data || [],
-        meta: responseData.data?.meta || responseData.meta || null
+        meta: responseData.data?.meta || responseData.meta || null,
       },
-      status: response.status
+      status: response.status,
     };
   },
 
   // Get banner by id
-  getBannerById: async (id) => {
-    const token = localStorage.getItem("authToken");
+  getBannerById: async id => {
+    const token = localStorage.getItem('authToken');
 
     const response = await fetch(`${process.env.REACT_APP_API_URL}/banner/${id}`, {
       headers: {
-        "accept": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -107,7 +104,7 @@ export const bannerService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -115,26 +112,26 @@ export const bannerService = {
     return {
       success: true,
       data: responseData.data,
-      status: response.status
+      status: response.status,
     };
   },
 
   // Create a new banner
-  createBanner: async (bannerData) => {
-    const token = localStorage.getItem("authToken");
+  createBanner: async bannerData => {
+    const token = localStorage.getItem('authToken');
 
     // Format dates for API (the form should send ISO strings or null)
     const formattedData = {
       ...bannerData,
-      startDate: bannerData.startDate ? (new Date(bannerData.startDate)).toISOString() : null,
-      endDate: bannerData.endDate ? (new Date(bannerData.endDate)).toISOString() : null
+      startDate: bannerData.startDate ? new Date(bannerData.startDate).toISOString() : null,
+      endDate: bannerData.endDate ? new Date(bannerData.endDate).toISOString() : null,
     };
 
     const response = await fetch(`${process.env.REACT_APP_API_URL}/banner`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(formattedData),
     });
@@ -170,7 +167,7 @@ export const bannerService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -181,26 +178,26 @@ export const bannerService = {
       success: true,
       data: result.data || result,
       message: 'Banner registrado exitosamente',
-      status: response.status
+      status: response.status,
     };
   },
 
   // Update a banner
   updateBanner: async (id, bannerData) => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem('authToken');
 
     // Format dates for API (the form should send ISO strings or null)
     const formattedData = {
       ...bannerData,
-      startDate: bannerData.startDate ? (new Date(bannerData.startDate)).toISOString() : null,
-      endDate: bannerData.endDate ? (new Date(bannerData.endDate)).toISOString() : null
+      startDate: bannerData.startDate ? new Date(bannerData.startDate).toISOString() : null,
+      endDate: bannerData.endDate ? new Date(bannerData.endDate).toISOString() : null,
     };
 
     const response = await fetch(`${process.env.REACT_APP_API_URL}/banner/${id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(formattedData),
     });
@@ -230,7 +227,7 @@ export const bannerService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -241,19 +238,19 @@ export const bannerService = {
       success: true,
       data: result.data || result,
       message: 'Banner actualizado exitosamente',
-      status: response.status
+      status: response.status,
     };
   },
 
   // Delete a banner
-  deleteBanner: async (id) => {
-    const token = localStorage.getItem("authToken");
+  deleteBanner: async id => {
+    const token = localStorage.getItem('authToken');
 
     const response = await fetch(`${process.env.REACT_APP_API_URL}/banner/${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -282,7 +279,7 @@ export const bannerService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -290,7 +287,7 @@ export const bannerService = {
     return {
       success: true,
       message: 'Banner eliminado exitosamente',
-      status: response.status
+      status: response.status,
     };
   },
 };

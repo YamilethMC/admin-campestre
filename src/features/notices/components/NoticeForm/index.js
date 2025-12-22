@@ -5,8 +5,8 @@ import { formStyles } from './Style';
 const NoticeForm = ({ notice = null, onSave, onCancel }) => {
   const isEdit = !!notice;
 
-  const formatDateForInput = (isoString) => {
-     return isoString?.slice(0, 10) || "";
+  const formatDateForInput = isoString => {
+    return isoString?.slice(0, 10) || '';
   };
 
   // Original data to compare for changes
@@ -31,7 +31,7 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
   const [pendingNavigationAction, setPendingNavigationAction] = useState(null);
   const [pendingSaveData, setPendingSaveData] = useState(null);
   const [isCreatingNew, setIsCreatingNew] = useState(!notice); // Track if creating new notice
-  
+
   // Set original data when component mounts
   useEffect(() => {
     if (notice) {
@@ -56,13 +56,12 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
       });
     }
   }, [notice]);
-  
+
   // Check for changes
   useEffect(() => {
     if (originalData) {
-      const isChanged = 
-        JSON.stringify(originalData) !== JSON.stringify(formData);
-      // If it's a new notice (no initial notice data) and any field has been modified, 
+      const isChanged = JSON.stringify(originalData) !== JSON.stringify(formData);
+      // If it's a new notice (no initial notice data) and any field has been modified,
       // or if it's an edit and fields have changed
       setHasUnsavedChanges(isChanged);
     }
@@ -71,18 +70,18 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = e => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData(prev => ({
           ...prev,
-          image: reader.result // This will be a base64 string
+          image: reader.result, // This will be a base64 string
         }));
         setImageFile(file);
         setImageChanged(true);
@@ -90,8 +89,6 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
       reader.readAsDataURL(file);
     }
   };
-
-
 
   const validateForm = () => {
     const newErrors = {};
@@ -110,7 +107,7 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     e.preventDefault();
 
     if (validateForm()) {
@@ -205,28 +202,34 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
   return (
     <div className={formStyles.container}>
       <div className="flex items-center mb-6">
-        <button
-          onClick={handleBack}
-          className={formStyles.backButton}
-          aria-label="Regresar"
-        >
-          <svg className={formStyles.backIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        <button onClick={handleBack} className={formStyles.backButton} aria-label="Regresar">
+          <svg
+            className={formStyles.backIcon}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
         </button>
-        <h2 className={formStyles.title}>
-          {isEdit ? 'Editar aviso' : 'Crear nuevo aviso'}
-        </h2>
+        <h2 className={formStyles.title}>{isEdit ? 'Editar aviso' : 'Crear nuevo aviso'}</h2>
       </div>
 
       <form onSubmit={handleSubmit} className={formStyles.form}>
         <div className={formStyles.formRow}>
           <div>
-            <label className={formStyles.label}>Título del aviso <span className="text-red-500">*</span></label>
+            <label className={formStyles.label}>
+              Título del aviso <span className="text-red-500">*</span>
+            </label>
             <input
               type="text"
               value={formData.title}
-              onChange={(e) => {
+              onChange={e => {
                 handleInputChange('title', e.target.value);
                 // Clear error when user starts typing
                 if (errors.title) {
@@ -238,16 +241,12 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
             {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
           </div>
 
-
-
-
-
           <div className="flex items-center">
             <input
               type="checkbox"
               id="isActive"
               checked={formData.active}
-              onChange={(e) => handleInputChange('active', e.target.checked)}
+              onChange={e => handleInputChange('active', e.target.checked)}
               className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
             />
             <label htmlFor="isActive" className="ml-2 block text-sm text-gray-700">
@@ -256,10 +255,12 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
           </div>
 
           <div className="col-span-2">
-            <label className={formStyles.label}>Descripción <span className="text-red-500">*</span></label>
+            <label className={formStyles.label}>
+              Descripción <span className="text-red-500">*</span>
+            </label>
             <textarea
               value={formData.message}
-              onChange={(e) => {
+              onChange={e => {
                 handleInputChange('message', e.target.value);
                 // Clear error when user starts typing
                 if (errors.message) {
@@ -289,8 +290,18 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
                     />
                   </div>
                 ) : (
-                  <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <svg
+                    className="mx-auto h-12 w-12 text-gray-400"
+                    stroke="currentColor"
+                    fill="none"
+                    viewBox="0 0 48 48"
+                  >
+                    <path
+                      d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 )}
                 <div>
@@ -316,7 +327,7 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
             <input
               type="text"
               value={formData.type}
-              onChange={(e) => handleInputChange('type', e.target.value)}
+              onChange={e => handleInputChange('type', e.target.value)}
               className={formStyles.input}
             />
           </div>
@@ -326,31 +337,22 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
             <input
               type="date"
               value={formData.visibleUntil}
-              onChange={(e) => handleInputChange('visibleUntil', e.target.value)}
+              onChange={e => handleInputChange('visibleUntil', e.target.value)}
               className={formStyles.input}
             />
           </div>
-
-
         </div>
 
         <div className={formStyles.buttonRow}>
-          <button
-            type="button"
-            onClick={handleCancel}
-            className={formStyles.cancelButton}
-          >
+          <button type="button" onClick={handleCancel} className={formStyles.cancelButton}>
             Cancelar
           </button>
-          <button
-            type="submit"
-            className={formStyles.saveButton}
-          >
+          <button type="submit" className={formStyles.saveButton}>
             {isEdit ? 'Guardar cambios' : 'Crear aviso'}
           </button>
         </div>
       </form>
-      
+
       <Modal
         isOpen={showConfirmationModal}
         title="Confirmar salida"
@@ -374,9 +376,12 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
           </div>
         }
       >
-        <p>¿Está seguro que quiere {pendingNavigationAction === 'back' ? 'regresar' : 'cancelar'}? Los cambios no guardados se perderán.</p>
+        <p>
+          ¿Está seguro que quiere {pendingNavigationAction === 'back' ? 'regresar' : 'cancelar'}?
+          Los cambios no guardados se perderán.
+        </p>
       </Modal>
-      
+
       <Modal
         isOpen={showSaveConfirmationModal}
         title={isEdit ? 'Confirmar actualización' : 'Confirmar creación'}
@@ -400,7 +405,11 @@ const NoticeForm = ({ notice = null, onSave, onCancel }) => {
           </div>
         }
       >
-        <p>{pendingNavigationAction === 'create' ? '¿Desea crear el aviso?' : '¿Desea guardar los cambios?'}</p>
+        <p>
+          {pendingNavigationAction === 'create'
+            ? '¿Desea crear el aviso?'
+            : '¿Desea guardar los cambios?'}
+        </p>
       </Modal>
     </div>
   );

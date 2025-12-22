@@ -3,15 +3,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { UserIcon, LockIcon, RefreshIcon } from '../../../../shared/components/icons/icons';
 
 const LoginForm = () => {
-  const {
-    username,
-    setUsername,
-    password,
-    setPassword,
-    loading,
-    error,
-    handleSubmit
-  } = useAuth();
+  const { username, setUsername, password, setPassword, loading, error, handleSubmit } = useAuth();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -20,9 +12,7 @@ const LoginForm = () => {
           <div className="mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-primary">
             <div className="text-white text-2xl font-bold">S</div>
           </div>
-          <h2 className="mt-6 text-2xl font-bold text-gray-900">
-            Iniciar sesión
-          </h2>
+          <h2 className="mt-6 text-2xl font-bold text-gray-900">Iniciar sesión</h2>
           <p className="mt-2 text-sm text-gray-600">
             Ingrese sus credenciales para acceder al sistema
           </p>
@@ -43,7 +33,7 @@ const LoginForm = () => {
                   type="text"
                   required
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={e => setUsername(e.target.value)}
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
                   placeholder="Nombre de usuario"
                 />
@@ -63,7 +53,7 @@ const LoginForm = () => {
                   type="password"
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={e => setPassword(e.target.value)}
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
                   placeholder="Contraseña"
                 />
@@ -71,20 +61,14 @@ const LoginForm = () => {
             </div>
           </div>
 
-          {error && (
-            <div className="text-red-600 text-sm text-center py-2">
-              {error}
-            </div>
-          )}
+          {error && <div className="text-red-600 text-sm text-center py-2">{error}</div>}
 
           <div>
             <button
               type="submit"
               disabled={loading}
               className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-                loading
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-primary hover:bg-primary-dark'
+                loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-primary hover:bg-primary-dark'
               } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary`}
             >
               {loading ? (

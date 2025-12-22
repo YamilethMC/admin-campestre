@@ -4,7 +4,7 @@ export const bulkUploadService = {
    * @param {File} file - The Excel file to upload
    * @returns {Promise<Object>} Upload result
    */
-  uploadMembers: async (file) => {
+  uploadMembers: async file => {
     // Get auth token
     const token = localStorage.getItem('authToken');
 
@@ -15,11 +15,11 @@ export const bulkUploadService = {
     }
 
     const response = await fetch(`${process.env.REACT_APP_API_URL}/club-members/bulk-upload`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-      body: formData
+      body: formData,
     });
 
     if (!response.ok) {
@@ -29,7 +29,8 @@ export const bulkUploadService = {
       // Manejar códigos de error específicos en el servicio
       switch (response.status) {
         case 400:
-          errorMessage = 'Solicitud incorrecta: Verifica que el archivo esté en el formato correcto';
+          errorMessage =
+            'Solicitud incorrecta: Verifica que el archivo esté en el formato correcto';
           break;
         case 500:
           errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
@@ -41,16 +42,22 @@ export const bulkUploadService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
     const responseJson = await response.json();
 
     // Verificar si hay errores en el procesamiento, incluso si la solicitud HTTP fue exitosa
-    if (responseJson.data && (responseJson.data.errors > 0 || (responseJson.data.errorsList && responseJson.data.errorsList.length > 0))) {
+    if (
+      responseJson.data &&
+      (responseJson.data.errors > 0 ||
+        (responseJson.data.errorsList && responseJson.data.errorsList.length > 0))
+    ) {
       // Hay errores en el procesamiento
-      const errorCount = responseJson.data.errors || (responseJson.data.errorsList ? responseJson.data.errorsList.length : 0);
+      const errorCount =
+        responseJson.data.errors ||
+        (responseJson.data.errorsList ? responseJson.data.errorsList.length : 0);
       const successCount = responseJson.data.success || 0;
       const message = `Carga masiva completada con ${errorCount} error(es) y ${successCount} éxito(s)`;
 
@@ -58,7 +65,7 @@ export const bulkUploadService = {
         success: false, // Marcamos como fallido si hay errores
         data: responseJson.data,
         error: message,
-        status: response.status
+        status: response.status,
       };
     } else {
       // Procesamiento exitoso sin errores
@@ -66,8 +73,8 @@ export const bulkUploadService = {
         success: true,
         data: responseJson.data,
         message: responseJson.data?.message || 'Archivo subido exitosamente',
-        status: response.status
+        status: response.status,
       };
     }
-  }
+  },
 };

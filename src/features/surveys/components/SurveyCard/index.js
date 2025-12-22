@@ -10,12 +10,14 @@ const SurveyCard = ({ survey, onEdit, onViewResponses, onToggleStatus, onDelete 
 
   // Close menu when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (isMenuOpen &&
-          menuRef.current &&
-          !menuRef.current.contains(event.target) &&
-          buttonRef.current &&
-          !buttonRef.current.contains(event.target)) {
+    const handleClickOutside = event => {
+      if (
+        isMenuOpen &&
+        menuRef.current &&
+        !menuRef.current.contains(event.target) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target)
+      ) {
         setIsMenuOpen(false);
       }
     };
@@ -26,7 +28,7 @@ const SurveyCard = ({ survey, onEdit, onViewResponses, onToggleStatus, onDelete 
     };
   }, [isMenuOpen]);
 
-  const getPriorityColor = (priority) => {
+  const getPriorityColor = priority => {
     switch (priority) {
       case 'HIGH':
         return 'bg-red-100 text-red-800 border-red-200';
@@ -39,7 +41,7 @@ const SurveyCard = ({ survey, onEdit, onViewResponses, onToggleStatus, onDelete 
     }
   };
 
-  const getCategoryColor = (category) => {
+  const getCategoryColor = category => {
     switch (category) {
       case 'SERVICES':
         return 'bg-purple-100 text-purple-800 border-purple-200';
@@ -54,14 +56,14 @@ const SurveyCard = ({ survey, onEdit, onViewResponses, onToggleStatus, onDelete 
     }
   };
 
-  const getStatusColor = (isActive) => {
+  const getStatusColor = isActive => {
     return isActive
       ? 'bg-green-100 text-green-800 border-green-200'
       : 'bg-gray-100 text-gray-800 border-gray-200';
   };
 
   // Function to translate API priority to display value
-  const getDisplayPriority = (priority) => {
+  const getDisplayPriority = priority => {
     switch (priority) {
       case 'HIGH':
         return SurveyPriority.HIGH; // 'Importante'
@@ -75,7 +77,7 @@ const SurveyCard = ({ survey, onEdit, onViewResponses, onToggleStatus, onDelete 
   };
 
   // Function to translate API category to display value
-  const getDisplayCategory = (category) => {
+  const getDisplayCategory = category => {
     switch (category) {
       case 'SERVICES':
         return SurveyCategory.SERVICES; // 'Servicios'
@@ -143,34 +145,55 @@ const SurveyCard = ({ survey, onEdit, onViewResponses, onToggleStatus, onDelete 
           <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
             <div className="flex items-center">
               <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
               {survey.timeStimed || 'N/A'}
             </div>
 
             <div className="flex items-center">
               <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
               </svg>
               {survey.participantCount || 0} personas
             </div>
 
             <div className="flex items-center">
               <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
               </svg>
               {survey.questionCount || 0} preguntas
             </div>
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <span className={`px-2 py-1 rounded-md text-xs font-medium border ${getPriorityColor(survey.priority)}`}>
+            <span
+              className={`px-2 py-1 rounded-md text-xs font-medium border ${getPriorityColor(survey.priority)}`}
+            >
               {getDisplayPriority(survey.priority)}
             </span>
-            <span className={`px-2 py-1 rounded-md text-xs font-medium border ${getCategoryColor(survey.category)}`}>
+            <span
+              className={`px-2 py-1 rounded-md text-xs font-medium border ${getCategoryColor(survey.category)}`}
+            >
               {getDisplayCategory(survey.category)}
             </span>
-            <span className={`px-2 py-1 rounded-md text-xs font-medium border ${getStatusColor(survey.active)}`}>
+            <span
+              className={`px-2 py-1 rounded-md text-xs font-medium border ${getStatusColor(survey.active)}`}
+            >
               {survey.active ? 'Activa' : 'Inactiva'}
             </span>
           </div>
@@ -195,7 +218,7 @@ const SurveyCard = ({ survey, onEdit, onViewResponses, onToggleStatus, onDelete 
               className="absolute right-0 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200"
               style={{
                 bottom: '100%',
-                marginBottom: '0.5rem' // 2 * 0.25rem (0.5rem = 2px)
+                marginBottom: '0.5rem', // 2 * 0.25rem (0.5rem = 2px)
               }}
             >
               <button
@@ -217,12 +240,12 @@ const SurveyCard = ({ survey, onEdit, onViewResponses, onToggleStatus, onDelete 
                 Ver respuestas
               </button>
               {onDelete && (
-              <button
-                onClick={handleDeleteClick}
-                className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-              >
-                Eliminar
-              </button>
+                <button
+                  onClick={handleDeleteClick}
+                  className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                >
+                  Eliminar
+                </button>
               )}
             </div>
           )}
@@ -253,7 +276,10 @@ const SurveyCard = ({ survey, onEdit, onViewResponses, onToggleStatus, onDelete 
             </div>
           }
         >
-          <p>¿Está seguro de que desea eliminar la encuesta "{survey.title}"? Esta acción no se puede deshacer.</p>
+          <p>
+            ¿Está seguro de que desea eliminar la encuesta "{survey.title}"? Esta acción no se puede
+            deshacer.
+          </p>
         </Modal>
       )}
     </div>

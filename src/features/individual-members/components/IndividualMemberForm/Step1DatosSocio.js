@@ -1,9 +1,18 @@
 import React from 'react';
 
-const Step1DatosSocio = ({ formData, handleChange, genderOptions, loadingGender, isDependent, isEditing }) => {
+const Step1DatosSocio = ({
+  formData,
+  handleChange,
+  genderOptions,
+  loadingGender,
+  isDependent,
+  isEditing,
+}) => {
   return (
     <div className="border border-gray-200 rounded-lg p-6 shadow-sm">
-      <h3 className="text-lg font-medium text-gray-500 mb-4 uppercase tracking-wide">Datos del socio</h3>
+      <h3 className="text-lg font-medium text-gray-500 mb-4 uppercase tracking-wide">
+        Datos del socio
+      </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -32,7 +41,7 @@ const Step1DatosSocio = ({ formData, handleChange, genderOptions, loadingGender,
             required
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Apellidos <span className="text-red-500">*</span>
@@ -59,7 +68,7 @@ const Step1DatosSocio = ({ formData, handleChange, genderOptions, loadingGender,
             disabled={loadingGender}
           >
             <option value="">Seleccione una opción...</option>
-            {genderOptions.map((option) => (
+            {genderOptions.map(option => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
@@ -92,7 +101,7 @@ const Step1DatosSocio = ({ formData, handleChange, genderOptions, loadingGender,
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Email <span className="text-red-500">*</span>
@@ -105,7 +114,7 @@ const Step1DatosSocio = ({ formData, handleChange, genderOptions, loadingGender,
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
           />
         </div>
-        
+
         {isDependent && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -132,7 +141,7 @@ const Step1DatosSocio = ({ formData, handleChange, genderOptions, loadingGender,
             </select>
           </div>
         )}
-        
+
         {!isEditing && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -162,9 +171,7 @@ const Step1DatosSocio = ({ formData, handleChange, genderOptions, loadingGender,
             onChange={handleChange}
             className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
           />
-          <label className="ml-2 block text-sm text-gray-700">
-            ¿Es foráneo?
-          </label>
+          <label className="ml-2 block text-sm text-gray-700">¿Es foráneo?</label>
         </div>
       </div>
     </div>

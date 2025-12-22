@@ -7,10 +7,15 @@ import { AppContext } from '../../../../shared/context/AppContext';
 const SurveyForm = ({ survey = null, onSave, onCancel }) => {
   const isEdit = !!survey;
   const { addToast } = useContext(AppContext);
-  const { surveyCategoryOptions, surveyPriorityOptions, loadingSurveyCategory, loadingSurveyPriority } = useSurvey();
+  const {
+    surveyCategoryOptions,
+    surveyPriorityOptions,
+    loadingSurveyCategory,
+    loadingSurveyPriority,
+  } = useSurvey();
   // Original data to compare for changes
   const [originalData, setOriginalData] = useState(null);
-  
+
   const [formData, setFormData] = useState({
     title: survey?.title || '',
     description: survey?.description || '',
@@ -20,30 +25,44 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
     image: survey?.image || '',
     responsesShow: survey?.responsesShow !== undefined ? survey.responsesShow : true,
     isActive: survey ? survey.active : true,
-    questions: survey?.surveyQuestions && Array.isArray(survey.surveyQuestions) && survey.surveyQuestions.length > 0
-      ? survey.surveyQuestions.map(q => ({
-        id: q.id,
-        question: q.question,
-        type: q.type,
-        required: q.required,
-        order: q.order,
-        options: q.type === SurveyQuestionType.BOOLEAN && (!q.options || q.options.length === 0)
-          ? [{id:0, option:'Sí'}, {id:1, option:'No'}]
-          : (q.options && Array.isArray(q.options))
-            ? q.options.map(opt => ({id:opt.id, option:opt.option})) // Extract the option text from each option object
-            : [{id:0, option:''}] // Ensure options array exists
-      }))
-      : [{ id: Date.now(), question: '', type: SurveyQuestionType.TEXT, options: [{id:0, option:''}], required:
-      false }]
-   })
-          /*...q,
+    questions:
+      survey?.surveyQuestions &&
+      Array.isArray(survey.surveyQuestions) &&
+      survey.surveyQuestions.length > 0
+        ? survey.surveyQuestions.map(q => ({
+            id: q.id,
+            question: q.question,
+            type: q.type,
+            required: q.required,
+            order: q.order,
+            options:
+              q.type === SurveyQuestionType.BOOLEAN && (!q.options || q.options.length === 0)
+                ? [
+                    { id: 0, option: 'Sí' },
+                    { id: 1, option: 'No' },
+                  ]
+                : q.options && Array.isArray(q.options)
+                  ? q.options.map(opt => ({ id: opt.id, option: opt.option })) // Extract the option text from each option object
+                  : [{ id: 0, option: '' }], // Ensure options array exists
+          }))
+        : [
+            {
+              id: Date.now(),
+              question: '',
+              type: SurveyQuestionType.TEXT,
+              options: [{ id: 0, option: '' }],
+              required: false,
+            },
+          ],
+  });
+  /*...q,
           options: q.type === SurveyQuestionType.YES_NO && (!q.options || q.options.length === 0) 
             ? ['Sí', 'No'] 
             : q.options || [''] // Ensure options array exists
         }))
       : [{ id: Date.now(), question: '', type: SurveyQuestionType.TEXT, options: [''], required: false }]
   });*/
-  
+
   const [errors, setErrors] = useState({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
@@ -51,10 +70,10 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
   const [pendingNavigationCallback, setPendingNavigationCallback] = useState(null);
   const [pendingSaveData, setPendingSaveData] = useState(null);
   const [imageFile, setImageFile] = useState(null);
-  const [imageChanged, setImageChanged] = useState(false); 
+  const [imageChanged, setImageChanged] = useState(false);
 
   // Simple function to validate image format
-  const validateImageFormat = (image) => {
+  const validateImageFormat = image => {
     // Check if the image is in the correct data URL format
     return image && image.startsWith('data:image/');
   };
@@ -74,7 +93,15 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
         isActive: survey.active,
         questions: survey.surveyQuestions
           ? survey.surveyQuestions.map(q => ({ ...q }))
-          : [{ id: Date.now(), question: '', type: SurveyQuestionType.TEXT, options: [''], required: false }]
+          : [
+              {
+                id: Date.now(),
+                question: '',
+                type: SurveyQuestionType.TEXT,
+                options: [''],
+                required: false,
+              },
+            ],
       });
     } else {
       // For create mode
@@ -87,16 +114,23 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
         image: '',
         responsesShow: true,
         isActive: true,
-        questions: [{ id: Date.now(), question: '', type: SurveyQuestionType.TEXT, options: [''], required: false }]
+        questions: [
+          {
+            id: Date.now(),
+            question: '',
+            type: SurveyQuestionType.TEXT,
+            options: [''],
+            required: false,
+          },
+        ],
       });
     }
   }, [survey]);
-  
+
   // Check for changes
   useEffect(() => {
     if (originalData) {
-      const isChanged = 
-        JSON.stringify(originalData) !== JSON.stringify(formData);
+      const isChanged = JSON.stringify(originalData) !== JSON.stringify(formData);
       setHasUnsavedChanges(isChanged);
     }
   }, [formData, originalData]);
@@ -104,25 +138,25 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleToggleChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = e => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData(prev => ({
           ...prev,
-          image: reader.result // This will be a base64 string
+          image: reader.result, // This will be a base64 string
         }));
         setImageFile(file);
         setImageChanged(true); // Mark that image has been changed
@@ -135,21 +169,28 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
     const updatedQuestions = [...formData.questions];
     let updatedQuestion = {
       ...updatedQuestions[index],
-      [field]: value
+      [field]: value,
     };
-    
+
     // If the question type is changed to 'yes-no', automatically add 'Sí' and 'No' options
     if (field === 'type' && value === SurveyQuestionType.BOOLEAN) {
-      updatedQuestion.options = [{id:0, option:'Sí', value:'Sí'},{id:0, option:'No', value:'No'}];
-    } else if (field === 'type' && updatedQuestion.type === SurveyQuestionType.BOOLEAN && value !== SurveyQuestionType.BOOLEAN) {
+      updatedQuestion.options = [
+        { id: 0, option: 'Sí', value: 'Sí' },
+        { id: 0, option: 'No', value: 'No' },
+      ];
+    } else if (
+      field === 'type' &&
+      updatedQuestion.type === SurveyQuestionType.BOOLEAN &&
+      value !== SurveyQuestionType.BOOLEAN
+    ) {
       // If changing from 'yes-no' to another type, reset options to default
-      updatedQuestion.options = [{id:0, option:'', value:''}];
+      updatedQuestion.options = [{ id: 0, option: '', value: '' }];
     }
-    
+
     updatedQuestions[index] = updatedQuestion;
     setFormData(prev => ({
       ...prev,
-      questions: updatedQuestions
+      questions: updatedQuestions,
     }));
   };
 
@@ -160,29 +201,33 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
     updatedQuestions[questionIndex].options = updatedOptions;
     setFormData(prev => ({
       ...prev,
-      questions: updatedQuestions
+      questions: updatedQuestions,
     }));
   };
 
-  const addOption = (questionIndex) => {
+  const addOption = questionIndex => {
     const updatedQuestions = [...formData.questions];
     const newOption = { id: 0, option: '' };
-    updatedQuestions[questionIndex].options = [...updatedQuestions[questionIndex].options, newOption];
+    updatedQuestions[questionIndex].options = [
+      ...updatedQuestions[questionIndex].options,
+      newOption,
+    ];
     setFormData(prev => ({
       ...prev,
-      questions: updatedQuestions
+      questions: updatedQuestions,
     }));
   };
 
   const removeOption = (questionIndex, optionIndex) => {
     const updatedQuestions = [...formData.questions];
-    if (updatedQuestions[questionIndex].options.length > 2) { // Ensure at least 2 options
+    if (updatedQuestions[questionIndex].options.length > 2) {
+      // Ensure at least 2 options
       const updatedOptions = [...updatedQuestions[questionIndex].options];
       updatedOptions.splice(optionIndex, 1);
       updatedQuestions[questionIndex].options = updatedOptions;
       setFormData(prev => ({
         ...prev,
-        questions: updatedQuestions
+        questions: updatedQuestions,
       }));
     }
   };
@@ -192,53 +237,53 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
       ...prev,
       questions: [
         ...prev.questions,
-        { 
-          id: 0, 
-          question: '', 
-          type: SurveyQuestionType.TEXT, 
-          options: [{ id: 0, option: '' }], 
-          required: false 
-        }
-      ]
+        {
+          id: 0,
+          question: '',
+          type: SurveyQuestionType.TEXT,
+          options: [{ id: 0, option: '' }],
+          required: false,
+        },
+      ],
     }));
   };
 
-  const removeQuestion = (index) => {
+  const removeQuestion = index => {
     if (formData.questions.length > 1) {
       const updatedQuestions = [...formData.questions];
       updatedQuestions.splice(index, 1);
       setFormData(prev => ({
         ...prev,
-        questions: updatedQuestions
+        questions: updatedQuestions,
       }));
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     e.preventDefault();
 
     if (validateForm()) {
       // Prepare the data for submission
-        let submitData = { ...formData };
+      let submitData = { ...formData };
 
-        // Only include image in submitData if it has been changed
-        if (imageChanged && submitData.image) {
-          // Validate image format if it has been changed
-          if (!validateImageFormat(submitData.image)) {
-            addToast('Formato de imagen inválido. Debe ser un archivo de imagen válido.', 'error');
-            return;
-          }
-        } else {
-          // Remove image from submitData if it hasn't been changed
-          delete submitData.image;
+      // Only include image in submitData if it has been changed
+      if (imageChanged && submitData.image) {
+        // Validate image format if it has been changed
+        if (!validateImageFormat(submitData.image)) {
+          addToast('Formato de imagen inválido. Debe ser un archivo de imagen válido.', 'error');
+          return;
         }
+      } else {
+        // Remove image from submitData if it hasn't been changed
+        delete submitData.image;
+      }
       setPendingSaveData(submitData);
       setShowSaveConfirmationModal(true);
     }
   };
 
   // Confirmation before navigating away if there are unsaved changes
-  const confirmLeave = (callback) => {
+  const confirmLeave = callback => {
     if (hasUnsavedChanges) {
       setPendingNavigationCallback(() => callback);
       setShowConfirmationModal(true);
@@ -314,7 +359,7 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
     }
   };
 
-  const getQuestionTypeName = (type) => {
+  const getQuestionTypeName = type => {
     switch (type) {
       case SurveyQuestionType.NUMBER:
         return 'Rango (1-10)';
@@ -337,8 +382,18 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
           className="mr-4 p-2 rounded-md hover:bg-gray-100 transition-colors"
           aria-label="Regresar"
         >
-          <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <svg
+            className="w-6 h-6 text-gray-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
         </button>
         <h2 className="text-2xl font-bold text-gray-800">
@@ -355,7 +410,7 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
             <input
               type="text"
               value={formData.title}
-              onChange={(e) => {
+              onChange={e => {
                 handleInputChange('title', e.target.value);
                 // Clear error when user starts typing
                 if (errors.title) {
@@ -374,7 +429,7 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
             <input
               type="text"
               value={formData.estimatedTime}
-              onChange={(e) => handleInputChange('estimatedTime', e.target.value)}
+              onChange={e => handleInputChange('estimatedTime', e.target.value)}
               placeholder="ej. 3-5 min"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
@@ -384,18 +439,17 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
             <label className="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
             <select
               value={formData.category}
-              onChange={(e) => handleInputChange('category', e.target.value)}
+              onChange={e => handleInputChange('category', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             >
               <option value="">Seleccione una opción...</option>
               {surveyCategoryOptions
-                .filter((option) => option.value !== 'TODAS') // ⬅️ aquí tu filtro
-                .map((option) => (
+                .filter(option => option.value !== 'TODAS') // ⬅️ aquí tu filtro
+                .map(option => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
-                ))
-              }
+                ))}
             </select>
           </div>
 
@@ -403,11 +457,11 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
             <label className="block text-sm font-medium text-gray-700 mb-1">Prioridad</label>
             <select
               value={formData.priority}
-              onChange={(e) => handleInputChange('priority', e.target.value)}
+              onChange={e => handleInputChange('priority', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             >
               <option value="">Seleccione una opción...</option>
-              {surveyPriorityOptions.map((option) => (
+              {surveyPriorityOptions.map(option => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -419,7 +473,7 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
             <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
             <textarea
               value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
+              onChange={e => handleInputChange('description', e.target.value)}
               rows="3"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
@@ -442,8 +496,18 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
                     />
                   </div>
                 ) : (
-                  <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <svg
+                    className="mx-auto h-12 w-12 text-gray-400"
+                    stroke="currentColor"
+                    fill="none"
+                    viewBox="0 0 48 48"
+                  >
+                    <path
+                      d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 )}
                 <div>
@@ -469,7 +533,9 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
               <div>
                 <p className="text-sm font-medium text-gray-900">Mostrar contador de respuestas</p>
-                <p className="text-sm text-gray-500">Habilita el contador de personas que han contestado la encuesta</p>
+                <p className="text-sm text-gray-500">
+                  Habilita el contador de personas que han contestado la encuesta
+                </p>
               </div>
               <button
                 type="button"
@@ -492,11 +558,16 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
         </div>
 
         <div className="mb-6">
-          <h3 className="text-lg font-medium text-gray-800 mb-4">Preguntas <span className="text-red-500">*</span></h3>
+          <h3 className="text-lg font-medium text-gray-800 mb-4">
+            Preguntas <span className="text-red-500">*</span>
+          </h3>
           {errors.questions && <p className="mt-1 text-sm text-red-600 mb-2">{errors.questions}</p>}
 
           {formData.questions.map((question, index) => (
-            <div key={question.id} className="bg-gray-50 p-4 rounded-lg mb-4 border border-gray-200">
+            <div
+              key={question.id}
+              className="bg-gray-50 p-4 rounded-lg mb-4 border border-gray-200"
+            >
               <div className="flex justify-between items-center mb-3">
                 <h4 className="font-medium text-gray-700">Pregunta {index + 1}</h4>
                 {formData.questions.length > 1 && (
@@ -507,18 +578,25 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
                     aria-label="Eliminar pregunta"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
                     </svg>
                   </button>
                 )}
               </div>
 
               <div className="mb-3">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Texto de la pregunta <span className="text-red-500">*</span></label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Texto de la pregunta <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="text"
                   value={question.question}
-                  onChange={(e) => {
+                  onChange={e => {
                     handleQuestionChange(index, 'question', e.target.value);
                     // Clear error when user starts typing
                     if (errors.questions) {
@@ -533,14 +611,18 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de pregunta</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Tipo de pregunta
+                  </label>
                   <select
                     value={question.type}
-                    onChange={(e) => handleQuestionChange(index, 'type', e.target.value)}
+                    onChange={e => handleQuestionChange(index, 'type', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   >
                     {Object.entries(SurveyQuestionType).map(([key, value]) => (
-                      <option key={key} value={value}>{getQuestionTypeName(value)}</option>
+                      <option key={key} value={value}>
+                        {getQuestionTypeName(value)}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -550,7 +632,7 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
                     type="checkbox"
                     id={`required-${index}`}
                     checked={question.required}
-                    onChange={(e) => handleQuestionChange(index, 'required', e.target.checked)}
+                    onChange={e => handleQuestionChange(index, 'required', e.target.checked)}
                     className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
                   />
                   <label htmlFor={`required-${index}`} className="ml-2 block text-sm text-gray-700">
@@ -559,7 +641,8 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
                 </div>
               </div>
 
-              {(question.type === SurveyQuestionType.SELECT || question.type === SurveyQuestionType.BOOLEAN) && (
+              {(question.type === SurveyQuestionType.SELECT ||
+                question.type === SurveyQuestionType.BOOLEAN) && (
                 <div className="mb-3">
                   <div className="flex justify-between items-center mb-2">
                     <label className="block text-sm font-medium text-gray-700">Opciones</label>
@@ -568,19 +651,29 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
                       onClick={() => addOption(index)}
                       className="text-primary hover:text-primary-dark text-sm flex items-center"
                     >
-                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      <svg
+                        className="w-4 h-4 mr-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                        />
                       </svg>
                       Agregar opción
                     </button>
                   </div>
-                  
+
                   {question.options.map((option, optionIndex) => (
                     <div key={optionIndex} className="flex items-center mb-2">
                       <input
                         type="text"
                         value={option.option}
-                        onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}
+                        onChange={e => handleOptionChange(index, optionIndex, e.target.value)}
                         className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                         placeholder={`Opción ${optionIndex + 1}`}
                       />
@@ -591,8 +684,18 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
                           className="ml-2 text-red-600 hover:text-red-800 p-1"
                           aria-label="Eliminar opción"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
                           </svg>
                         </button>
                       )}
@@ -610,7 +713,12 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
               className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md flex items-center transition-colors"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
               </svg>
               Agregar pregunta
             </button>
@@ -633,7 +741,7 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
           </button>
         </div>
       </form>
-      
+
       <Modal
         isOpen={showConfirmationModal}
         title="Confirmar salida"
@@ -659,7 +767,7 @@ const SurveyForm = ({ survey = null, onSave, onCancel }) => {
       >
         <p>¿Está seguro que quiere salir?</p>
       </Modal>
-      
+
       <Modal
         isOpen={showSaveConfirmationModal}
         title="Confirmar guardado"

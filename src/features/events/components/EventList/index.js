@@ -10,12 +10,12 @@ const EventList = ({
   onEdit,
   onDelete,
   onViewRegistrations,
-  onAddEvent
+  onAddEvent,
 }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(null);
   const [openDropdown, setOpenDropdown] = useState(null);
 
-  const handleDeleteConfirm = (id) => {
+  const handleDeleteConfirm = id => {
     setShowDeleteModal(id);
   };
 
@@ -30,15 +30,15 @@ const EventList = ({
     }
   };
 
-  const toggleDropdown = (eventId) => {
+  const toggleDropdown = eventId => {
     setOpenDropdown(openDropdown === eventId ? null : eventId);
   };
 
-  const handleViewRegistrationsClick = (event) => {
+  const handleViewRegistrationsClick = event => {
     onViewRegistrations(event);
   };
 
-  const handleEditClick = (event) => {
+  const handleEditClick = event => {
     onEdit(event);
   };
 
@@ -46,7 +46,7 @@ const EventList = ({
   // Since we can't modify the import, I'll define a mapping function instead
 
   // Function to get Spanish label for type
-  const getEventTypeLabel = (type) => {
+  const getEventTypeLabel = type => {
     switch (type) {
       case 'SOCIAL':
         return 'Social';
@@ -62,7 +62,7 @@ const EventList = ({
   };
 
   // Function to get event type color
-  const getEventTypeColor = (type) => {
+  const getEventTypeColor = type => {
     switch (type) {
       case 'SOCIAL':
         return 'bg-blue-100 text-blue-800';
@@ -78,7 +78,7 @@ const EventList = ({
   };
 
   // Function to format date with time - using the exact time from the ISO string
-  const formatDate = (dateStr) => {
+  const formatDate = dateStr => {
     if (!dateStr) return 'No especificada';
     try {
       // Parse the ISO string to extract exact date and time
@@ -89,16 +89,18 @@ const EventList = ({
         weekday: 'long',
         day: 'numeric',
         month: 'long',
-        year: 'numeric'
+        year: 'numeric',
       });
 
       // Extract the time part from the ISO string (before timezone conversion)
       // ISO format is YYYY-MM-DDTHH:mm:ss.sssZ
       const timeMatch = dateStr.match(/T(\d{2}:\d{2}):\d{2}/);
-      const timePart = timeMatch ? timeMatch[1] : date.toLocaleTimeString('es-ES', {
-        hour: '2-digit',
-        minute: '2-digit'
-      });
+      const timePart = timeMatch
+        ? timeMatch[1]
+        : date.toLocaleTimeString('es-ES', {
+            hour: '2-digit',
+            minute: '2-digit',
+          });
 
       return `${datePart} a las ${timePart}`;
     } catch {
@@ -125,12 +127,17 @@ const EventList = ({
           className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md flex items-center transition-colors"
         >
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
           </svg>
           Agregar evento
         </button>
       </div>
-      
+
       {!hasEvents ? (
         <div className="bg-white p-8 rounded-xl shadow-md border border-gray-200 text-center">
           <h3 className="text-lg font-medium text-gray-900 mb-1">No se encontraron eventos</h3>
@@ -138,7 +145,7 @@ const EventList = ({
         </div>
       ) : (
         <div className="space-y-4">
-          {events.map((event) => (
+          {events.map(event => (
             <div key={event.id} className="bg-white p-6 rounded-lg shadow border border-gray-200">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
@@ -163,31 +170,62 @@ const EventList = ({
 
                   <div className="flex items-center text-sm text-gray-600 mb-3">
                     <div className="flex items-center mr-4">
-                      <svg className="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      <svg
+                        className="w-4 h-4 mr-1 text-gray-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
                       </svg>
                       <span>{formatDate(event.dateISO)}</span>
                     </div>
                     <div className="flex items-center">
-                      <svg className="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <svg
+                        className="w-4 h-4 mr-1 text-gray-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
                       </svg>
                       <span>{event.location}</span>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className={`px-3 py-1 rounded-md text-xs font-medium ${getEventTypeColor(event.type)}`}>
+                    <span
+                      className={`px-3 py-1 rounded-md text-xs font-medium ${getEventTypeColor(event.type)}`}
+                    >
                       {getEventTypeLabel(event.type)}
                     </span>
                     <div className="flex gap-1">
                       <span className="text-xs text-gray-500">Total: </span>
                       <span className="text-xs font-medium text-gray-700">{event.totalSpots}</span>
                       <span className="text-xs text-gray-500 ml-2">Ocupados: </span>
-                      <span className="text-xs font-medium text-gray-700">{event.totalSpots - event.availableSpots}</span>
+                      <span className="text-xs font-medium text-gray-700">
+                        {event.totalSpots - event.availableSpots}
+                      </span>
                       <span className="text-xs text-gray-500 ml-2">Disponibles: </span>
-                      <span className={`text-xs font-medium ${event.availableSpots > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      <span
+                        className={`text-xs font-medium ${event.availableSpots > 0 ? 'text-green-600' : 'text-red-600'}`}
+                      >
                         {event.availableSpots}
                       </span>
                     </div>
@@ -266,7 +304,9 @@ const EventList = ({
               key={num}
               onClick={() => setPage(num)}
               className={`px-3 py-1 rounded border text-sm ${
-                page === num ? 'bg-primary text-white border-primary' : 'border-gray-300 text-gray-700'
+                page === num
+                  ? 'bg-primary text-white border-primary'
+                  : 'border-gray-300 text-gray-700'
               }`}
             >
               {num}
@@ -278,7 +318,9 @@ const EventList = ({
             disabled={page === meta.totalPages}
             onClick={() => setPage(page + 1)}
             className={`px-3 py-1 rounded border text-sm ${
-              page === meta.totalPages ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
+              page === meta.totalPages
+                ? 'text-gray-300 border-gray-200'
+                : 'text-primary border-primary'
             }`}
           >
             Siguiente

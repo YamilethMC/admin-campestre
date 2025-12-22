@@ -30,9 +30,9 @@ export const useTemporaryPasses = () => {
     try {
       const expirationDate = new Date();
       expirationDate.setDate(expirationDate.getDate() + days);
-      
+
       const result = await temporaryPassesService.approvePass(userId, expirationDate.toISOString());
-      
+
       if (result.success) {
         addToast('Pase temporal aprobado exitosamente', 'success');
         await loadPasses(); // Reload the list
@@ -48,10 +48,10 @@ export const useTemporaryPasses = () => {
     }
   };
 
-  const rejectPass = async (memberId) => {
+  const rejectPass = async memberId => {
     try {
       const result = await temporaryPassesService.rejectPass(memberId);
-      
+
       if (result.success) {
         addToast('Pase temporal rechazado', 'success');
         await loadPasses(); // Reload the list

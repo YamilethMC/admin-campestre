@@ -25,11 +25,11 @@ const NoticesContainer = () => {
     createNotice,
     updateNotice,
     getNoticeById,
-    deleteNotice
+    deleteNotice,
   } = useNotice();
 
   // Update filters
-  const updateFilters = (newFilters) => {
+  const updateFilters = newFilters => {
     if (newFilters.status !== undefined) {
       setStatus(newFilters.status);
       setPage(1);
@@ -47,7 +47,7 @@ const NoticesContainer = () => {
   };
 
   // Handle editing a notice
-  const handleEditNotice = async (notice) => {
+  const handleEditNotice = async notice => {
     try {
       // Get the full notice data
       const fullNotice = await getNoticeById(notice.id);
@@ -59,7 +59,7 @@ const NoticesContainer = () => {
   };
 
   // Handle saving a notice (create or update)
-  const handleSaveNotice = async (noticeData) => {
+  const handleSaveNotice = async noticeData => {
     try {
       if (currentNotice) {
         // Update existing notice
@@ -81,7 +81,7 @@ const NoticesContainer = () => {
   };
 
   // Handle deleting a notice
-  const handleDeleteNotice = async (id) => {
+  const handleDeleteNotice = async id => {
     try {
       await deleteNotice(id);
     } catch (err) {
@@ -91,7 +91,10 @@ const NoticesContainer = () => {
 
   if (error) {
     return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+      <div
+        className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+        role="alert"
+      >
         <strong className="font-bold">Error: </strong>
         <span className="block sm:inline">{error}</span>
       </div>
@@ -101,11 +104,7 @@ const NoticesContainer = () => {
   // Render the current view
   if (view === 'form') {
     return (
-      <NoticeForm
-        notice={currentNotice}
-        onSave={handleSaveNotice}
-        onCancel={handleCancelForm}
-      />
+      <NoticeForm notice={currentNotice} onSave={handleSaveNotice} onCancel={handleCancelForm} />
     );
   }
 
@@ -114,10 +113,7 @@ const NoticesContainer = () => {
     <div>
       <NoticeHeader />
 
-      <NoticeFilters
-        filters={{ status, search }}
-        onFilterChange={updateFilters}
-      />
+      <NoticeFilters filters={{ status, search }} onFilterChange={updateFilters} />
 
       <NoticeList
         notices={notices}

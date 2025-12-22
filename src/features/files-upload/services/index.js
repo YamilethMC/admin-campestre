@@ -1,7 +1,7 @@
 // File upload service with real API calls
 export const fileUploadService = {
   // Get list of files with pagination and search
-  getFiles: async (params) => {
+  getFiles: async params => {
     // Extract params with defaults
     const { page = 1, limit = 10, search = '', order = 'asc', orderBy = 'name' } = params;
 
@@ -13,9 +13,9 @@ export const fileUploadService = {
 
     const response = await fetch(query, {
       headers: {
-        "accept": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -37,7 +37,7 @@ export const fileUploadService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -46,14 +46,14 @@ export const fileUploadService = {
       success: true,
       data: {
         data: responseJson.data.files,
-        meta: responseJson.data.meta
+        meta: responseJson.data.meta,
       },
-      status: response.status
+      status: response.status,
     };
   },
 
   // Upload a new file
-  uploadFile: async (fileData) => {
+  uploadFile: async fileData => {
     // Get auth token
     const token = localStorage.getItem('authToken');
 
@@ -66,11 +66,11 @@ export const fileUploadService = {
     formData.append('description', fileData.description || '');
 
     const response = await fetch(`${process.env.REACT_APP_API_URL}/files/upload`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-      body: formData
+      body: formData,
     });
 
     if (!response.ok) {
@@ -95,7 +95,7 @@ export const fileUploadService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -104,22 +104,22 @@ export const fileUploadService = {
     // Mensaje de éxito para el toast
     return {
       success: true,
-      data: {data: result.data.files, meta: result.data.meta},
+      data: { data: result.data.files, meta: result.data.meta },
       message: 'Archivo subido exitosamente',
-      status: response.status
+      status: response.status,
     };
   },
 
   // Get a single file by ID
-  getFileById: async (id) => {
+  getFileById: async id => {
     // Get auth token
     const token = localStorage.getItem('authToken');
 
     const response = await fetch(`${process.env.REACT_APP_API_URL}/files/${id}`, {
       headers: {
-        "accept": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -141,7 +141,7 @@ export const fileUploadService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -150,7 +150,7 @@ export const fileUploadService = {
     return {
       success: true,
       data: data.data,
-      status: response.status
+      status: response.status,
     };
   },
 
@@ -160,16 +160,16 @@ export const fileUploadService = {
     const token = localStorage.getItem('authToken');
 
     const response = await fetch(`${process.env.REACT_APP_API_URL}/files/${id}`, {
-      method: "PATCH",
+      method: 'PATCH',
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         name: fileData.name,
         description: fileData.description,
-        type: fileData.type || 'pdf'  // Default to 'pdf' if not provided
-      })
+        type: fileData.type || 'pdf', // Default to 'pdf' if not provided
+      }),
     });
 
     if (!response.ok) {
@@ -194,7 +194,7 @@ export const fileUploadService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -203,23 +203,23 @@ export const fileUploadService = {
     // Mensaje de éxito para el toast
     return {
       success: true,
-      data: {data: result.data.files, meta: result.data.meta},
+      data: { data: result.data.files, meta: result.data.meta },
       message: 'Archivo actualizado exitosamente',
-      status: response.status
+      status: response.status,
     };
   },
 
   // Delete a file
-  deleteFile: async (id) => {
+  deleteFile: async id => {
     // Get auth token
     const token = localStorage.getItem('authToken');
 
     const response = await fetch(`${process.env.REACT_APP_API_URL}/files/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
       headers: {
-        "accept": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -241,7 +241,7 @@ export const fileUploadService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -250,7 +250,7 @@ export const fileUploadService = {
       success: true,
       message: 'Archivo eliminado exitosamente',
       deletedId: id,
-      status: response.status
+      status: response.status,
     };
-  }
+  },
 };

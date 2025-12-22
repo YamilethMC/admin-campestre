@@ -7,32 +7,29 @@ export const noticeService = {
     orderBy = 'title',
     order = 'asc',
     active = true, // Default to active notices
-    search = ''
+    search = '',
   } = {}) => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem('authToken');
 
     const params = new URLSearchParams({
       page,
       limit,
       search,
       order,
-      orderBy
+      orderBy,
     });
 
     if (active !== false) {
-      params.append("active", active);
+      params.append('active', active);
     }
 
-    const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/notify?${params.toString()}`,
-      {
-        method: "GET",
-        headers: {
-          "accept": "*/*",
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/notify?${params.toString()}`, {
+      method: 'GET',
+      headers: {
+        accept: '*/*',
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -56,7 +53,7 @@ export const noticeService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -65,21 +62,21 @@ export const noticeService = {
       success: true,
       data: {
         data: responseData.data.notifications || [],
-        meta: responseData.data.meta || null
+        meta: responseData.data.meta || null,
       },
-      status: response.status
+      status: response.status,
     };
   },
 
   // Get notice by id
-  getNoticeById: async (id) => {
-    const token = localStorage.getItem("authToken");
+  getNoticeById: async id => {
+    const token = localStorage.getItem('authToken');
 
     const response = await fetch(`${process.env.REACT_APP_API_URL}/notify/${id}`, {
       headers: {
-        "accept": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -107,7 +104,7 @@ export const noticeService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -115,20 +112,20 @@ export const noticeService = {
     return {
       success: true,
       data: responseData.data,
-      status: response.status
+      status: response.status,
     };
   },
 
   // Create a new notice
-  createNotice: async (noticeData) => {
-    const token = localStorage.getItem("authToken");
+  createNotice: async noticeData => {
+    const token = localStorage.getItem('authToken');
     noticeData.sentDate = new Date().toISOString();
     noticeData.visibleUntil = new Date(noticeData.visibleUntil).toISOString();
     const response = await fetch(`${process.env.REACT_APP_API_URL}/notify`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(noticeData),
     });
@@ -161,7 +158,7 @@ export const noticeService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -172,19 +169,19 @@ export const noticeService = {
       success: true,
       data: result.data,
       message: 'Aviso registrado exitosamente',
-      status: response.status
+      status: response.status,
     };
   },
 
   // Update a notice
   updateNotice: async (id, noticeData) => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem('authToken');
     noticeData.visibleUntil = new Date(noticeData.visibleUntil).toISOString();
     const response = await fetch(`${process.env.REACT_APP_API_URL}/notify/${id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(noticeData),
     });
@@ -205,7 +202,7 @@ export const noticeService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -216,18 +213,18 @@ export const noticeService = {
       success: true,
       data: result.data,
       message: 'Aviso actualizado exitosamente',
-      status: response.status
+      status: response.status,
     };
   },
 
   // Toggle notice status (activate/deactivate)
   toggleNoticeStatus: async (id, active) => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem('authToken');
     const response = await fetch(`${process.env.REACT_APP_API_URL}/notify/${id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ active }),
     });
@@ -248,7 +245,7 @@ export const noticeService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -259,21 +256,19 @@ export const noticeService = {
       success: true,
       data: result.data,
       message: active ? 'Aviso activado exitosamente' : 'Aviso desactivado exitosamente',
-      status: response.status
+      status: response.status,
     };
   },
 
-
-
   // Delete a notice
-  deleteNotice: async (id) => {
-    const token = localStorage.getItem("authToken");
+  deleteNotice: async id => {
+    const token = localStorage.getItem('authToken');
 
     const response = await fetch(`${process.env.REACT_APP_API_URL}/notify/${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -293,7 +288,7 @@ export const noticeService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -301,7 +296,7 @@ export const noticeService = {
     return {
       success: true,
       message: 'Aviso eliminado exitosamente',
-      status: response.status
+      status: response.status,
     };
   },
 };

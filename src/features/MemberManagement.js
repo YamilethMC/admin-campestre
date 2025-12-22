@@ -17,7 +17,7 @@ const MemberManagement = () => {
       telefono: '555-1234',
       foraneo: false,
       direccion: 'Calle Falsa 123',
-      id_sistema_entradas: 'ENT-001'
+      id_sistema_entradas: 'ENT-001',
     },
     {
       id: 2,
@@ -28,37 +28,36 @@ const MemberManagement = () => {
       telefono: '555-5678',
       foraneo: true,
       direccion: 'Avenida Siempre Viva 456',
-      id_sistema_entradas: 'ENT-002'
-    }
-  ]);
-  
-  const [logs, setLogs] = useState([
-    'Sistema iniciado correctamente',
-    'Datos iniciales cargados'
+      id_sistema_entradas: 'ENT-002',
+    },
   ]);
 
-  const addLog = (message) => {
+  const [logs, setLogs] = useState(['Sistema iniciado correctamente', 'Datos iniciales cargados']);
+
+  const addLog = message => {
     setLogs(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
   };
 
   // Function to add a single member
-  const addMember = (memberData) => {
+  const addMember = memberData => {
     const newMember = {
       ...memberData,
-      id: members.length > 0 ? Math.max(...members.map(m => m.id)) + 1 : 1
+      id: members.length > 0 ? Math.max(...members.map(m => m.id)) + 1 : 1,
     };
-    
+
     setMembers(prev => [...prev, newMember]);
-    addLog(`Socio agregado: ${newMember.nombre} ${newMember.apellidos} (N° ${newMember.numero_socio})`);
+    addLog(
+      `Socio agregado: ${newMember.nombre} ${newMember.apellidos} (N° ${newMember.numero_socio})`,
+    );
   };
 
   // Function to add multiple members
-  const addMembers = (membersData) => {
+  const addMembers = membersData => {
     const newMembers = membersData.map((member, index) => ({
       ...member,
-      id: members.length > 0 ? Math.max(...members.map(m => m.id)) + 1 + index : 1 + index
+      id: members.length > 0 ? Math.max(...members.map(m => m.id)) + 1 + index : 1 + index,
     }));
-    
+
     setMembers(prev => [...prev, ...newMembers]);
     addLog(`Se agregaron ${newMembers.length} socios desde archivo CSV`);
   };

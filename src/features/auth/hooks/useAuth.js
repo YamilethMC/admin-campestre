@@ -9,7 +9,7 @@ export const useAuth = () => {
   const [error, setError] = useState('');
   const { login: contextLogin, addToast } = useContext(AppContext);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
     setLoading(true);
@@ -40,6 +40,6 @@ export const useAuth = () => {
     loading,
     error,
     handleSubmit,
-    resetForm
+    resetForm,
   };
 };

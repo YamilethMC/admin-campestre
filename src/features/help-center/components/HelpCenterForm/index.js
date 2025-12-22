@@ -9,7 +9,7 @@ const HelpCenterForm = ({ helpCenter = null, onSave, onCancel }) => {
 
   const [formData, setFormData] = useState({
     question: helpCenter?.question || '',
-    answer: helpCenter?.answer || ''
+    answer: helpCenter?.answer || '',
   });
 
   const [errors, setErrors] = useState({});
@@ -25,13 +25,13 @@ const HelpCenterForm = ({ helpCenter = null, onSave, onCancel }) => {
       // For edit mode
       setOriginalData({
         question: helpCenter.question,
-        answer: helpCenter.answer
+        answer: helpCenter.answer,
       });
     } else {
       // For create mode
       setOriginalData({
         question: '',
-        answer: ''
+        answer: '',
       });
     }
   }, [helpCenter]);
@@ -39,8 +39,7 @@ const HelpCenterForm = ({ helpCenter = null, onSave, onCancel }) => {
   // Check for changes
   useEffect(() => {
     if (originalData) {
-      const isChanged =
-        JSON.stringify(originalData) !== JSON.stringify(formData);
+      const isChanged = JSON.stringify(originalData) !== JSON.stringify(formData);
       setHasUnsavedChanges(isChanged);
     }
   }, [formData, originalData]);
@@ -48,11 +47,11 @@ const HelpCenterForm = ({ helpCenter = null, onSave, onCancel }) => {
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     e.preventDefault();
 
     if (validateForm()) {
@@ -64,7 +63,7 @@ const HelpCenterForm = ({ helpCenter = null, onSave, onCancel }) => {
   };
 
   // Confirmation before navigating away if there are unsaved changes
-  const confirmLeave = (callback) => {
+  const confirmLeave = callback => {
     if (hasUnsavedChanges) {
       setPendingNavigationCallback(() => callback);
       setShowConfirmationModal(true);
@@ -133,8 +132,18 @@ const HelpCenterForm = ({ helpCenter = null, onSave, onCancel }) => {
           className="mr-4 p-2 rounded-md hover:bg-gray-100 transition-colors"
           aria-label="Regresar"
         >
-          <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <svg
+            className="w-6 h-6 text-gray-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
         </button>
         <h2 className="text-2xl font-bold text-gray-800">
@@ -149,7 +158,7 @@ const HelpCenterForm = ({ helpCenter = null, onSave, onCancel }) => {
           </label>
           <textarea
             value={formData.question}
-            onChange={(e) => {
+            onChange={e => {
               handleInputChange('question', e.target.value);
               // Clear error when user starts typing
               if (errors.question) {
@@ -171,7 +180,7 @@ const HelpCenterForm = ({ helpCenter = null, onSave, onCancel }) => {
           </label>
           <textarea
             value={formData.answer}
-            onChange={(e) => {
+            onChange={e => {
               handleInputChange('answer', e.target.value);
               // Clear error when user starts typing
               if (errors.answer) {

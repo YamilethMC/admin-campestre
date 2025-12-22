@@ -4,8 +4,25 @@ import { AppContext } from '../../../../shared/context/AppContext';
 import { memberService } from '../../services';
 import MultiStepForm from './MultiStepForm';
 
-const IndividualMemberForm = ({ onCancel, loadMembers, initialData = null, memberId = null, isDependent = false }) => {
-  const { formData, genderOptions, loadingGender, tituloOptions, loadingTitulo, paymentMethodOptions, loadingPaymentMethod, handleChange, handleSubmit, setFormData } = useIndividualMember();
+const IndividualMemberForm = ({
+  onCancel,
+  loadMembers,
+  initialData = null,
+  memberId = null,
+  isDependent = false,
+}) => {
+  const {
+    formData,
+    genderOptions,
+    loadingGender,
+    tituloOptions,
+    loadingTitulo,
+    paymentMethodOptions,
+    loadingPaymentMethod,
+    handleChange,
+    handleSubmit,
+    setFormData,
+  } = useIndividualMember();
   const { addToast } = useContext(AppContext);
   const [isLoadingMember, setIsLoadingMember] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
@@ -21,13 +38,16 @@ const IndividualMemberForm = ({ onCancel, loadMembers, initialData = null, membe
           apellidos: initialData.user?.lastName || '',
           sexo: initialData.user?.gender || '',
           rfc: initialData.user?.RFC || '',
-          fecha_nacimiento: initialData.user?.birthDate ? new Date(initialData.user.birthDate).toISOString().split('T')[0] : '',
+          fecha_nacimiento: initialData.user?.birthDate
+            ? new Date(initialData.user.birthDate).toISOString().split('T')[0]
+            : '',
           email: initialData.user?.email || '',
           telefono_movil: initialData.user?.phone?.find(p => p.type === 'MOVIL')?.number || '',
           alias_movil: initialData.user?.phone?.find(p => p.type === 'MOVIL')?.alias || '',
           telefono_fijo: initialData.user?.phone?.find(p => p.type === 'PHONE')?.number || '',
           alias_fijo: initialData.user?.phone?.find(p => p.type === 'PHONE')?.alias || '',
-          telefono_emergencia: initialData.user?.phone?.find(p => p.type === 'EMERGENCY')?.number || '',
+          telefono_emergencia:
+            initialData.user?.phone?.find(p => p.type === 'EMERGENCY')?.number || '',
           alias_emergencia: initialData.user?.phone?.find(p => p.type === 'EMERGENCY')?.alias || '',
           foraneo: initialData.user?.foraneo || false,
           calle: initialData.user?.address?.street || '',
@@ -41,7 +61,9 @@ const IndividualMemberForm = ({ onCancel, loadMembers, initialData = null, membe
           titulo: initialData.title || '',
           profesion: initialData.profession || '',
           metodo_pago: initialData.paymentMethod || '',
-          fecha_admision: initialData.dateOfAdmission ? new Date(initialData.dateOfAdmission).toISOString().split('T')[0] : '',
+          fecha_admision: initialData.dateOfAdmission
+            ? new Date(initialData.dateOfAdmission).toISOString().split('T')[0]
+            : '',
           relationship: initialData.relationship || '',
         };
         setFormData(formattedData);
@@ -60,14 +82,18 @@ const IndividualMemberForm = ({ onCancel, loadMembers, initialData = null, membe
               apellidos: memberData.user?.lastName || '',
               sexo: memberData.user?.gender || '',
               rfc: memberData.user?.RFC || '',
-              fecha_nacimiento: memberData.user?.birthDate ? new Date(memberData.user.birthDate).toISOString().split('T')[0] : '',
+              fecha_nacimiento: memberData.user?.birthDate
+                ? new Date(memberData.user.birthDate).toISOString().split('T')[0]
+                : '',
               email: memberData.user?.email || '',
               telefono_movil: memberData.user?.phone?.find(p => p.type === 'MOVIL')?.number || '',
               alias_movil: memberData.user?.phone?.find(p => p.type === 'MOVIL')?.alias || '',
               telefono_fijo: memberData.user?.phone?.find(p => p.type === 'PHONE')?.number || '',
               alias_fijo: memberData.user?.phone?.find(p => p.type === 'PHONE')?.alias || '',
-              telefono_emergencia: memberData.user?.phone?.find(p => p.type === 'EMERGENCY')?.number || '',
-              alias_emergencia: memberData.user?.phone?.find(p => p.type === 'EMERGENCY')?.alias || '',
+              telefono_emergencia:
+                memberData.user?.phone?.find(p => p.type === 'EMERGENCY')?.number || '',
+              alias_emergencia:
+                memberData.user?.phone?.find(p => p.type === 'EMERGENCY')?.alias || '',
               foraneo: memberData.user?.foraneo || false,
               calle: memberData.user?.address?.street || '',
               numero_exterior: memberData.user?.address?.externalNumber || '',
@@ -80,7 +106,9 @@ const IndividualMemberForm = ({ onCancel, loadMembers, initialData = null, membe
               titulo: memberData.title || '',
               profesion: memberData.profession || '',
               metodo_pago: memberData.paymentMethod || '',
-              fecha_admision: memberData.dateOfAdmission ? new Date(memberData.dateOfAdmission).toISOString().split('T')[0] : '',
+              fecha_admision: memberData.dateOfAdmission
+                ? new Date(memberData.dateOfAdmission).toISOString().split('T')[0]
+                : '',
               relationship: memberData.relationship || '',
             };
             setFormData(formattedData);
@@ -135,7 +163,7 @@ const IndividualMemberForm = ({ onCancel, loadMembers, initialData = null, membe
     fetchMemberData();
   }, [initialData, memberId, isDependent, setFormData, addToast]);
 
-  const handleFormSubmit = async (e) => {
+  const handleFormSubmit = async e => {
     e.preventDefault();
     setShowSubmitModal(true);
   };
@@ -143,11 +171,29 @@ const IndividualMemberForm = ({ onCancel, loadMembers, initialData = null, membe
   const handleConfirmSubmit = async () => {
     let submissionSuccess;
     if (isDependent && !isEditing) {
-      submissionSuccess = await handleSubmit({ preventDefault: () => {} }, null, memberId, initialData, isDependent);
+      submissionSuccess = await handleSubmit(
+        { preventDefault: () => {} },
+        null,
+        memberId,
+        initialData,
+        isDependent,
+      );
     } else if (isEditing) {
-      submissionSuccess = await handleSubmit({ preventDefault: () => {} }, editingMemberId, null, initialData, isDependent);
+      submissionSuccess = await handleSubmit(
+        { preventDefault: () => {} },
+        editingMemberId,
+        null,
+        initialData,
+        isDependent,
+      );
     } else {
-      submissionSuccess = await handleSubmit({ preventDefault: () => {} }, null, null, initialData, isDependent);
+      submissionSuccess = await handleSubmit(
+        { preventDefault: () => {} },
+        null,
+        null,
+        initialData,
+        isDependent,
+      );
     }
     setShowSubmitModal(false);
 
@@ -190,7 +236,8 @@ const IndividualMemberForm = ({ onCancel, loadMembers, initialData = null, membe
               <div className="bg-white rounded-lg p-6 w-96">
                 <h3 className="text-lg font-medium text-gray-900 mb-2">Confirmar registro</h3>
                 <p className="text-gray-600 mb-4">
-                  ¿Estás seguro que deseas registrar al socio? Verifica que todos los datos sean correctos.
+                  ¿Estás seguro que deseas registrar al socio? Verifica que todos los datos sean
+                  correctos.
                 </p>
                 <div className="flex justify-end space-x-3">
                   <button

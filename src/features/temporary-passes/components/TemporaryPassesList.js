@@ -8,12 +8,12 @@ const TemporaryPassesList = () => {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [expirationDays, setExpirationDays] = useState(30);
 
-  const handleApproveClick = (pass) => {
+  const handleApproveClick = pass => {
     setSelectedPass(pass);
     setShowApproveModal(true);
   };
 
-  const handleRejectClick = (pass) => {
+  const handleRejectClick = pass => {
     setSelectedPass(pass);
     setShowRejectModal(true);
   };
@@ -39,16 +39,16 @@ const TemporaryPassesList = () => {
     }
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('es-MX', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
-  const getRelationshipLabel = (relationship) => {
+  const getRelationshipLabel = relationship => {
     const labels = {
       WIFE: 'Esposa',
       HUSBAND: 'Esposo',
@@ -59,7 +59,7 @@ const TemporaryPassesList = () => {
       BROTHER: 'Hermano',
       SISTER: 'Hermana',
       FRIEND: 'Amigo',
-      OTHER: 'Otro'
+      OTHER: 'Otro',
     };
     return labels[relationship] || relationship;
   };
@@ -83,8 +83,18 @@ const TemporaryPassesList = () => {
 
       {passes.length === 0 ? (
         <div className="p-12 text-center">
-          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          <svg
+            className="mx-auto h-12 w-12 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
           </svg>
           <h3 className="mt-2 text-sm font-medium text-gray-900">No hay pases pendientes</h3>
           <p className="mt-1 text-sm text-gray-500">
@@ -114,7 +124,7 @@ const TemporaryPassesList = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {passes.map((pass) => (
+              {passes.map(pass => (
                 <tr key={pass.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -169,7 +179,11 @@ const TemporaryPassesList = () => {
           <div className="bg-white rounded-lg p-6 w-96">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Aprobar pase temporal</h3>
             <p className="text-gray-600 mb-4">
-              ¿Deseas aprobar el pase temporal para <strong>{selectedPass.user?.name} {selectedPass.user?.lastName}</strong>?
+              ¿Deseas aprobar el pase temporal para{' '}
+              <strong>
+                {selectedPass.user?.name} {selectedPass.user?.lastName}
+              </strong>
+              ?
             </p>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -180,11 +194,14 @@ const TemporaryPassesList = () => {
                 min="1"
                 max="365"
                 value={expirationDays}
-                onChange={(e) => setExpirationDays(parseInt(e.target.value))}
+                onChange={e => setExpirationDays(parseInt(e.target.value))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <p className="text-xs text-gray-500 mt-1">
-                El pase expirará el {new Date(Date.now() + expirationDays * 24 * 60 * 60 * 1000).toLocaleDateString('es-MX')}
+                El pase expirará el{' '}
+                {new Date(Date.now() + expirationDays * 24 * 60 * 60 * 1000).toLocaleDateString(
+                  'es-MX',
+                )}
               </p>
             </div>
             <div className="flex justify-end space-x-3">
@@ -200,7 +217,7 @@ const TemporaryPassesList = () => {
               </button>
               <button
                 onClick={handleConfirmApprove}
-                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark"
               >
                 Aprobar
               </button>
@@ -215,7 +232,11 @@ const TemporaryPassesList = () => {
           <div className="bg-white rounded-lg p-6 w-96">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Rechazar pase temporal</h3>
             <p className="text-gray-600 mb-4">
-              ¿Estás seguro que deseas rechazar el pase temporal para <strong>{selectedPass.user?.name} {selectedPass.user?.lastName}</strong>?
+              ¿Estás seguro que deseas rechazar el pase temporal para{' '}
+              <strong>
+                {selectedPass.user?.name} {selectedPass.user?.lastName}
+              </strong>
+              ?
             </p>
             <p className="text-sm text-red-600 mb-4">
               Esta acción eliminará permanentemente el registro del pase temporal.

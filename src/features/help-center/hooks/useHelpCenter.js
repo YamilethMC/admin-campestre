@@ -37,7 +37,7 @@ export const useHelpCenter = () => {
   }, [addLog, addToast]);
 
   // Create new help center
-  const createHelpCenter = async (helpCenterData) => {
+  const createHelpCenter = async helpCenterData => {
     try {
       setLoading(true);
       const result = await helpCenterService.createHelpCenter(helpCenterData);
@@ -79,7 +79,7 @@ export const useHelpCenter = () => {
   };
 
   // Get a single help center by ID
-  const getHelpCenterById = async (id) => {
+  const getHelpCenterById = async id => {
     try {
       setLoading(true);
       const result = await helpCenterService.getHelpCenterById(id);
@@ -99,7 +99,7 @@ export const useHelpCenter = () => {
   };
 
   // Delete a help center
-  const deleteHelpCenter = async (id) => {
+  const deleteHelpCenter = async id => {
     try {
       const result = await helpCenterService.deleteHelpCenter(id);
       if (result.success) {
@@ -125,6 +125,6 @@ export const useHelpCenter = () => {
     getHelpCenterById,
     deleteHelpCenter,
     addLog,
-    addToast
+    addToast,
   };
 };

@@ -1,15 +1,11 @@
 import React from 'react';
 
-const FacilityFilters = ({
-  filters,
-  onFilterChange,
-  onDateChange
-}) => {
-  const handleStatusChange = (status) => {
+const FacilityFilters = ({ filters, onFilterChange, onDateChange }) => {
+  const handleStatusChange = status => {
     onFilterChange({ status });
   };
 
-  const handleTypeChange = (type) => {
+  const handleTypeChange = type => {
     onFilterChange({ type });
   };
 
@@ -17,7 +13,7 @@ const FacilityFilters = ({
     { value: '', label: 'Todas' },
     { value: 'ACTIVE', label: 'Activas' },
     { value: 'INACTIVE', label: 'Inactivas' },
-    { value: 'MAINTENANCE', label: 'En mantenimiento' }
+    { value: 'MAINTENANCE', label: 'En mantenimiento' },
   ];
 
   const typeOptions = [
@@ -25,7 +21,7 @@ const FacilityFilters = ({
     { value: 'PADEL', label: 'Padel' },
     { value: 'TENNIS', label: 'Tennis' },
     { value: 'GYM', label: 'Gimnasio' },
-    { value: 'OTHER', label: 'Otro' }
+    { value: 'OTHER', label: 'Otro' },
   ];
 
   return (
@@ -35,7 +31,7 @@ const FacilityFilters = ({
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Estatus</label>
           <div className="flex space-x-2">
-            {statusOptions.map((option) => (
+            {statusOptions.map(option => (
               <button
                 key={option.value}
                 onClick={() => handleStatusChange(option.value)}
@@ -57,7 +53,7 @@ const FacilityFilters = ({
           <input
             type="text"
             value={filters.search || ''}
-            onChange={(e) => onFilterChange({ search: e.target.value })}
+            onChange={e => onFilterChange({ search: e.target.value })}
             placeholder="Buscar instalaciones..."
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           />
@@ -67,7 +63,7 @@ const FacilityFilters = ({
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
           <div className="flex space-x-2">
-            {typeOptions.map((option) => (
+            {typeOptions.map(option => (
               <button
                 key={option.value}
                 onClick={() => handleTypeChange(option.value)}
@@ -89,7 +85,7 @@ const FacilityFilters = ({
           <input
             type="date"
             value={filters.date || ''}
-            onChange={(e) => onDateChange(e.target.value)}
+            onChange={e => onDateChange(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           />
         </div>

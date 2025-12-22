@@ -2,22 +2,22 @@ import React, { useState } from 'react';
 import FileCard from '../FileCard';
 import FileUploadFilters from '../FileUploadFilters';
 
-const FileUploadList = ({ 
-  files, 
-  loading, 
-  meta, 
-  page, 
-  setPage, 
-  search, 
-  setSearch, 
-  onEdit, 
-  onDelete, 
-  onAddFile 
+const FileUploadList = ({
+  files,
+  loading,
+  meta,
+  page,
+  setPage,
+  search,
+  setSearch,
+  onEdit,
+  onDelete,
+  onAddFile,
 }) => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [fileToDelete, setFileToDelete] = useState(null);
 
-  const handleDeleteClick = (file) => {
+  const handleDeleteClick = file => {
     setFileToDelete(file);
     setShowConfirmationModal(true);
   };
@@ -39,10 +39,7 @@ const FileUploadList = ({
     // Show a skeleton loading state when loading and no files are displayed yet
     return (
       <div>
-        <FileUploadFilters
-          search={search}
-          onSearchChange={setSearch}
-        />
+        <FileUploadFilters search={search} onSearchChange={setSearch} />
         <div className="space-y-4">
           {/* Skeleton loading cards */}
           {[...Array(3)].map((_, index) => (
@@ -66,11 +63,8 @@ const FileUploadList = ({
 
   return (
     <div>
-      <FileUploadFilters
-        search={search}
-        onSearchChange={setSearch}
-      />
-      
+      <FileUploadFilters search={search} onSearchChange={setSearch} />
+
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold text-gray-800">Lista de documentos</h2>
         <button
@@ -78,7 +72,12 @@ const FileUploadList = ({
           className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md flex items-center transition-colors"
         >
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
           </svg>
           Subir archivo
         </button>
@@ -86,8 +85,18 @@ const FileUploadList = ({
 
       {files.length === 0 ? (
         <div className="bg-white rounded-lg shadow p-8 text-center">
-          <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h10a2 2 0 012 2v12a2 2 0 01-2 2z" />
+          <svg
+            className="w-16 h-16 mx-auto text-gray-400 mb-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h10a2 2 0 012 2v12a2 2 0 01-2 2z"
+            />
           </svg>
           <h3 className="text-lg font-medium text-gray-800 mb-1">No se han subido archivos</h3>
           <p className="text-gray-500">No hay documentos disponibles con los filtros aplicados</p>
@@ -95,12 +104,7 @@ const FileUploadList = ({
       ) : (
         <div>
           {files.map(file => (
-            <FileCard
-              key={file.id}
-              file={file}
-              onEdit={onEdit}
-              onDelete={handleDeleteClick}
-            />
+            <FileCard key={file.id} file={file} onEdit={onEdit} onDelete={handleDeleteClick} />
           ))}
 
           {/* Pagination controls */}
@@ -123,7 +127,9 @@ const FileUploadList = ({
                   key={num}
                   onClick={() => setPage(num)}
                   className={`px-3 py-1 rounded border text-sm ${
-                    page === num ? 'bg-primary text-white border-primary' : 'border-gray-300 text-gray-700'
+                    page === num
+                      ? 'bg-primary text-white border-primary'
+                      : 'border-gray-300 text-gray-700'
                   }`}
                 >
                   {num}
@@ -135,7 +141,9 @@ const FileUploadList = ({
                 disabled={page === meta.totalPages}
                 onClick={() => setPage(page + 1)}
                 className={`px-3 py-1 rounded border text-sm ${
-                  page === meta.totalPages ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
+                  page === meta.totalPages
+                    ? 'text-gray-300 border-gray-200'
+                    : 'text-primary border-primary'
                 }`}
               >
                 Siguiente
@@ -151,7 +159,8 @@ const FileUploadList = ({
           <div className="bg-white rounded-lg p-6 w-96">
             <h3 className="text-lg font-medium text-gray-900 mb-2">Confirmar eliminación</h3>
             <p className="text-gray-600 mb-4">
-              ¿Estás seguro que deseas eliminar el archivo "{fileToDelete.name}"? Esta acción no se puede deshacer.
+              ¿Estás seguro que deseas eliminar el archivo "{fileToDelete.name}"? Esta acción no se
+              puede deshacer.
             </p>
             <div className="flex justify-end space-x-3">
               <button

@@ -15,17 +15,22 @@ export const useEvents = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const loadEvents = async ({page: pageParam = 1, search: searchParam = search, type: typeParam = type, date: dateParam = date} = {}) => {
+  const loadEvents = async ({
+    page: pageParam = 1,
+    search: searchParam = search,
+    type: typeParam = type,
+    date: dateParam = date,
+  } = {}) => {
     try {
       setLoading(true);
-      
-      const data = await eventService.fetchEvents({ 
-        page: pageParam, 
-        search: searchParam, 
-        type: typeParam, 
-        date: dateParam 
+
+      const data = await eventService.fetchEvents({
+        page: pageParam,
+        search: searchParam,
+        type: typeParam,
+        date: dateParam,
       });
-      
+
       if (data.success) {
         setEvents(data.data.events);
         setMeta(data.data.meta);
@@ -44,11 +49,11 @@ export const useEvents = () => {
   // Set up auto-refresh every 30 minutes (1800000 ms)
   useEffect(() => {
     const autoRefreshInterval = setInterval(() => {
-      loadEvents({page, search, type, date});
+      loadEvents({ page, search, type, date });
     }, 1800000); // 30 minutes = 1800000 ms
 
     // Initial load
-    loadEvents({page, search, type, date});
+    loadEvents({ page, search, type, date });
 
     // Cleanup interval on unmount
     return () => {
@@ -57,7 +62,7 @@ export const useEvents = () => {
   }, [addLog, addToast, page, search, type, date]);
 
   // Create new event
-  const createEvent = async (eventData) => {
+  const createEvent = async eventData => {
     try {
       setLoading(true);
       const result = await eventService.createEvent(eventData);
@@ -101,7 +106,7 @@ export const useEvents = () => {
   };
 
   // Get a single event by ID
-  const getEventById = async (id) => {
+  const getEventById = async id => {
     try {
       setLoading(true);
       const result = await eventService.getEventById(id);
@@ -120,7 +125,7 @@ export const useEvents = () => {
   };
 
   // Delete an event
-  const deleteEvent = async (id) => {
+  const deleteEvent = async id => {
     try {
       setLoading(true);
       const result = await eventService.deleteEvent(id);
@@ -149,7 +154,11 @@ export const useEvents = () => {
   const updateEventRegistration = async (eventId, memberId, registrationData) => {
     try {
       setLoading(true);
-      const result = await eventService.updateEventRegistration(eventId, memberId, registrationData);
+      const result = await eventService.updateEventRegistration(
+        eventId,
+        memberId,
+        registrationData,
+      );
       if (result.success) {
         return result.data;
       } else {
@@ -203,7 +212,7 @@ export const useEvents = () => {
   };
 
   // Get club member by ID with guests
-  const getClubMemberById = async (memberId) => {
+  const getClubMemberById = async memberId => {
     try {
       setLoading(true);
       const result = await eventService.getClubMemberById(memberId);
@@ -284,6 +293,6 @@ export const useEvents = () => {
     resetFilters,
     updateFilters,
     addLog,
-    addToast
+    addToast,
   };
 };

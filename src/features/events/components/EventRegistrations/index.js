@@ -9,7 +9,7 @@ const EventRegistrations = ({
   onRefreshEvent,
   createEventRegistration,
   getClubMemberById,
-  searchClubMembers
+  searchClubMembers,
 }) => {
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
 
@@ -49,7 +49,7 @@ const EventRegistrations = ({
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [registrationToSubmit, setRegistrationToSubmit] = useState(null);
 
-  const toggleDropdown = (id) => {
+  const toggleDropdown = id => {
     setOpenDropdown(openDropdown === id ? null : id);
   };
 
@@ -62,9 +62,8 @@ const EventRegistrations = ({
     return result;
   };
 
-
   // Handle member selection with expandable functionality
-  const handleMemberSelect = async (member) => {
+  const handleMemberSelect = async member => {
     // If clicking on an already expanded member, collapse it
     if (expandedMemberId === member.id) {
       // Collapse the member
@@ -95,12 +94,12 @@ const EventRegistrations = ({
   };
 
   // Handle search input change - update the local state
-  const handleSearchChange = (value) => {
+  const handleSearchChange = value => {
     setSearchTerm(value);
   };
 
   // Function to handle search when user presses enter or clicks search button
-  const handleSearch = async (e) => {
+  const handleSearch = async e => {
     e?.preventDefault();
     fetchMembers(searchTerm);
   };
@@ -115,7 +114,7 @@ const EventRegistrations = ({
   };
 
   // Handle member selection (for the main member checkbox)
-  const handleMemberCheckboxSelect = (checked) => {
+  const handleMemberCheckboxSelect = checked => {
     setIsMemberSelected(checked);
   };
 
@@ -135,7 +134,7 @@ const EventRegistrations = ({
     // Prepare the data to submit
     const registrationData = {
       clubMemberId: selectedMember.id,
-      totalRegistrations
+      totalRegistrations,
     };
 
     setRegistrationToSubmit(registrationData);
@@ -175,7 +174,7 @@ const EventRegistrations = ({
     }
   };
 
-    // Calculate event statistics
+  // Calculate event statistics
   const totalSpots = event?.totalSpots || 0;
   const ocupedSpots = registrations.reduce((sum, reg) => sum + (reg.totalRegistrations || 0), 0);
   const availableSpots = Math.max(0, totalSpots - ocupedSpots);
@@ -188,7 +187,7 @@ const EventRegistrations = ({
     setShowAddMemberModal(false);
   };
 
-  const handleUpdateRegistrations = (registration) => {
+  const handleUpdateRegistrations = registration => {
     setShowUpdateModal(registration);
     setUpdatedRegistrationsCount(registration.totalRegistrations);
   };
@@ -196,11 +195,9 @@ const EventRegistrations = ({
   const handleUpdateConfirm = async () => {
     if (showUpdateModal && onUpdateRegistration) {
       try {
-        const result = await onUpdateRegistration(
-          event.id,
-          showUpdateModal.clubMemberId,
-          { totalRegistrations: updatedRegistrationsCount }
-        );
+        const result = await onUpdateRegistration(event.id, showUpdateModal.clubMemberId, {
+          totalRegistrations: updatedRegistrationsCount,
+        });
         if (result) {
           if (onRefreshEvent) {
             await onRefreshEvent(event.id);
@@ -214,7 +211,10 @@ const EventRegistrations = ({
   };
 
   const incrementRegistration = () => {
-    if (showUpdateModal && updatedRegistrationsCount < availableSpots + showUpdateModal.totalRegistrations) {
+    if (
+      showUpdateModal &&
+      updatedRegistrationsCount < availableSpots + showUpdateModal.totalRegistrations
+    ) {
       setUpdatedRegistrationsCount(prev => prev + 1);
     }
   };
@@ -225,7 +225,7 @@ const EventRegistrations = ({
     }
   };
 
-  const handleDeleteRegistration = (registrationId) => {
+  const handleDeleteRegistration = registrationId => {
     setShowDeleteModal(registrationId);
   };
 
@@ -250,15 +250,15 @@ const EventRegistrations = ({
   };
 
   // Format date for display
-  const formatDate = (dateStr) => {
+  const formatDate = dateStr => {
     if (!dateStr) return 'No especificada';
     try {
       const date = new Date(dateStr);
-      return date.toLocaleDateString('es-ES', { 
-        weekday: 'long', 
-        day: 'numeric', 
-        month: 'long', 
-        year: 'numeric' 
+      return date.toLocaleDateString('es-ES', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
       });
     } catch {
       return dateStr;
@@ -268,12 +268,14 @@ const EventRegistrations = ({
   return (
     <div className="bg-white rounded-lg shadow p-6 mb-6">
       <div className="flex items-center mb-6">
-        <button
-          onClick={onBack}
-          className="mr-4 text-gray-600 hover:text-gray-900"
-        >
+        <button onClick={onBack} className="mr-4 text-gray-600 hover:text-gray-900">
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
           </svg>
         </button>
         <div>
@@ -288,8 +290,18 @@ const EventRegistrations = ({
         <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
           <div className="flex items-center">
             <div className="bg-blue-100 p-2 rounded-lg mr-3">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              <svg
+                className="w-6 h-6 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
               </svg>
             </div>
             <div>
@@ -303,9 +315,24 @@ const EventRegistrations = ({
         <div className="bg-gradient-to-r from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
           <div className="flex items-center">
             <div className="bg-purple-100 p-2 rounded-lg mr-3">
-              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              <svg
+                className="w-6 h-6 text-purple-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
               </svg>
             </div>
             <div>
@@ -325,7 +352,9 @@ const EventRegistrations = ({
             </div>
             <div className="text-center">
               <p className="text-xs text-green-600">Disponibles</p>
-              <p className={`text-lg font-bold ${availableSpots > 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <p
+                className={`text-lg font-bold ${availableSpots > 0 ? 'text-green-600' : 'text-red-600'}`}
+              >
                 {availableSpots}
               </p>
             </div>
@@ -358,7 +387,7 @@ const EventRegistrations = ({
       {registrations.length > 0 ? (
         <div className="bg-white shadow-lg rounded-lg">
           <ul className="divide-y divide-gray-200">
-            {registrations.map((registration) => (
+            {registrations.map(registration => (
               <li key={registration.id} className="hover:bg-gray-50 transition-colors duration-150">
                 <div className="block">
                   <div className="flex items-center px-6 py-5">
@@ -367,26 +396,50 @@ const EventRegistrations = ({
                         <div>
                           <div className="flex items-center">
                             <div className="flex-shrink-0 h-12 w-12 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold">
-                              {registration.clubMember.user.name.charAt(0)}{registration.clubMember.user.lastName?.charAt(0) || ''}
+                              {registration.clubMember.user.name.charAt(0)}
+                              {registration.clubMember.user.lastName?.charAt(0) || ''}
                             </div>
                             <div className="ml-4">
                               <p className="text-base font-bold text-gray-900">
-                                {registration.clubMember.user.name} {registration.clubMember.user.lastName}
+                                {registration.clubMember.user.name}{' '}
+                                {registration.clubMember.user.lastName}
                               </p>
                               <p className="text-sm text-gray-500">
-                                <span className="font-medium">Código:</span> {registration.clubMember.memberCode || 'N/A'}
+                                <span className="font-medium">Código:</span>{' '}
+                                {registration.clubMember.memberCode || 'N/A'}
                               </p>
                               <p className="text-sm text-gray-500 flex items-center mt-1">
-                                <svg className="h-4 w-4 text-gray-400 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                <svg
+                                  className="h-4 w-4 text-gray-400 mr-1"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                  />
                                 </svg>
                                 {registration.clubMember.user.email}
                               </p>
                               <p className="text-sm text-gray-500 flex items-center mt-1">
-                                <svg className="h-4 w-4 text-gray-400 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                <svg
+                                  className="h-4 w-4 text-gray-400 mr-1"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                  />
                                 </svg>
-                                Fecha: {formatDate(registration.createdAt || registration.updatedAt)}
+                                Fecha:{' '}
+                                {formatDate(registration.createdAt || registration.updatedAt)}
                               </p>
                             </div>
                           </div>
@@ -394,11 +447,25 @@ const EventRegistrations = ({
 
                         <div className="flex items-center justify-between md:justify-end">
                           <div className="flex items-center bg-gradient-to-r from-green-50 to-green-100 rounded-lg px-4 py-2 mr-4">
-                            <svg className="h-5 w-5 text-green-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            <svg
+                              className="h-5 w-5 text-green-600 mr-2"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                              />
                             </svg>
-                            <span className="text-lg font-bold text-gray-900">{registration.totalRegistrations}</span>
-                            <span className="text-sm text-gray-600 ml-1">registrado{registration.totalRegistrations !== 1 ? 's' : ''}</span>
+                            <span className="text-lg font-bold text-gray-900">
+                              {registration.totalRegistrations}
+                            </span>
+                            <span className="text-sm text-gray-600 ml-1">
+                              registrado{registration.totalRegistrations !== 1 ? 's' : ''}
+                            </span>
                           </div>
 
                           <div className="relative inline-block text-left">
@@ -406,8 +473,18 @@ const EventRegistrations = ({
                               onClick={() => toggleDropdown(registration.id)}
                               className="inline-flex justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary items-center justify-center transition-colors duration-150"
                             >
-                              <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6a2 2 0 110-4 2 2 0 010 4zM12 14a2 2 0 110-4 2 2 0 010 4zM12 22a2 2 0 110-4 2 2 0 010 4z" />
+                              <svg
+                                className="h-5 w-5"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M12 6a2 2 0 110-4 2 2 0 010 4zM12 14a2 2 0 110-4 2 2 0 010 4zM12 22a2 2 0 110-4 2 2 0 010 4z"
+                                />
                               </svg>
                             </button>
                             {openDropdown === registration.id && (
@@ -420,8 +497,18 @@ const EventRegistrations = ({
                                     }}
                                     className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left transition-colors duration-150"
                                   >
-                                    <svg className="h-4 w-4 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    <svg
+                                      className="h-4 w-4 mr-2 text-blue-600"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                      />
                                     </svg>
                                     Actualizar número de inscripciones
                                   </button>
@@ -432,8 +519,18 @@ const EventRegistrations = ({
                                     }}
                                     className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left transition-colors duration-150"
                                   >
-                                    <svg className="h-4 w-4 mr-2 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    <svg
+                                      className="h-4 w-4 mr-2 text-red-600"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                      />
                                     </svg>
                                     Eliminar
                                   </button>
@@ -453,9 +550,7 @@ const EventRegistrations = ({
       ) : (
         <div className="text-center py-12">
           <h3 className="mt-2 text-lg font-medium text-gray-900">No hay registros</h3>
-          <p className="mt-1 text-gray-500">
-            Este evento aún no tiene registros de socios.
-          </p>
+          <p className="mt-1 text-gray-500">Este evento aún no tiene registros de socios.</p>
         </div>
       )}
 
@@ -471,14 +566,17 @@ const EventRegistrations = ({
               {/* Search section */}
               <div className="mt-6 px-7">
                 <div className="mb-4">
-                  <label htmlFor="memberSearch" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="memberSearch"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Buscar socio
                   </label>
                   <input
                     type="text"
                     id="memberSearch"
                     value={searchTerm}
-                    onChange={(e) => {
+                    onChange={e => {
                       handleSearchChange(e.target.value);
                       // Automatically trigger search after a short delay to avoid too many API calls
                       clearTimeout(searchTimeoutRef.current);
@@ -494,7 +592,7 @@ const EventRegistrations = ({
                 {/* Members list with expandable guest selection */}
                 {!loadingMembers && (
                   <div className="border rounded-lg max-h-60 overflow-y-auto">
-                    {members.map((member) => (
+                    {members.map(member => (
                       <React.Fragment key={member.id}>
                         <div
                           className={`p-3 border-b hover:bg-gray-50 cursor-pointer ${
@@ -504,7 +602,9 @@ const EventRegistrations = ({
                         >
                           <div className="flex items-center">
                             <span className="font-semibold">{member.memberCode || 'N/A'}</span>
-                            <span className="ml-2">{member.user.name} {member.user.lastName}</span>
+                            <span className="ml-2">
+                              {member.user.name} {member.user.lastName}
+                            </span>
                           </div>
                         </div>
 
@@ -518,7 +618,7 @@ const EventRegistrations = ({
                                   <input
                                     type="checkbox"
                                     checked={isMemberSelected}
-                                    onChange={(e) => handleMemberCheckboxSelect(e.target.checked)}
+                                    onChange={e => handleMemberCheckboxSelect(e.target.checked)}
                                     className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
                                   />
                                   <span className="ml-2">
@@ -530,13 +630,15 @@ const EventRegistrations = ({
                               {/* Guests list for this specific member */}
                               {memberGuests.length > 0 && (
                                 <div className="space-y-2 ml-4">
-                                  {memberGuests.map((guest) => (
+                                  {memberGuests.map(guest => (
                                     <div key={guest.id} className="p-3 border rounded-md bg-white">
                                       <label className="flex items-center">
                                         <input
                                           type="checkbox"
                                           checked={selectedGuests.includes(guest.id)}
-                                          onChange={(e) => handleGuestSelect(guest.id, e.target.checked)}
+                                          onChange={e =>
+                                            handleGuestSelect(guest.id, e.target.checked)
+                                          }
                                           className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
                                         />
                                         <span className="ml-2">
@@ -553,14 +655,11 @@ const EventRegistrations = ({
                       </React.Fragment>
                     ))}
                     {members.length === 0 && !loadingMembers && (
-                      <div className="p-3 text-center text-gray-500">
-                        No se encontraron socios
-                      </div>
+                      <div className="p-3 text-center text-gray-500">No se encontraron socios</div>
                     )}
                   </div>
                 )}
               </div>
-
 
               <div className="items-center px-4 py-6 flex justify-end space-x-3">
                 <button
@@ -571,9 +670,11 @@ const EventRegistrations = ({
                 </button>
                 <button
                   onClick={handleSaveRegistration}
-                  disabled={!selectedMember || (isMemberSelected === false && selectedGuests.length === 0)}
+                  disabled={
+                    !selectedMember || (isMemberSelected === false && selectedGuests.length === 0)
+                  }
                   className={`px-4 py-2 text-white text-base font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary ${
-                    (!selectedMember || (isMemberSelected === false && selectedGuests.length === 0))
+                    !selectedMember || (isMemberSelected === false && selectedGuests.length === 0)
                       ? 'bg-gray-400 cursor-not-allowed'
                       : 'bg-primary hover:bg-primary-dark'
                   }`}
@@ -593,11 +694,10 @@ const EventRegistrations = ({
             <div className="px-6 pt-6">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">
-                    Actualizar inscripciones
-                  </h3>
+                  <h3 className="text-lg font-bold text-gray-900">Actualizar inscripciones</h3>
                   <p className="text-sm text-gray-500 mt-1">
-                    Socio: {showUpdateModal.clubMember.user.name} {showUpdateModal.clubMember.user.lastName}
+                    Socio: {showUpdateModal.clubMember.user.name}{' '}
+                    {showUpdateModal.clubMember.user.lastName}
                   </p>
                 </div>
                 <button
@@ -605,7 +705,12 @@ const EventRegistrations = ({
                   className="text-gray-400 hover:text-gray-500 transition-colors"
                 >
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -614,15 +719,25 @@ const EventRegistrations = ({
             <div className="px-6 py-4">
               <div className="text-center">
                 <div className="inline-flex items-center bg-gradient-to-r from-blue-50 to-blue-100 rounded-full px-4 py-2">
-                  <svg className="h-5 w-5 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  <svg
+                    className="h-5 w-5 text-blue-600 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                    />
                   </svg>
-                  <span className="text-2xl font-bold text-gray-900">{updatedRegistrationsCount}</span>
+                  <span className="text-2xl font-bold text-gray-900">
+                    {updatedRegistrationsCount}
+                  </span>
                 </div>
 
-                <p className="text-sm text-gray-500 mt-2">
-                  Personas registradas actualmente
-                </p>
+                <p className="text-sm text-gray-500 mt-2">Personas registradas actualmente</p>
               </div>
 
               <div className="mt-6 flex items-center justify-center">
@@ -637,13 +752,19 @@ const EventRegistrations = ({
 
                 <div className="mx-6 text-center">
                   <p className="text-sm text-gray-500">Disponibles</p>
-                  <p className="text-lg font-bold text-blue-600">{availableSpots + showUpdateModal.totalRegistrations - updatedRegistrationsCount}</p>
+                  <p className="text-lg font-bold text-blue-600">
+                    {availableSpots +
+                      showUpdateModal.totalRegistrations -
+                      updatedRegistrationsCount}
+                  </p>
                 </div>
 
                 <button
                   type="button"
                   onClick={incrementRegistration}
-                  disabled={updatedRegistrationsCount >= availableSpots + showUpdateModal.totalRegistrations}
+                  disabled={
+                    updatedRegistrationsCount >= availableSpots + showUpdateModal.totalRegistrations
+                  }
                   className="h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-xl font-bold shadow-md transition-all duration-150 disabled:transform-none hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                 >
                   +
@@ -704,10 +825,13 @@ const EventRegistrations = ({
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div className="mt-3 text-center">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mt-4">Confirmar registro</h3>
+              <h3 className="text-lg leading-6 font-medium text-gray-900 mt-4">
+                Confirmar registro
+              </h3>
               <div className="mt-2 px-7 py-3">
                 <p className="text-sm text-gray-500">
-                  ¿Estás seguro de que deseas registrar a {registrationToSubmit?.totalRegistrations} persona(s) para este evento?
+                  ¿Estás seguro de que deseas registrar a {registrationToSubmit?.totalRegistrations}{' '}
+                  persona(s) para este evento?
                 </p>
               </div>
               <div className="items-center px-4 py-3 flex justify-center space-x-3">

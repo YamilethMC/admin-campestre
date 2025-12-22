@@ -23,7 +23,7 @@ export function useFacilities(initialFilters = {}) {
       type: filters.type !== undefined ? filters.type : type,
       date: filters.date !== undefined ? filters.date : date,
       order: 'asc', // Fixed as requested
-      orderBy: 'name' // Fixed as requested
+      orderBy: 'name', // Fixed as requested
     });
 
     if (response.success) {
@@ -50,7 +50,7 @@ export function useFacilities(initialFilters = {}) {
   };
 
   // Get a specific facility by ID with reservations
-  const getFacilityById = async (id) => {
+  const getFacilityById = async id => {
     try {
       const result = await facilityService.getFacilityById(id);
 
@@ -67,7 +67,7 @@ export function useFacilities(initialFilters = {}) {
   };
 
   // Create new facility
-  const createFacility = async (facilityData) => {
+  const createFacility = async facilityData => {
     try {
       const result = await facilityService.createFacility(facilityData);
 
@@ -101,7 +101,7 @@ export function useFacilities(initialFilters = {}) {
   };
 
   // Delete a facility
-  const deleteFacility = async (id) => {
+  const deleteFacility = async id => {
     try {
       const result = await facilityService.deleteFacility(id);
 
@@ -149,7 +149,11 @@ export function useFacilities(initialFilters = {}) {
   // Create facility reservation
   const createFacilityReservation = async (facilityId, memberId, reservationData) => {
     try {
-      const result = await facilityService.createFacilityReservation(facilityId, memberId, reservationData);
+      const result = await facilityService.createFacilityReservation(
+        facilityId,
+        memberId,
+        reservationData,
+      );
 
       if (result.success) {
         return result.data;
@@ -166,7 +170,11 @@ export function useFacilities(initialFilters = {}) {
   // Update facility reservation (to cancel)
   const updateFacilityReservation = async (reservationId, clubMemberId, reservationData) => {
     try {
-      const result = await facilityService.updateFacilityReservation(reservationId, clubMemberId, reservationData);
+      const result = await facilityService.updateFacilityReservation(
+        reservationId,
+        clubMemberId,
+        reservationData,
+      );
 
       if (result.success) {
         return result.data;
@@ -221,6 +229,6 @@ export function useFacilities(initialFilters = {}) {
     deleteReservation,
     createFacilityReservation,
     updateFacilityReservation,
-    searchClubMembers
+    searchClubMembers,
   };
 }

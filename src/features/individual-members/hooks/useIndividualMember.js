@@ -35,7 +35,7 @@ export const useIndividualMember = () => {
     relationship: '', // Campo para la relación cuando se agrega un dependiente
     notificationMethod: 'email',
   });
-  
+
   const [genderOptions, setGenderOptions] = useState([]);
   const [loadingGender, setLoadingGender] = useState(false);
 
@@ -45,24 +45,29 @@ export const useIndividualMember = () => {
   const [paymentMethodOptions, setPaymentMethodOptions] = useState([]);
   const [loadingPaymentMethod, setLoadingPaymentMethod] = useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => {
-      let newValue = type === "checkbox" ? checked : value;
+      let newValue = type === 'checkbox' ? checked : value;
 
-      if (name === "telefono_movil" || name === "telefono_fijo" || name === "telefono_emergencia") {
+      if (name === 'telefono_movil' || name === 'telefono_fijo' || name === 'telefono_emergencia') {
         // Permite solo dígitos y corta a 10
-        newValue = value.replace(/\D/g, "").slice(0, 10);
+        newValue = value.replace(/\D/g, '').slice(0, 10);
       }
 
-      if( name === "code_socio" || name === "codigo_postal" || name === "numero_exterior" || name === "numero_interior") {
-        newValue = value.replace(/\D/g, "");
+      if (
+        name === 'code_socio' ||
+        name === 'codigo_postal' ||
+        name === 'numero_exterior' ||
+        name === 'numero_interior'
+      ) {
+        newValue = value.replace(/\D/g, '');
       }
 
-      if(name === "fecha_nacimiento") {
+      if (name === 'fecha_nacimiento') {
         const fechaActual = formattedDate();
 
-        if(value >= fechaActual) {
+        if (value >= fechaActual) {
           addLog('Error: La fecha de nacimiento no puede ser futura');
           addToast('Error: La fecha de nacimiento no puede ser futura', 'error');
           newValue = '';
@@ -74,7 +79,7 @@ export const useIndividualMember = () => {
         [name]: newValue,
       };
     });
-  }
+  };
 
   const formattedDate = () => {
     const fechaActual = new Date();
@@ -83,26 +88,25 @@ export const useIndividualMember = () => {
     const day = String(fechaActual.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
-  }
+  };
 
   const phone = [
     {
       number: formData.telefono_movil,
       alias: formData.alias_movil,
-      type: "MOVIL"
+      type: 'MOVIL',
     },
     {
       number: formData.telefono_fijo,
       alias: formData.alias_fijo,
-      type: "PHONE"
+      type: 'PHONE',
     },
     {
       number: formData.telefono_emergencia,
       alias: formData.alias_emergencia,
-      type: "EMERGENCY"
-    }
-  ].filter(p => p.number && p.number.trim() !== "");
-
+      type: 'EMERGENCY',
+    },
+  ].filter(p => p.number && p.number.trim() !== '');
 
   const buildMemberData = (parentMemberId = null) => {
     const memberData = {
@@ -111,7 +115,7 @@ export const useIndividualMember = () => {
       active: true,
       name: formData.nombre,
       lastName: formData.apellidos,
-      type: "SOCIO",
+      type: 'SOCIO',
       birthDate: new Date(formData.fecha_nacimiento).toISOString(),
       gender: formData.sexo,
       RFC: formData.rfc,
@@ -123,7 +127,7 @@ export const useIndividualMember = () => {
         city: formData.ciudad,
         zipCode: formData.codigo_postal,
         state: formData.estado,
-        country: formData.pais
+        country: formData.pais,
       },
       phone: phone,
       /*qrCode: {
@@ -150,7 +154,13 @@ export const useIndividualMember = () => {
     return memberData;
   };
 
-  const handleSubmit = async (e, memberId = null, parentMemberId = null, initialData = null, isDependent = false) => {
+  const handleSubmit = async (
+    e,
+    memberId = null,
+    parentMemberId = null,
+    initialData = null,
+    isDependent = false,
+  ) => {
     e.preventDefault();
     // Validación de campos requeridos
     if (!validateFormData(isDependent, initialData)) {
@@ -170,7 +180,7 @@ export const useIndividualMember = () => {
         result = await memberService.addMember(memberData);
       }
 
-      if(result.success){
+      if (result.success) {
         let action;
         if (parentMemberId) {
           action = 'agregado como dependiente';
@@ -180,18 +190,17 @@ export const useIndividualMember = () => {
           action = 'agregado';
         }
         addLog(`Socio ${action}: ${formData.nombre} ${formData.apellidos}`);
-        if(result){
+        if (result) {
           resetForm();
         }
         return true;
-      }else{
-        addToast(result.error, "error");
+      } else {
+        addToast(result.error, 'error');
         return false;
       }
-
     } catch (err) {
       console.error(err);
-      addToast(err.message, "error");
+      addToast(err.message, 'error');
       return false;
     }
   };
@@ -368,12 +377,15 @@ export const useIndividualMember = () => {
 
     if (formData.telefono_emergencia && !/^\d{10}$/.test(formData.telefono_emergencia)) {
       addLog('Error: El teléfono de emergencia debe contener exactamente 10 dígitos numéricos');
-      addToast('Error: El teléfono de emergencia debe contener exactamente 10 dígitos numéricos', 'error');
+      addToast(
+        'Error: El teléfono de emergencia debe contener exactamente 10 dígitos numéricos',
+        'error',
+      );
       return false;
     }
 
     return true;
-  }
+  };
 
   // Load gender options on component mount
   useEffect(() => {
@@ -437,6 +449,6 @@ export const useIndividualMember = () => {
     paymentMethodOptions,
     loadingPaymentMethod,
     handleChange,
-    handleSubmit
+    handleSubmit,
   };
-}
+};

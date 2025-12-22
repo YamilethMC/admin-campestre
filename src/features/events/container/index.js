@@ -35,11 +35,11 @@ const EventsContainer = () => {
     deleteEventRegistration,
     createEventRegistration,
     getClubMemberById,
-    searchClubMembers
+    searchClubMembers,
   } = useEvents();
 
   // Update filters
-  const updateFilterParams = (newFilters) => {
+  const updateFilterParams = newFilters => {
     if (newFilters.type !== undefined && type !== newFilters.type) {
       setType(newFilters.type);
       setPage(1);
@@ -54,7 +54,7 @@ const EventsContainer = () => {
     }
   };
 
-  const handleDateChange = (newDate) => {
+  const handleDateChange = newDate => {
     // Only reset to page 1 if the date is actually different from the current date
     if (date !== newDate) {
       setDate(newDate);
@@ -69,7 +69,7 @@ const EventsContainer = () => {
   };
 
   // Handle editing an event
-  const handleEditEvent = async (event) => {
+  const handleEditEvent = async event => {
     try {
       // Load the full event data
       const fullEvent = await getEventById(event.id);
@@ -83,7 +83,7 @@ const EventsContainer = () => {
   };
 
   // Handle viewing registrations
-  const handleViewRegistrations = async (event) => {
+  const handleViewRegistrations = async event => {
     try {
       // Load the full event data including registrations
       const fullEvent = await getEventById(event.id);
@@ -98,7 +98,7 @@ const EventsContainer = () => {
   };
 
   // Handle saving an event (create or update)
-  const handleSaveEvent = async (eventData) => {
+  const handleSaveEvent = async eventData => {
     try {
       if (currentEvent) {
         // Update existing event
@@ -134,7 +134,7 @@ const EventsContainer = () => {
   };
 
   // Handle deleting an event
-  const handleDeleteEvent = async (id) => {
+  const handleDeleteEvent = async id => {
     try {
       await deleteEvent(id);
       // If the list is empty and we're not on page 1, go back a page
@@ -156,16 +156,9 @@ const EventsContainer = () => {
     setDate(now.toISOString().slice(0, 7)); // Default to current year-month
   };
 
-
   // Form view
   if (view === 'form') {
-    return (
-      <EventForm
-        event={currentEvent}
-        onSave={handleSaveEvent}
-        onCancel={handleCancelForm}
-      />
-    );
+    return <EventForm event={currentEvent} onSave={handleSaveEvent} onCancel={handleCancelForm} />;
   }
 
   // Registrations view
@@ -180,7 +173,7 @@ const EventsContainer = () => {
         createEventRegistration={createEventRegistration}
         getClubMemberById={getClubMemberById}
         searchClubMembers={searchClubMembers}
-        onRefreshEvent={async (eventId) => {
+        onRefreshEvent={async eventId => {
           const fullEvent = await getEventById(eventId);
           if (fullEvent) {
             setCurrentEvent(fullEvent);

@@ -32,11 +32,11 @@ const SurveysContainer = () => {
     updateSurvey,
     getSurveyResponses,
     getSurveyById,
-    deleteSurvey
+    deleteSurvey,
   } = useSurvey();
 
   // Update filters
-  const updateFilters = (newFilters) => {
+  const updateFilters = newFilters => {
     if (newFilters.category !== undefined) {
       setCategory(newFilters.category);
       setPage(1);
@@ -58,7 +58,7 @@ const SurveysContainer = () => {
   };
 
   // Handle editing a survey
-  const handleEditSurvey = async (survey) => {
+  const handleEditSurvey = async survey => {
     try {
       // Get the full survey data including questions
       const fullSurvey = await getSurveyById(survey.id);
@@ -70,7 +70,7 @@ const SurveysContainer = () => {
   };
 
   // Handle viewing responses
-  const handleViewResponses = async (survey) => {
+  const handleViewResponses = async survey => {
     try {
       const surveyResponses = await getSurveyResponses(survey.id);
       setCurrentSurvey(survey);
@@ -82,7 +82,7 @@ const SurveysContainer = () => {
   };
 
   // Handle saving a survey (create or update)
-  const handleSaveSurvey = async (surveyData) => {
+  const handleSaveSurvey = async surveyData => {
     try {
       if (currentSurvey) {
         // Update existing survey
@@ -111,7 +111,7 @@ const SurveysContainer = () => {
   };
 
   // Handle deleting a survey
-  const handleDeleteSurvey = async (id) => {
+  const handleDeleteSurvey = async id => {
     try {
       await deleteSurvey(id);
     } catch (err) {
@@ -121,7 +121,10 @@ const SurveysContainer = () => {
 
   if (error) {
     return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+      <div
+        className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+        role="alert"
+      >
         <strong className="font-bold">Error: </strong>
         <span className="block sm:inline">{error}</span>
       </div>
@@ -131,11 +134,7 @@ const SurveysContainer = () => {
   // Render the current view
   if (view === 'form') {
     return (
-      <SurveyForm
-        survey={currentSurvey}
-        onSave={handleSaveSurvey}
-        onCancel={handleCancelForm}
-      />
+      <SurveyForm survey={currentSurvey} onSave={handleSaveSurvey} onCancel={handleCancelForm} />
     );
   }
 
@@ -152,15 +151,9 @@ const SurveysContainer = () => {
   // Default list view - show content even if loading
   return (
     <div>
-      <SurveyHeader
-        activeCount={activeCount}
-        inactiveCount={inactiveCount}
-      />
+      <SurveyHeader activeCount={activeCount} inactiveCount={inactiveCount} />
 
-      <SurveyFilters
-        filters={{ status, category, search }}
-        onFilterChange={updateFilters}
-      />
+      <SurveyFilters filters={{ status, category, search }} onFilterChange={updateFilters} />
 
       <SurveyList
         surveys={surveys}

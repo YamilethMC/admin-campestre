@@ -14,7 +14,7 @@ export const useBulkUpload = () => {
    * Handle file upload and send to API
    * @param {Object} e - File input event
    */
-  const handleFileUpload = async (e) => {
+  const handleFileUpload = async e => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -33,7 +33,9 @@ export const useBulkUpload = () => {
     if (result.success) {
       setUploadResult(result.data);
       // Usar el mensaje de la respuesta de la API si está disponible
-      const message = result.message || `Archivo subido exitosamente. ${result.data?.totalMembersAdded || 0} socios agregados.`;
+      const message =
+        result.message ||
+        `Archivo subido exitosamente. ${result.data?.totalMembersAdded || 0} socios agregados.`;
       addLog(message);
       addToast(message, 'success');
     } else {
@@ -53,7 +55,7 @@ export const useBulkUpload = () => {
     setUploadResult(null);
 
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value = '';
     }
   };
 
@@ -62,6 +64,6 @@ export const useBulkUpload = () => {
     uploadResult,
     handleFileUpload,
     resetForm,
-    fileInputRef
+    fileInputRef,
   };
 };

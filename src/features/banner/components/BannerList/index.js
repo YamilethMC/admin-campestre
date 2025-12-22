@@ -10,7 +10,7 @@ const BannerList = ({
   setPage,
   onEdit,
   onDelete,
-  onAddBanner
+  onAddBanner,
 }) => {
   if (loading && banners.length === 0) {
     // Show a skeleton loading state when loading and no banners are displayed yet
@@ -23,7 +23,12 @@ const BannerList = ({
             className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md flex items-center transition-colors"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              />
             </svg>
             Agregar banner
           </button>
@@ -65,7 +70,12 @@ const BannerList = ({
           className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md flex items-center transition-colors"
         >
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
           </svg>
           Agregar banner
         </button>
@@ -78,14 +88,11 @@ const BannerList = ({
         </div>
       ) : (
         <div className="space-y-4">
-          {banners && Array.isArray(banners) && banners.map(banner => (
-            <BannerCard
-              key={banner.id}
-              banner={banner}
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
-          ))}
+          {banners &&
+            Array.isArray(banners) &&
+            banners.map(banner => (
+              <BannerCard key={banner.id} banner={banner} onEdit={onEdit} onDelete={onDelete} />
+            ))}
 
           {/* Pagination controls */}
           {meta && (
@@ -107,7 +114,9 @@ const BannerList = ({
                   key={num}
                   onClick={() => setPage(num)}
                   className={`px-3 py-1 rounded border text-sm ${
-                    page === num ? 'bg-primary text-white border-primary' : 'border-gray-300 text-gray-700'
+                    page === num
+                      ? 'bg-primary text-white border-primary'
+                      : 'border-gray-300 text-gray-700'
                   }`}
                 >
                   {num}
@@ -119,7 +128,9 @@ const BannerList = ({
                 disabled={page === meta.totalPages}
                 onClick={() => setPage(page + 1)}
                 className={`px-3 py-1 rounded border text-sm ${
-                  page === meta.totalPages ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
+                  page === meta.totalPages
+                    ? 'text-gray-300 border-gray-200'
+                    : 'text-primary border-primary'
                 }`}
               >
                 Siguiente

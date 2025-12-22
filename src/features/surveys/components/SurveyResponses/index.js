@@ -3,7 +3,7 @@ import './SurveyResponses.css';
 
 const SurveyResponses = ({ survey, responses, onBack }) => {
   // Calculate statistics for each question based on API response format
-  const calculateQuestionStats = (questionData) => {
+  const calculateQuestionStats = questionData => {
     // Check if question has responses based on its type
     switch (questionData.type) {
       case 'TEXT':
@@ -12,7 +12,7 @@ const SurveyResponses = ({ survey, responses, onBack }) => {
           return {
             count: questionData.textResponses.length,
             displayCount: questionData.textResponses.length,
-            responses: questionData.textResponses
+            responses: questionData.textResponses,
           };
         }
         break;
@@ -45,7 +45,7 @@ const SurveyResponses = ({ survey, responses, onBack }) => {
             average: average,
             count: totalResponses,
             displayCount: totalResponses,
-            distribution
+            distribution,
           };
         }
         break;
@@ -57,7 +57,7 @@ const SurveyResponses = ({ survey, responses, onBack }) => {
           const totalResponses = Object.values(optionCounts).reduce((sum, count) => sum + count, 0);
 
           // Calculate percentage for each option
-          const calculatedPercentage = (count) => {
+          const calculatedPercentage = count => {
             if (totalResponses === 0) return 0;
             return Math.round((count / totalResponses) * 100);
           };
@@ -71,7 +71,7 @@ const SurveyResponses = ({ survey, responses, onBack }) => {
             optionCounts,
             count: totalResponses,
             displayCount: totalResponses,
-            percentages
+            percentages,
           };
         }
         break;
@@ -80,22 +80,24 @@ const SurveyResponses = ({ survey, responses, onBack }) => {
         // For boolean questions, we get true and false counts
         if (questionData.trueCount !== undefined && questionData.falseCount !== undefined) {
           const totalResponses = questionData.trueCount + questionData.falseCount;
-          const truePercentage = totalResponses > 0 ? Math.round((questionData.trueCount / totalResponses) * 100) : 0;
-          const falsePercentage = totalResponses > 0 ? Math.round((questionData.falseCount / totalResponses) * 100) : 0;
+          const truePercentage =
+            totalResponses > 0 ? Math.round((questionData.trueCount / totalResponses) * 100) : 0;
+          const falsePercentage =
+            totalResponses > 0 ? Math.round((questionData.falseCount / totalResponses) * 100) : 0;
 
           return {
             optionCounts: {
-              'Sí': questionData.trueCount,
-              'No': questionData.falseCount
+              Sí: questionData.trueCount,
+              No: questionData.falseCount,
             },
             count: totalResponses,
             displayCount: totalResponses,
             percentages: {
-              'Sí': truePercentage,
-              'No': falsePercentage
+              Sí: truePercentage,
+              No: falsePercentage,
             },
             trueCount: questionData.trueCount,
-            falseCount: questionData.falseCount
+            falseCount: questionData.falseCount,
           };
         }
         break;
@@ -117,8 +119,18 @@ const SurveyResponses = ({ survey, responses, onBack }) => {
           className="mr-4 p-2 rounded-md hover:bg-gray-100 transition-colors no-print"
           aria-label="Regresar"
         >
-          <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <svg
+            className="w-6 h-6 text-gray-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
         </button>
         <h2 className="text-2xl font-bold text-gray-800">Respuestas de Encuesta</h2>
@@ -134,31 +146,48 @@ const SurveyResponses = ({ survey, responses, onBack }) => {
             <div className="flex flex-wrap gap-4 text-sm text-gray-600">
               <div className="flex items-center">
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 <span>{responses.estimatedTime}</span>
               </div>
 
               <div className="flex items-center">
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
                 </svg>
                 <span>{responses.responseCount} personas</span>
               </div>
 
               <div className="flex items-center">
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                  />
                 </svg>
                 <span>{responses.questionCount} preguntas</span>
               </div>
 
               <div>
-                <span className={`px-2 py-1 rounded-md text-xs font-medium border ${
-                  responses.isActive
-                    ? 'bg-green-100 text-green-800 border-green-200'
-                    : 'bg-gray-100 text-gray-800 border-gray-200'
-                }`}>
+                <span
+                  className={`px-2 py-1 rounded-md text-xs font-medium border ${
+                    responses.isActive
+                      ? 'bg-green-100 text-green-800 border-green-200'
+                      : 'bg-gray-100 text-gray-800 border-gray-200'
+                  }`}
+                >
                   {responses.isActive ? 'Activa' : 'Inactiva'}
                 </span>
               </div>
@@ -171,7 +200,12 @@ const SurveyResponses = ({ survey, responses, onBack }) => {
               className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md flex items-center transition-colors"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+                />
               </svg>
               Imprimir
             </button>
@@ -217,7 +251,9 @@ const SurveyResponses = ({ survey, responses, onBack }) => {
                         {/* Distribution for rating questions */}
                         {stats.distribution && (
                           <div className="mb-3">
-                            <div className="text-xs text-gray-600 mb-1">Distribución de calificaciones:</div>
+                            <div className="text-xs text-gray-600 mb-1">
+                              Distribución de calificaciones:
+                            </div>
                             <div className="space-y-1">
                               {Object.entries(stats.distribution)
                                 .filter(([rating, count]) => count > 0)
@@ -229,7 +265,9 @@ const SurveyResponses = ({ survey, responses, onBack }) => {
                                       <div className="w-full bg-gray-200 rounded-full h-2">
                                         <div
                                           className="bg-primary h-2 rounded-full"
-                                          style={{ width: `${(count / stats.displayCount) * 100}%` }}
+                                          style={{
+                                            width: `${(count / stats.displayCount) * 100}%`,
+                                          }}
                                         ></div>
                                       </div>
                                     </div>
@@ -246,7 +284,10 @@ const SurveyResponses = ({ survey, responses, onBack }) => {
                             <div className="text-xs text-gray-600">Respuestas:</div>
                             {stats.responses.length > 0 ? (
                               stats.responses.map((response, idx) => (
-                                <div key={idx} className="p-2 bg-white rounded border border-gray-200 text-sm">
+                                <div
+                                  key={idx}
+                                  className="p-2 bg-white rounded border border-gray-200 text-sm"
+                                >
                                   "{response}"
                                 </div>
                               ))
@@ -267,16 +308,22 @@ const SurveyResponses = ({ survey, responses, onBack }) => {
                                 <div className="flex items-center justify-between">
                                   <span className="text-sm">{option}</span>
                                   <div className="flex items-center">
-                                    <span className="text-sm font-medium mr-2">{count} respuestas</span>
+                                    <span className="text-sm font-medium mr-2">
+                                      {count} respuestas
+                                    </span>
                                     {stats.percentages && (
-                                      <span className="text-xs text-gray-600">({stats.percentages[option]}%)</span>
+                                      <span className="text-xs text-gray-600">
+                                        ({stats.percentages[option]}%)
+                                      </span>
                                     )}
                                   </div>
                                 </div>
                                 <div className="w-full bg-gray-200 rounded-full h-2">
                                   <div
                                     className="bg-primary h-2 rounded-full"
-                                    style={{ width: `${stats.percentages ? stats.percentages[option] : 0}%` }}
+                                    style={{
+                                      width: `${stats.percentages ? stats.percentages[option] : 0}%`,
+                                    }}
                                   ></div>
                                 </div>
                               </div>

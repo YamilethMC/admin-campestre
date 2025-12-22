@@ -1,7 +1,7 @@
 import React from 'react';
 
 const MemberFilters = ({ filters, onFilterChange }) => {
-  const handleSearchChange = (e) => {
+  const handleSearchChange = e => {
     onFilterChange({ ...filters, search: e.target.value });
   };
 
@@ -10,7 +10,9 @@ const MemberFilters = ({ filters, onFilterChange }) => {
       <div className="flex flex-col md:flex-row md:items-center gap-6">
         {/* Status Filter - 1/4 of the screen */}
         <div className="md:w-1/4 space-y-3 flex-shrink-0">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Estatus</h3>
+          <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
+            Estatus
+          </h3>
           <div className="flex flex-wrap gap-2">
             <button
               key="activos"
@@ -44,7 +46,9 @@ const MemberFilters = ({ filters, onFilterChange }) => {
 
         {/* Search Filter - 2/4 (1/2) of the screen */}
         <div className="md:w-1/2 flex-1">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide invisible md:visible">Buscar</h3>
+          <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide invisible md:visible">
+            Buscar
+          </h3>
           <input
             type="text"
             placeholder="Buscar socios..."

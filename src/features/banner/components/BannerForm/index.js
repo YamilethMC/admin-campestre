@@ -6,19 +6,23 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
   const isEdit = !!banner;
   const { addToast } = useContext(AppContext);
 
-  const formatDateForInput = (isoString) => {
-    return isoString?.slice(0, 10) || "";
+  const formatDateForInput = isoString => {
+    return isoString?.slice(0, 10) || '';
   };
 
   const [originalData, setOriginalData] = useState(null);
 
   // Define action types
   const actionTypes = [
-    { id: 1, name: "Enlace externo", description: "Abrir página en navegación móvil" },
-    { id: 2, name: "Enlace interno", description: "Abrir página en aplicación" },
-    { id: 3, name: "Abrir modal", description: "Mostrar modal con información, formulario u otro contenido" },
-    { id: 4, name: "Abrir documento", description: "Abrir documento con URL de almacenamiento" },
-    { id: 5, name: "Compartir", description: "Compartir banner en redes sociales" }
+    { id: 1, name: 'Enlace externo', description: 'Abrir página en navegación móvil' },
+    { id: 2, name: 'Enlace interno', description: 'Abrir página en aplicación' },
+    {
+      id: 3,
+      name: 'Abrir modal',
+      description: 'Mostrar modal con información, formulario u otro contenido',
+    },
+    { id: 4, name: 'Abrir documento', description: 'Abrir documento con URL de almacenamiento' },
+    { id: 5, name: 'Compartir', description: 'Compartir banner en redes sociales' },
   ];
 
   const [formData, setFormData] = useState({
@@ -28,9 +32,9 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
     active: banner ? banner.active : true,
     startDate: banner ? formatDateForInput(banner.startDate) : '',
     endDate: banner ? formatDateForInput(banner.endDate) : '',
-    typeActionId: banner?.typeActionId || 1
+    typeActionId: banner?.typeActionId || 1,
   });
-  
+
   const [imageFile, setImageFile] = useState(null);
   const [imageChanged, setImageChanged] = useState(false); // Track if image has been changed
   const [errors, setErrors] = useState({});
@@ -43,7 +47,7 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
   const [isCreatingNew, setIsCreatingNew] = useState(!banner);
 
   // Simple function to validate image format
-  const validateImageFormat = (image) => {
+  const validateImageFormat = image => {
     // Check if the image is in the correct data URL format
     return image && image.startsWith('data:image/');
   };
@@ -59,7 +63,7 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
         active: banner.active,
         startDate: banner ? formatDateForInput(banner.startDate) : '',
         endDate: banner ? formatDateForInput(banner.endDate) : '',
-        typeActionId: banner.typeActionId
+        typeActionId: banner.typeActionId,
       });
     } else {
       // For create mode - set original data to default values
@@ -70,7 +74,7 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
         active: true,
         startDate: '',
         endDate: '',
-        typeActionId: 1
+        typeActionId: 1,
       });
     }
   }, [banner]);
@@ -78,8 +82,7 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
   // Check for changes
   useEffect(() => {
     if (originalData) {
-      const isChanged =
-        JSON.stringify(originalData) !== JSON.stringify(formData);
+      const isChanged = JSON.stringify(originalData) !== JSON.stringify(formData);
       setHasUnsavedChanges(isChanged);
     }
   }, [formData, originalData]);
@@ -87,18 +90,18 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = e => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData(prev => ({
           ...prev,
-          image: reader.result // This will be a base64 string
+          image: reader.result, // This will be a base64 string
         }));
         setImageFile(file);
         setImageChanged(true); // Mark that image has been changed
@@ -124,7 +127,7 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
     if (validateForm()) {
@@ -242,7 +245,12 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
           aria-label="Regresar"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
         </button>
         <h2 className="text-xl font-semibold text-gray-800">
@@ -253,7 +261,9 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information Section */}
         <div className="border border-gray-200 rounded-lg p-4 shadow-sm">
-          <h3 className="text-lg font-medium text-gray-500 mb-4 uppercase tracking-wide">Información básica</h3>
+          <h3 className="text-lg font-medium text-gray-500 mb-4 uppercase tracking-wide">
+            Información básica
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -262,7 +272,7 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
               <input
                 type="text"
                 value={formData.title}
-                onChange={(e) => {
+                onChange={e => {
                   handleInputChange('title', e.target.value);
                   if (errors.title) {
                     setErrors(prev => ({ ...prev, title: '' }));
@@ -280,7 +290,7 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
                 type="checkbox"
                 id="isActive"
                 checked={formData.active}
-                onChange={(e) => handleInputChange('active', e.target.checked)}
+                onChange={e => handleInputChange('active', e.target.checked)}
                 className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
               />
               <label htmlFor="isActive" className="ml-2 block text-sm text-gray-700">
@@ -289,12 +299,10 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Descripción
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
               <textarea
                 value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
+                onChange={e => handleInputChange('description', e.target.value)}
                 rows="3"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               ></textarea>
@@ -306,9 +314,7 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
         <div className="border border-gray-200 rounded-lg p-4 shadow-sm">
           <h3 className="text-lg font-medium text-gray-500 mb-4 uppercase tracking-wide">Media</h3>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Imagen
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Imagen</label>
             <div
               className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-primary transition-colors"
               onClick={() => document.getElementById('image-upload').click()}
@@ -323,8 +329,18 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
                     />
                   </div>
                 ) : (
-                  <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <svg
+                    className="mx-auto h-12 w-12 text-gray-400"
+                    stroke="currentColor"
+                    fill="none"
+                    viewBox="0 0 48 48"
+                  >
+                    <path
+                      d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 )}
                 <div>
@@ -350,7 +366,9 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
 
         {/* Dates and Actions Section */}
         <div className="border border-gray-200 rounded-lg p-4 shadow-sm">
-          <h3 className="text-lg font-medium text-gray-500 mb-4 uppercase tracking-wide">Fechas y acciones</h3>
+          <h3 className="text-lg font-medium text-gray-500 mb-4 uppercase tracking-wide">
+            Fechas y acciones
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -359,19 +377,17 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
               <input
                 type="date"
                 value={formData.startDate}
-                onChange={(e) => handleInputChange('startDate', e.target.value)}
+                onChange={e => handleInputChange('startDate', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Fecha de fin
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de fin</label>
               <input
                 type="date"
                 value={formData.endDate}
-                onChange={(e) => handleInputChange('endDate', e.target.value)}
+                onChange={e => handleInputChange('endDate', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             </div>
@@ -382,7 +398,7 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
               </label>
               <select
                 value={formData.typeActionId}
-                onChange={(e) => {
+                onChange={e => {
                   handleInputChange('typeActionId', parseInt(e.target.value));
                   if (errors.typeActionId) {
                     setErrors(prev => ({ ...prev, typeActionId: '' }));
@@ -398,7 +414,9 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
                   </option>
                 ))}
               </select>
-              {errors.typeActionId && <p className="mt-1 text-sm text-red-600">{errors.typeActionId}</p>}
+              {errors.typeActionId && (
+                <p className="mt-1 text-sm text-red-600">{errors.typeActionId}</p>
+              )}
             </div>
           </div>
         </div>
@@ -444,7 +462,10 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
           </div>
         }
       >
-        <p>¿Está seguro que quiere {pendingNavigationAction === 'back' ? 'regresar' : 'cancelar'}? Los cambios no guardados se perderán.</p>
+        <p>
+          ¿Está seguro que quiere {pendingNavigationAction === 'back' ? 'regresar' : 'cancelar'}?
+          Los cambios no guardados se perderán.
+        </p>
       </Modal>
 
       {/* Save Confirmation Modal */}

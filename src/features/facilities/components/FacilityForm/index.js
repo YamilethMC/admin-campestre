@@ -10,7 +10,7 @@ const FacilityForm = ({ facility, onSave, onCancel }) => {
     status: 'ACTIVE',
     openTime: '08:00:00',
     closeTime: '22:00:00',
-    maxDuration: 60
+    maxDuration: 60,
   });
 
   const [errors, setErrors] = useState({});
@@ -28,9 +28,17 @@ const FacilityForm = ({ facility, onSave, onCancel }) => {
         type: facility.type || '',
         description: facility.description || '',
         status: facility.status || 'ACTIVE',
-        openTime: facility.openTime ? (facility.openTime.length > 8 ? facility.openTime.substring(11, 19) : facility.openTime.padEnd(8, ':00').substring(0, 8)) : '08:00:00',
-        closeTime: facility.closeTime ? (facility.closeTime.length > 8 ? facility.closeTime.substring(11, 19) : facility.closeTime.padEnd(8, ':00').substring(0, 8)) : '22:00:00',
-        maxDuration: facility.maxDuration || 60
+        openTime: facility.openTime
+          ? facility.openTime.length > 8
+            ? facility.openTime.substring(11, 19)
+            : facility.openTime.padEnd(8, ':00').substring(0, 8)
+          : '08:00:00',
+        closeTime: facility.closeTime
+          ? facility.closeTime.length > 8
+            ? facility.closeTime.substring(11, 19)
+            : facility.closeTime.padEnd(8, ':00').substring(0, 8)
+          : '22:00:00',
+        maxDuration: facility.maxDuration || 60,
       });
     } else {
       // Reset form for new facility
@@ -41,24 +49,24 @@ const FacilityForm = ({ facility, onSave, onCancel }) => {
         status: 'ACTIVE',
         openTime: '08:00:00',
         closeTime: '22:00:00',
-        maxDuration: 60
+        maxDuration: 60,
       });
       setErrors({});
     }
   }, [facility]);
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
 
     // Clear error when user types
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
   };
@@ -104,7 +112,7 @@ const FacilityForm = ({ facility, onSave, onCancel }) => {
     confirmAction('save');
   };
 
-  const formatTimeWithSeconds = (timeStr) => {
+  const formatTimeWithSeconds = timeStr => {
     // If time doesn't have seconds, add :00
     if (timeStr && timeStr.split(':').length === 2) {
       return `${timeStr}:00`;
@@ -119,7 +127,7 @@ const FacilityForm = ({ facility, onSave, onCancel }) => {
       const formattedData = {
         ...formData,
         openTime: `2023-01-01T${formatTimeWithSeconds(formData.openTime)}Z`,
-        closeTime: `2023-01-01T${formatTimeWithSeconds(formData.closeTime)}Z`
+        closeTime: `2023-01-01T${formatTimeWithSeconds(formData.closeTime)}Z`,
       };
 
       await onSave(formattedData);
@@ -160,13 +168,13 @@ const FacilityForm = ({ facility, onSave, onCancel }) => {
     { value: 'PADEL', label: 'Padel' },
     { value: 'TENNIS', label: 'Tennis' },
     { value: 'GYM', label: 'Gimnasio' },
-    { value: 'OTHER', label: 'Otro' }
+    { value: 'OTHER', label: 'Otro' },
   ];
 
   const statusOptions = [
     { value: 'ACTIVE', label: 'Activo' },
     { value: 'INACTIVE', label: 'Inactivo' },
-    { value: 'MAINTENANCE', label: 'En mantenimiento' }
+    { value: 'MAINTENANCE', label: 'En mantenimiento' },
   ];
 
   return (
@@ -174,12 +182,14 @@ const FacilityForm = ({ facility, onSave, onCancel }) => {
       <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
         {/* Header */}
         <div className="flex items-center mb-6">
-          <button
-            onClick={handleBack}
-            className="text-gray-600 hover:text-gray-900 mr-4"
-          >
+          <button onClick={handleBack} className="text-gray-600 hover:text-gray-900 mr-4">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </button>
           <h2 className="text-2xl font-bold text-gray-800">
@@ -221,7 +231,7 @@ const FacilityForm = ({ facility, onSave, onCancel }) => {
               }`}
             >
               <option value="">Seleccione un tipo</option>
-              {typeOptions.map((option) => (
+              {typeOptions.map(option => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -243,7 +253,7 @@ const FacilityForm = ({ facility, onSave, onCancel }) => {
                 errors.status ? 'border-red-500' : 'border-gray-300'
               }`}
             >
-              {statusOptions.map((option) => (
+              {statusOptions.map(option => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -254,9 +264,7 @@ const FacilityForm = ({ facility, onSave, onCancel }) => {
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Descripción
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
             <textarea
               name="description"
               value={formData.description}
@@ -320,7 +328,9 @@ const FacilityForm = ({ facility, onSave, onCancel }) => {
               }`}
               placeholder="Duración máxima en minutos"
             />
-            {errors.maxDuration && <p className="mt-1 text-sm text-red-600">{errors.maxDuration}</p>}
+            {errors.maxDuration && (
+              <p className="mt-1 text-sm text-red-600">{errors.maxDuration}</p>
+            )}
           </div>
         </div>
 
@@ -370,7 +380,9 @@ const FacilityForm = ({ facility, onSave, onCancel }) => {
       >
         <p>
           {modalAction?.action === 'save'
-            ? (facility ? '¿Desea guardar los cambios?' : '¿Desea crear la instalación?')
+            ? facility
+              ? '¿Desea guardar los cambios?'
+              : '¿Desea crear la instalación?'
             : `¿Está seguro que quiere ${modalAction?.action === 'back' ? 'salir' : 'cancelar'}?`}
           {modalAction?.action !== 'save' && ' Los cambios no guardados se perderán.'}
         </p>

@@ -1,5 +1,3 @@
-
-
 export const cardStyles = {
   container: `bg-white rounded-lg shadow p-4 mb-4 border border-gray-200 hover:shadow-md transition-shadow`,
   cardTop: `flex justify-between items-start`,
@@ -21,5 +19,5 @@ export const cardStyles = {
     active: 'bg-green-100 text-green-800 border-green-200',
     inactive: 'bg-gray-100 text-gray-800 border-gray-200',
   },
-  typeTag: "bg-blue-100 text-blue-900 px-2 py-1 rounded-md text-xs font-semibold",
+  typeTag: 'bg-blue-100 text-blue-900 px-2 py-1 rounded-md text-xs font-semibold',
 };

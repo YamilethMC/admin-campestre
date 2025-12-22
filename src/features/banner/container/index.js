@@ -24,11 +24,11 @@ const BannerContainer = () => {
     createBanner,
     updateBanner,
     getBannerById,
-    deleteBanner
+    deleteBanner,
   } = useBanner();
 
   // Update filters
-  const updateFilters = (newFilters) => {
+  const updateFilters = newFilters => {
     if (newFilters.status !== undefined) {
       setStatus(newFilters.status);
       setPage(1);
@@ -46,7 +46,7 @@ const BannerContainer = () => {
   };
 
   // Handle editing a banner
-  const handleEditBanner = async (banner) => {
+  const handleEditBanner = async banner => {
     try {
       // Get the full banner data
       const fullBanner = await getBannerById(banner.id);
@@ -58,7 +58,7 @@ const BannerContainer = () => {
   };
 
   // Handle saving a banner (create or update)
-  const handleSaveBanner = async (bannerData) => {
+  const handleSaveBanner = async bannerData => {
     try {
       if (currentBanner) {
         // Update existing banner
@@ -81,7 +81,7 @@ const BannerContainer = () => {
   };
 
   // Handle deleting a banner
-  const handleDeleteBanner = async (id) => {
+  const handleDeleteBanner = async id => {
     try {
       await deleteBanner(id);
     } catch (err) {
@@ -91,7 +91,10 @@ const BannerContainer = () => {
 
   if (error) {
     return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+      <div
+        className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+        role="alert"
+      >
         <strong className="font-bold">Error: </strong>
         <span className="block sm:inline">{error}</span>
       </div>
@@ -101,11 +104,7 @@ const BannerContainer = () => {
   // Render the current view
   if (view === 'form') {
     return (
-      <BannerForm
-        banner={currentBanner}
-        onSave={handleSaveBanner}
-        onCancel={handleCancelForm}
-      />
+      <BannerForm banner={currentBanner} onSave={handleSaveBanner} onCancel={handleCancelForm} />
     );
   }
 
@@ -114,10 +113,7 @@ const BannerContainer = () => {
     <div>
       <BannerHeader />
 
-      <BannerFilters
-        filters={{ status, search }}
-        onFilterChange={updateFilters}
-      />
+      <BannerFilters filters={{ status, search }} onFilterChange={updateFilters} />
 
       <BannerList
         banners={banners}

@@ -1,5 +1,3 @@
-
-
 export const listStyles = {
   container: `flex justify-between items-center mb-4`,
   title: `text-xl font-semibold text-gray-800`,

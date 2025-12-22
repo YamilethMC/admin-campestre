@@ -1,17 +1,17 @@
 import React from 'react';
 import NoticeCard from '../NoticeCard';
 
-const NoticeList = ({ 
-  notices, 
-  filters, 
-  loading, 
-  meta, 
-  page, 
-  setPage, 
-  onEdit, 
-  onToggleStatus, 
-  onDelete, 
-  onAddNotice 
+const NoticeList = ({
+  notices,
+  filters,
+  loading,
+  meta,
+  page,
+  setPage,
+  onEdit,
+  onToggleStatus,
+  onDelete,
+  onAddNotice,
 }) => {
   if (loading && notices.length === 0) {
     // Show a skeleton loading state when loading and no notices are displayed yet
@@ -24,7 +24,12 @@ const NoticeList = ({
             className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md flex items-center transition-colors"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              />
             </svg>
             Agregar aviso
           </button>
@@ -56,7 +61,12 @@ const NoticeList = ({
           className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md flex items-center transition-colors"
         >
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
           </svg>
           Agregar aviso
         </button>
@@ -64,8 +74,18 @@ const NoticeList = ({
 
       {notices.length === 0 ? (
         <div className="bg-white rounded-lg shadow p-8 text-center">
-          <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          <svg
+            className="w-16 h-16 mx-auto text-gray-400 mb-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
           </svg>
           <h3 className="text-lg font-medium text-gray-800 mb-1">No hay avisos</h3>
           <p className="text-gray-500">No se han subido avisos con los filtros aplicados</p>
@@ -102,7 +122,9 @@ const NoticeList = ({
                   key={num}
                   onClick={() => setPage(num)}
                   className={`px-3 py-1 rounded border text-sm ${
-                    page === num ? 'bg-primary text-white border-primary' : 'border-gray-300 text-gray-700'
+                    page === num
+                      ? 'bg-primary text-white border-primary'
+                      : 'border-gray-300 text-gray-700'
                   }`}
                 >
                   {num}
@@ -114,7 +136,9 @@ const NoticeList = ({
                 disabled={page === meta.totalPages}
                 onClick={() => setPage(page + 1)}
                 className={`px-3 py-1 rounded border text-sm ${
-                  page === meta.totalPages ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
+                  page === meta.totalPages
+                    ? 'text-gray-300 border-gray-200'
+                    : 'text-primary border-primary'
                 }`}
               >
                 Siguiente

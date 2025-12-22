@@ -8,11 +8,11 @@ const EventForm = ({ event, onSave, onCancel }) => {
     name: '',
     description: '',
     image: '',
-    inscritedShow: true,  // Changed from showInscribedCount
-    progressShow: true,   // Changed from showProgress
+    inscritedShow: true, // Changed from showInscribedCount
+    progressShow: true, // Changed from showProgress
     date: '',
     totalSpots: 0,
-    location: ''
+    location: '',
   });
 
   const [imageFile, setImageFile] = useState(null);
@@ -38,7 +38,7 @@ const EventForm = ({ event, onSave, onCancel }) => {
         progressShow: event.progressShow !== undefined ? event.progressShow : true,
         date: formattedDate,
         totalSpots: event.totalSpots || 0,
-        location: event.location || ''
+        location: event.location || '',
       });
     } else {
       setFormData({
@@ -50,35 +50,35 @@ const EventForm = ({ event, onSave, onCancel }) => {
         progressShow: true,
         date: '',
         totalSpots: 0,
-        location: ''
+        location: '',
       });
     }
   }, [event]);
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : (name === 'totalSpots' ? parseInt(value) || 0 : value)
+      [name]: type === 'checkbox' ? checked : name === 'totalSpots' ? parseInt(value) || 0 : value,
     }));
 
     // Clear error when field is modified
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = e => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData(prev => ({
           ...prev,
-          image: reader.result // This will be a base64 string
+          image: reader.result, // This will be a base64 string
         }));
         setImageFile(file);
         setImageChanged(true); // Mark that image has been changed
@@ -108,7 +108,7 @@ const EventForm = ({ event, onSave, onCancel }) => {
   };
 
   function toUTC(dateLocalString) {
-    const local = new Date(dateLocalString);        // Interpreta YYYY-MM-DDTHH:mm en tu zona local
+    const local = new Date(dateLocalString); // Interpreta YYYY-MM-DDTHH:mm en tu zona local
     return new Date(local.getTime() - local.getTimezoneOffset() * 60000).toISOString();
   }
 
@@ -116,7 +116,7 @@ const EventForm = ({ event, onSave, onCancel }) => {
     // Prepare the data for submission
     let adjustedData = {
       ...formData,
-      date: toUTC(formData.date)
+      date: toUTC(formData.date),
     };
 
     // Only include image in adjustedData if it has been changed
@@ -155,12 +155,14 @@ const EventForm = ({ event, onSave, onCancel }) => {
   return (
     <div className="bg-white rounded-lg shadow p-6 max-w-4xl mx-auto">
       <div className="flex items-center mb-6">
-        <button
-          onClick={handleCancelConfirm}
-          className="mr-4 text-gray-600 hover:text-gray-900"
-        >
+        <button onClick={handleCancelConfirm} className="mr-4 text-gray-600 hover:text-gray-900">
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
           </svg>
         </button>
         <h1 className="text-2xl font-bold text-gray-800">
@@ -207,9 +209,7 @@ const EventForm = ({ event, onSave, onCancel }) => {
 
         {/* Image Upload - Full width */}
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Imagen
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Imagen</label>
           <label
             htmlFor="image-upload"
             className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors"
@@ -224,8 +224,18 @@ const EventForm = ({ event, onSave, onCancel }) => {
                   />
                 </div>
               ) : (
-                <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                  <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <svg
+                  className="mx-auto h-12 w-12 text-gray-400"
+                  stroke="currentColor"
+                  fill="none"
+                  viewBox="0 0 48 48"
+                >
+                  <path
+                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               )}
               <div>
@@ -257,7 +267,9 @@ const EventForm = ({ event, onSave, onCancel }) => {
               </div>
               <button
                 type="button"
-                onClick={() => setFormData(prev => ({ ...prev, inscritedShow: !prev.inscritedShow }))}
+                onClick={() =>
+                  setFormData(prev => ({ ...prev, inscritedShow: !prev.inscritedShow }))
+                }
                 className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
                   formData.inscritedShow ? 'bg-primary' : 'bg-gray-200'
                 }`}
@@ -313,7 +325,7 @@ const EventForm = ({ event, onSave, onCancel }) => {
             }`}
           >
             <option value="">Seleccionar tipo</option>
-            {EventTypesOptions.filter(opt => opt.value !== 'TODAS').map((option) => (
+            {EventTypesOptions.filter(opt => opt.value !== 'TODAS').map(option => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>

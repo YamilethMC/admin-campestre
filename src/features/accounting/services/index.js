@@ -19,7 +19,7 @@ export const accountStatementService = {
       '4_estado_cuenta.pdf',
       '5_estado_cuenta.pdf',
       '10_estado_cuenta.pdf',
-      '15_estado_cuenta.pdf'
+      '15_estado_cuenta.pdf',
     ];
 
     // Process each file in the mock list
@@ -35,14 +35,14 @@ export const accountStatementService = {
             fileName,
             socioNumber,
             memberName: `${member.nombre} ${member.apellidos}`,
-            status: 'Asociado exitosamente'
+            status: 'Asociado exitosamente',
           };
         } else {
           return {
             fileName,
             socioNumber,
             memberName: 'No encontrado',
-            status: 'Socio no encontrado'
+            status: 'Socio no encontrado',
           };
         }
       } else {
@@ -50,7 +50,7 @@ export const accountStatementService = {
           fileName,
           socioNumber: 'N/A',
           memberName: 'N/A',
-          status: 'Número de socio no identificado'
+          status: 'Número de socio no identificado',
         };
       }
     });
@@ -64,14 +64,14 @@ export const accountStatementService = {
    * @param {File} file - The ZIP file to upload
    * @returns {Promise<Object>} API response
    */
-  uploadAccountStatements: async (file) => {
+  uploadAccountStatements: async file => {
     const token = localStorage.getItem('authToken');
 
     if (!token) {
       return {
         success: false,
         error: 'No se encontró token de autorización',
-        status: null
+        status: null,
       };
     }
 
@@ -79,13 +79,16 @@ export const accountStatementService = {
     formData.append('zipFile', file, file.name);
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/account-statements/upload-bulk`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/account-statements/upload-bulk`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
         },
-        body: formData
-      });
+      );
 
       if (!response.ok) {
         const errorResult = await response.json().catch(() => ({}));
@@ -94,10 +97,12 @@ export const accountStatementService = {
         // Manejar códigos de error específicos en el servicio
         switch (response.status) {
           case 400:
-            errorMessage = errorResult.message || 'Error en la validación del archivo o formato no soportado';
+            errorMessage =
+              errorResult.message || 'Error en la validación del archivo o formato no soportado';
             break;
           case 500:
-            errorMessage = errorResult.message || 'Error interno del servidor: Por favor intenta más tarde';
+            errorMessage =
+              errorResult.message || 'Error interno del servidor: Por favor intenta más tarde';
             break;
           default:
             errorMessage = errorResult.message || `Error HTTP ${response.status}`;
@@ -106,7 +111,7 @@ export const accountStatementService = {
         return {
           success: false,
           error: errorMessage,
-          status: response.status
+          status: response.status,
         };
       }
 
@@ -116,14 +121,15 @@ export const accountStatementService = {
         success: true,
         data: result,
         message: result.message || 'Estados de cuenta subidos exitosamente',
-        status: response.status
+        status: response.status,
       };
     } catch (error) {
       console.error('Error uploading account statements:', error);
       let errorMessage = 'Error de conexión. Por favor, intente de nuevo más tarde.';
 
       if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        errorMessage = 'No se pudo conectar con el servidor. Verifique su conexión a internet y que la API esté disponible.';
+        errorMessage =
+          'No se pudo conectar con el servidor. Verifique su conexión a internet y que la API esté disponible.';
       } else {
         errorMessage = error.message || errorMessage;
       }
@@ -131,7 +137,7 @@ export const accountStatementService = {
       return {
         success: false,
         error: errorMessage,
-        status: null
+        status: null,
       };
     }
   },
@@ -141,7 +147,7 @@ export const accountStatementService = {
    * @param {Array} results - Array of processing results
    * @returns {Promise<void>}
    */
-  sendAccountStatements: async (results) => {
+  sendAccountStatements: async results => {
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 300));
 
@@ -149,5 +155,5 @@ export const accountStatementService = {
     const successful = results.filter(r => r.status === 'Asociado exitosamente').length;
 
     return Promise.resolve();
-  }
+  },
 };

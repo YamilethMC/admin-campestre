@@ -19,6 +19,8 @@ import EventsContainer from './features/events/container';
 import HelpCenterContainer from './features/help-center/container';
 import BannerContainer from './features/banner/container';
 import TemporaryPassesContainer from './features/temporary-passes';
+import LegalDocumentManager from './features/legal';
+import Settings from './pages/Settings';
 import VerifyAccess from './pages/VerifyAccess';
 
 function App() {
@@ -53,6 +55,8 @@ function AppContent() {
         <Route path="archivos" element={<FileUploadContainer />} />
         <Route path="instalaciones" element={<FacilitiesContainer />} />
         <Route path="ayuda" element={<HelpCenterContainer />} />
+        <Route path="documentos-legales" element={<LegalDocumentManager />} />
+        <Route path="configuracion" element={<Settings />} />
         <Route path="logs" element={<LogPanel />} />
         <Route path="404" element={<NotFound />} />
         <Route path="*" element={<Navigate to="/404" replace />} />

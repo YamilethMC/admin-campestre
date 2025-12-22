@@ -16,13 +16,18 @@ const Modal = ({ isOpen, onClose, title, children, footer, showCloseButton = tru
                 aria-label="Cerrar"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             )}
           </div>
         )}
-        
+
         {/* If no title but close button is requested, add close button in the content area */}
         {!title && showCloseButton && (
           <div className="flex justify-end p-2">
@@ -32,20 +37,21 @@ const Modal = ({ isOpen, onClose, title, children, footer, showCloseButton = tru
               aria-label="Cerrar"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
         )}
-        
-        <div className="p-6">
-          {children}
-        </div>
-        
+
+        <div className="p-6">{children}</div>
+
         {footer && (
-          <div className="border-t border-gray-200 p-4 bg-gray-50 rounded-b-lg">
-            {footer}
-          </div>
+          <div className="border-t border-gray-200 p-4 bg-gray-50 rounded-b-lg">{footer}</div>
         )}
       </div>
     </div>

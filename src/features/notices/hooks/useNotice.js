@@ -24,7 +24,7 @@ export const useNotice = () => {
       search: params.search || search,
       active: params.status || status === 'activas', // Convert status to boolean
       order: 'asc', // Fixed as requested
-      orderBy: 'title' // Fixed as requested
+      orderBy: 'title', // Fixed as requested
     };
     const response = await noticeService.fetchNotices(currentParams);
 
@@ -53,7 +53,7 @@ export const useNotice = () => {
   };
 
   // Create new notice
-  const createNotice = async (noticeData) => {
+  const createNotice = async noticeData => {
     setLoading(true);
     const result = await noticeService.createNotice(noticeData);
 
@@ -81,7 +81,7 @@ export const useNotice = () => {
   };
 
   // Get a single notice by ID
-  const getNoticeById = async (id) => {
+  const getNoticeById = async id => {
     const result = await noticeService.getNoticeById(id);
 
     if (result.success) {
@@ -92,7 +92,7 @@ export const useNotice = () => {
   };
 
   // Delete a notice
-  const deleteNotice = async (id) => {
+  const deleteNotice = async id => {
     const result = await noticeService.deleteNotice(id);
 
     if (result.success) {
@@ -134,6 +134,6 @@ export const useNotice = () => {
     createNotice,
     updateNotice,
     getNoticeById,
-    deleteNotice
+    deleteNotice,
   };
 };

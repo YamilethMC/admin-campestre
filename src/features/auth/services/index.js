@@ -38,7 +38,7 @@ export const authService = {
         return {
           success: false,
           error: errorMessage,
-          status: response.status
+          status: response.status,
         };
       }
 
@@ -60,22 +60,22 @@ export const authService = {
       return {
         success: false,
         error: 'Error de conexión. Por favor, intente de nuevo más tarde.',
-        status: null
+        status: null,
       };
     }
   },
 
   async logout() {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem('authToken');
     if (!token) return;
 
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/logout`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "accept": "application/json",
-          "Authorization": `Bearer ${token}`
-        }
+          accept: 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) {
@@ -96,22 +96,22 @@ export const authService = {
         return {
           success: false,
           error: errorMessage,
-          status: response.status
+          status: response.status,
         };
       }
 
       return {
         success: true,
         message: 'Sesión cerrada exitosamente',
-        status: response.status
+        status: response.status,
       };
     } catch (error) {
-      console.error("Error en logout:", error);
+      console.error('Error en logout:', error);
       return {
         success: false,
         error: 'Error de conexión. Por favor, intente de nuevo más tarde.',
-        status: null
+        status: null,
       };
     }
-  }
+  },
 };

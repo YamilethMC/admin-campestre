@@ -31,7 +31,7 @@ const VerifyAccess = () => {
 
       const response = await fetch(`${apiUrl}/access/check-info/${passToken}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -56,7 +56,7 @@ const VerifyAccess = () => {
       const response = await fetch(`${apiUrl}/access/register-entry`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -101,8 +101,18 @@ const VerifyAccess = () => {
         <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
           <div className="text-center">
             <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
-              <svg className="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="h-8 w-8 text-red-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Error</h2>
@@ -125,8 +135,18 @@ const VerifyAccess = () => {
         <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
           <div className="text-center">
             <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-green-100 mb-4">
-              <svg className="h-12 w-12 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <svg
+                className="h-12 w-12 text-green-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">¡Entrada Registrada!</h2>
@@ -142,7 +162,9 @@ const VerifyAccess = () => {
   const pass = passInfo?.pass;
 
   return (
-    <div className={`min-h-screen ${isValid ? 'bg-gradient-to-br from-blue-500 to-purple-600' : 'bg-gradient-to-br from-red-500 to-pink-600'} flex items-center justify-center p-4`}>
+    <div
+      className={`min-h-screen ${isValid ? 'bg-gradient-to-br from-blue-500 to-purple-600' : 'bg-gradient-to-br from-red-500 to-pink-600'} flex items-center justify-center p-4`}
+    >
       <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full">
         {/* Header */}
         <div className="text-center mb-6">
@@ -221,7 +243,7 @@ const VerifyAccess = () => {
                 <p className="text-sm text-gray-600">
                   {new Date(pass.lastEntry).toLocaleString('es-MX', {
                     dateStyle: 'medium',
-                    timeStyle: 'short'
+                    timeStyle: 'short',
                   })}
                 </p>
               </div>
@@ -242,13 +264,29 @@ const VerifyAccess = () => {
             <button
               onClick={handleConfirmEntry}
               disabled={registering}
-              className="flex-1 bg-green-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
+              className="flex-1 bg-primary text-white py-4 rounded-lg font-bold text-lg hover:bg-primary-dark transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {registering ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   Registrando...
                 </>

@@ -7,7 +7,7 @@ export const temporaryPassesService = {
       const response = await fetch(`${API_URL}/club-members/temporary-passes/pending`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
@@ -39,7 +39,7 @@ export const temporaryPassesService = {
       const response = await fetch(`${API_URL}/users/${userId}`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -71,7 +71,7 @@ export const temporaryPassesService = {
       const response = await fetch(`${API_URL}/club-members/${memberId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });

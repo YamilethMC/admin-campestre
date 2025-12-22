@@ -1,34 +1,33 @@
 export const surveyService = {
-
   getSurveyCategoryOptions: async () => {
     await new Promise(resolve => setTimeout(resolve, 300));
-    
+
     return [
       { value: 'TODAS', label: 'Todas' },
       { value: 'SERVICES', label: 'Servicios' },
       { value: 'RESTAURANT', label: 'Restaurante' },
       { value: 'SPORTS', label: 'Deportes' },
-      { value: 'EVENTS', label: 'Eventos' }
+      { value: 'EVENTS', label: 'Eventos' },
     ];
   },
 
   getSurveyPriorityOptions: async () => {
     await new Promise(resolve => setTimeout(resolve, 300));
-    
+
     return [
       { value: 'HIGH', label: 'Importante' },
       { value: 'MEDIUM', label: 'Normal' },
-      { value: 'LOW', label: 'Baja' }
+      { value: 'LOW', label: 'Baja' },
     ];
   },
 
-  getSurveyById: async (id) => {
+  getSurveyById: async id => {
     const token = localStorage.getItem('authToken');
     const response = await fetch(`${process.env.REACT_APP_API_URL}/survey/${id}`, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
     });
     if (!response.ok) {
@@ -52,26 +51,26 @@ export const surveyService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
     const data = await response.json();
     return {
       success: true,
       data: data.data,
-      status: response.status
+      status: response.status,
     };
   },
 
-  createSurvey: async (surveyData) => {
+  createSurvey: async surveyData => {
     const token = localStorage.getItem('authToken');
     const response = await fetch(`${process.env.REACT_APP_API_URL}/survey`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(surveyData)
+      body: JSON.stringify(surveyData),
     });
     if (!response.ok) {
       const err = await response.json();
@@ -93,7 +92,7 @@ export const surveyService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -102,19 +101,19 @@ export const surveyService = {
       success: true,
       data: result,
       message: result.message || 'Encuesta creada exitosamente',
-      status: response.status
+      status: response.status,
     };
   },
 
   updateSurvey: async (id, surveyData) => {
     const token = localStorage.getItem('authToken');
     const response = await fetch(`${process.env.REACT_APP_API_URL}/survey/${id}`, {
-      method: "PATCH",
+      method: 'PATCH',
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(surveyData)
+      body: JSON.stringify(surveyData),
     });
     if (!response.ok) {
       const err = await response.json();
@@ -147,7 +146,7 @@ export const surveyService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
     const result = await response.json();
@@ -155,27 +154,27 @@ export const surveyService = {
       success: true,
       data: result,
       message: result.message || 'Encuesta actualizada exitosamente',
-      status: response.status
+      status: response.status,
     };
   },
 
-  toggleSurveyStatus: async (id) => {
-    const token = localStorage.getItem("authToken");
+  toggleSurveyStatus: async id => {
+    const token = localStorage.getItem('authToken');
     if (!token) {
       return {
         success: false,
         error: 'No se encontró el token de autenticación',
-        status: 401
+        status: 401,
       };
     }
 
     const response = await fetch(`${process.env.REACT_APP_API_URL}/survey/${id}/toggle-active`, {
-      method: "PATCH",
+      method: 'PATCH',
       headers: {
-        "accept": "application/json",
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
+        accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -188,7 +187,8 @@ export const surveyService = {
           errorMessage = 'No autorizado: Por favor inicia sesión para continuar';
           break;
         case 403:
-          errorMessage = 'Acceso prohibido: No tienes permisos para cambiar el estado de esta encuesta';
+          errorMessage =
+            'Acceso prohibido: No tienes permisos para cambiar el estado de esta encuesta';
           break;
         case 404:
           errorMessage = 'Encuesta no encontrada';
@@ -203,35 +203,35 @@ export const surveyService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
     return {
       success: true,
       message: 'Estado de encuesta actualizado exitosamente',
-      status: response.status
+      status: response.status,
     };
   },
 
   // Delete a survey
-  deleteSurvey: async (id) => {
-    const token = localStorage.getItem("authToken");
+  deleteSurvey: async id => {
+    const token = localStorage.getItem('authToken');
     if (!token) {
       return {
         success: false,
         error: 'No se encontró el token de autenticación',
-        status: 401
+        status: 401,
       };
     }
 
     const response = await fetch(`${process.env.REACT_APP_API_URL}/survey/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
       headers: {
-        "accept": "application/json",
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
+        accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -259,24 +259,24 @@ export const surveyService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
     return {
       success: true,
       message: 'Encuesta eliminada exitosamente',
-      status: response.status
+      status: response.status,
     };
   },
-  
+
   // Get all responses for a survey (for the responses view)
-  getSurveyResponses: async (surveyId) => {
+  getSurveyResponses: async surveyId => {
     const token = localStorage.getItem('authToken');
     const response = await fetch(`${process.env.REACT_APP_API_URL}/survey/${surveyId}/responses`, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
     });
     if (!response.ok) {
@@ -303,14 +303,14 @@ export const surveyService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
     const data = await response.json();
     return {
       success: true,
       data: data.data,
-      status: response.status
+      status: response.status,
     };
   },
 
@@ -320,9 +320,9 @@ export const surveyService = {
     limit = 10,
     search = '',
     category = '',
-    status = '' // 'true', 'false', or empty for all
+    status = '', // 'true', 'false', or empty for all
   } = {}) {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem('authToken');
 
     // Build query parameters
     let query = `${process.env.REACT_APP_API_URL}/survey?page=${page}&limit=${limit}`;
@@ -331,9 +331,9 @@ export const surveyService = {
     if (status) query += `&active=${encodeURIComponent(status)}`;
     const response = await fetch(query, {
       headers: {
-        "accept": "*/*",
-        "Authorization": `Bearer ${token}`
-      }
+        accept: '*/*',
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -357,7 +357,7 @@ export const surveyService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -390,9 +390,9 @@ export const surveyService = {
         surveys: surveys,
         meta: data.data.meta,
         activeCount,
-        inactiveCount
+        inactiveCount,
       },
-      status: response.status
+      status: response.status,
     };
-  }
+  },
 };

@@ -2,7 +2,13 @@ import React, { useState, useContext } from 'react';
 import { AppContext } from '../../../shared/context/AppContext';
 import IndividualMemberForm from '../components/IndividualMemberForm';
 
-const IndividualMember = ({ onCancel, loadMembers, initialData = null, memberId = null, isDependent = false }) => {
+const IndividualMember = ({
+  onCancel,
+  loadMembers,
+  initialData = null,
+  memberId = null,
+  isDependent = false,
+}) => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [pendingNavigationCallback, setPendingNavigationCallback] = useState(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
@@ -21,7 +27,7 @@ const IndividualMember = ({ onCancel, loadMembers, initialData = null, memberId 
     confirmLeave(onCancel);
   };
 
-  const confirmLeave = (callback) => {
+  const confirmLeave = callback => {
     setPendingNavigationCallback(() => callback);
     setShowConfirmationModal(true);
   };
@@ -47,12 +53,26 @@ const IndividualMember = ({ onCancel, loadMembers, initialData = null, memberId 
           className="mr-4 p-2 rounded-md hover:bg-gray-100 transition-colors"
           aria-label="Regresar"
         >
-          <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <svg
+            className="w-6 h-6 text-gray-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
         </button>
         <h2 className="text-2xl font-bold text-gray-800">
-          {isEditMode ? "Editar socio" : isAddingDependent ? "Agregar dependiente" : "Agregar socio"}
+          {isEditMode
+            ? 'Editar socio'
+            : isAddingDependent
+              ? 'Agregar dependiente'
+              : 'Agregar socio'}
         </h2>
       </div>
 

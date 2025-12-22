@@ -39,7 +39,7 @@ const EventFilters = ({ filters, onFilterChange, onDateChange }) => {
   }, [typeFilter, onFilterChange]);
 
   // Handle month/year navigation
-  const navigateMonth = (direction) => {
+  const navigateMonth = direction => {
     const [year, month] = dateInput.split('-').map(Number);
     let newDate = new Date(year, month - 1 + direction, 1);
     const newYear = newDate.getFullYear();
@@ -48,7 +48,7 @@ const EventFilters = ({ filters, onFilterChange, onDateChange }) => {
   };
 
   // Format date for display (e.g., "Noviembre 2025")
-  const formatDateDisplay = (dateStr) => {
+  const formatDateDisplay = dateStr => {
     const [year, month] = dateStr.split('-');
     const date = new Date(year, month - 1, 1);
     return date.toLocaleString('es-ES', { month: 'long', year: 'numeric' });
@@ -61,7 +61,7 @@ const EventFilters = ({ filters, onFilterChange, onDateChange }) => {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Evento</label>
           <div className="flex flex-wrap gap-2">
-            {EventTypesOptions.map((option) => (
+            {EventTypesOptions.map(option => (
               <button
                 key={option.value}
                 type="button"
@@ -87,13 +87,18 @@ const EventFilters = ({ filters, onFilterChange, onDateChange }) => {
               className="px-2 py-1.5 bg-gray-100 hover:bg-gray-200 transition-colors flex items-center"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </button>
             <input
               type="month"
               value={dateInput}
-              onChange={(e) => setDateInput(e.target.value)}
+              onChange={e => setDateInput(e.target.value)}
               className="flex-1 px-2 py-1.5 border-0 focus:outline-none focus:ring-0 text-center text-sm"
             />
             <button
@@ -101,7 +106,12 @@ const EventFilters = ({ filters, onFilterChange, onDateChange }) => {
               className="px-2 py-1.5 bg-gray-100 hover:bg-gray-200 transition-colors flex items-center"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </button>
           </div>
@@ -117,14 +127,24 @@ const EventFilters = ({ filters, onFilterChange, onDateChange }) => {
             <input
               type="text"
               value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
+              onChange={e => setSearchInput(e.target.value)}
               placeholder="Buscar por nombre..."
               className="w-full pl-7 pr-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
             <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
-              <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+              <svg
+                className="h-4 w-4 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
             </div>
           </div>
         </div>

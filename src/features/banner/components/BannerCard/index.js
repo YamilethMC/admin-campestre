@@ -8,12 +8,14 @@ const BannerCard = ({ banner, onEdit, onDelete }) => {
   const buttonRef = useRef(null);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (isMenuOpen &&
-          menuRef.current &&
-          !menuRef.current.contains(event.target) &&
-          buttonRef.current &&
-          !buttonRef.current.contains(event.target)) {
+    const handleClickOutside = event => {
+      if (
+        isMenuOpen &&
+        menuRef.current &&
+        !menuRef.current.contains(event.target) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target)
+      ) {
         setIsMenuOpen(false);
       }
     };
@@ -24,44 +26,36 @@ const BannerCard = ({ banner, onEdit, onDelete }) => {
     };
   }, [isMenuOpen]);
 
-  const formatDateForInput = (isoString) => {
-    if (!isoString) return "";
+  const formatDateForInput = isoString => {
+    if (!isoString) return '';
 
     const date = new Date(isoString);
-    const day = String(date.getUTCDate()).padStart(2, "0");
-    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
     const year = date.getUTCFullYear();
 
     return `${day}/${month}/${year}`;
   };
 
-  const getStatusColor = (active) => {
-    return active
-      ? 'bg-green-100 text-green-800'
-      : 'bg-red-100 text-red-800';
+  const getStatusColor = active => {
+    return active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
   };
 
-  const getActionTypeLabel = (typeActionId) => {
-    const actionTypes = [
-      "External link",
-      "Internal link", 
-      "Open modal",
-      "Open document",
-      "Shared"
-    ];
-    
+  const getActionTypeLabel = typeActionId => {
+    const actionTypes = ['External link', 'Internal link', 'Open modal', 'Open document', 'Shared'];
+
     const spanishLabels = [
-      "Enlace externo",
-      "Enlace interno",
-      "Abrir modal",
-      "Abrir documento",
-      "Compartir"
+      'Enlace externo',
+      'Enlace interno',
+      'Abrir modal',
+      'Abrir documento',
+      'Compartir',
     ];
-    
+
     if (typeActionId && typeActionId >= 1 && typeActionId <= 5) {
       return spanishLabels[typeActionId - 1];
     }
-    return actionTypes[typeActionId - 1] || "Desconocido";
+    return actionTypes[typeActionId - 1] || 'Desconocido';
   };
 
   const handleEdit = () => {
@@ -149,7 +143,7 @@ const BannerCard = ({ banner, onEdit, onDelete }) => {
               className="absolute right-0 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200"
               style={{
                 bottom: '100%',
-                marginBottom: '0.5rem'
+                marginBottom: '0.5rem',
               }}
             >
               <button
@@ -196,7 +190,10 @@ const BannerCard = ({ banner, onEdit, onDelete }) => {
             </div>
           }
         >
-          <p>¿Está seguro de que desea eliminar el banner "{banner.title}"? Esta acción no se puede deshacer.</p>
+          <p>
+            ¿Está seguro de que desea eliminar el banner "{banner.title}"? Esta acción no se puede
+            deshacer.
+          </p>
         </Modal>
       )}
     </div>

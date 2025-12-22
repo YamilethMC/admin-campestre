@@ -3,7 +3,7 @@ export const SurveyCategory = {
   SERVICES: 'Servicios',
   RESTAURANT: 'Restaurante',
   SPORTS: 'Deportes',
-  EVENTS: 'Eventos'
+  EVENTS: 'Eventos',
 };
 
 export const SurveyPriority = {
@@ -15,19 +15,19 @@ export const SurveyPriority = {
 export const SurveyStatus = {
   ACTIVE: 'activas',
   INACTIVE: 'inactivas',
-  ALL: 'todas'
+  ALL: 'todas',
 };
 
 export const SurveyQuestionType = {
   NUMBER: 'NUMBER', // 1-10 range
   SELECT: 'SELECT',
   TEXT: 'TEXT', // open question
-  BOOLEAN: 'BOOLEAN'
+  BOOLEAN: 'BOOLEAN',
 };
 
 export const SurveyFilter = {
   category: SurveyCategory.ALL,
-  status: SurveyStatus.ALL
+  status: SurveyStatus.ALL,
 };
 
 // Survey interface

@@ -24,7 +24,7 @@ export const useBanner = () => {
       search: params.search || search,
       active: params.status || status === 'activas', // Convert status to boolean
       order: 'asc', // Fixed as requested
-      orderBy: 'createdAt' // Fixed as requested
+      orderBy: 'createdAt', // Fixed as requested
     };
 
     const response = await bannerService.fetchBanners(currentParams);
@@ -41,7 +41,7 @@ export const useBanner = () => {
   };
 
   // Create new banner
-  const createBanner = async (bannerData) => {
+  const createBanner = async bannerData => {
     setLoading(true);
     const result = await bannerService.createBanner(bannerData);
 
@@ -75,7 +75,7 @@ export const useBanner = () => {
   };
 
   // Get a single banner by ID
-  const getBannerById = async (id) => {
+  const getBannerById = async id => {
     const result = await bannerService.getBannerById(id);
 
     if (result.success) {
@@ -86,7 +86,7 @@ export const useBanner = () => {
   };
 
   // Delete a banner
-  const deleteBanner = async (id) => {
+  const deleteBanner = async id => {
     const result = await bannerService.deleteBanner(id);
 
     if (result.success) {
@@ -133,6 +133,6 @@ export const useBanner = () => {
     createBanner,
     updateBanner,
     getBannerById,
-    deleteBanner
+    deleteBanner,
   };
 };

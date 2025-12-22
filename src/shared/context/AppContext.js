@@ -5,32 +5,26 @@ export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  
-  const [logs, setLogs] = useState([
-    'Sistema iniciado correctamente',
-    'Datos iniciales cargados'
-  ]);
-  
+
+  const [logs, setLogs] = useState(['Sistema iniciado correctamente', 'Datos iniciales cargados']);
+
   const [toasts, setToasts] = useState([]);
 
   useEffect(() => {
     if (logs.length === 2) {
-      setLogs([
-        'Sistema iniciado correctamente',
-        'Datos iniciales cargados'
-      ]);
+      setLogs(['Sistema iniciado correctamente', 'Datos iniciales cargados']);
     }
   }, []);
 
-  const addLog = (message) => {
+  const addLog = message => {
     setLogs(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
   };
   const addToast = (message, type = 'info') => {
     const id = Date.now() + Math.random();
     const newToast = { id, message, type };
-    
+
     setToasts(prev => [...prev, newToast]);
-    
+
     setTimeout(() => {
       setToasts(prev => prev.filter(toast => toast.id !== id));
     }, 5000);
@@ -42,7 +36,7 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem('authToken');
     const user = localStorage.getItem('currentUser');
-    
+
     if (token && user) {
       setAuthToken(token);
       setCurrentUser(JSON.parse(user));
@@ -54,10 +48,10 @@ export const AppProvider = ({ children }) => {
     setIsAuthenticated(true);
     setCurrentUser(user);
     setAuthToken(token);
-    
+
     localStorage.setItem('authToken', token);
     localStorage.setItem('currentUser', JSON.stringify(user));
-    
+
     return true;
   };
 
@@ -80,20 +74,22 @@ export const AppProvider = ({ children }) => {
   };
 
   return (
-    <AppContext.Provider value={{ 
-      logs, 
-      setLogs, 
-      toasts,
-      setToasts,
-      addLog,
-      addToast,
-      isAuthenticated,
-      setIsAuthenticated,
-      currentUser,
-      setCurrentUser,
-      login,
-      logout
-    }}>
+    <AppContext.Provider
+      value={{
+        logs,
+        setLogs,
+        toasts,
+        setToasts,
+        addLog,
+        addToast,
+        isAuthenticated,
+        setIsAuthenticated,
+        currentUser,
+        setCurrentUser,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AppContext.Provider>
   );

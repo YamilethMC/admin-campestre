@@ -2,21 +2,15 @@ import React from 'react';
 import { useAccountStatement } from '../../hooks/useAccountStatement';
 
 const AccountStatementForm = () => {
-  const {
-    fileList,
-    handleFileUpload,
-    handleUpload
-  } = useAccountStatement();
+  const { fileList, handleFileUpload, handleUpload } = useAccountStatement();
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
       <h2 className="text-xl font-semibold mb-4 text-primary">Carga masiva de estados de cuenta</h2>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">   
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Archivo ZIP
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Archivo ZIP</label>
           <div className="flex items-center">
             <input
               id="file-input-account-statement"

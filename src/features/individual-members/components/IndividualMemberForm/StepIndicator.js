@@ -10,15 +10,20 @@ const StepIndicator = ({ currentStep, steps }) => {
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-colors ${
                   index + 1 < currentStep
-                    ? 'bg-green-500 text-white'
-                    : index + 1 === currentStep
                     ? 'bg-primary text-white'
-                    : 'bg-gray-300 text-gray-600'
+                    : index + 1 === currentStep
+                      ? 'bg-primary text-white'
+                      : 'bg-gray-300 text-gray-600'
                 }`}
               >
                 {index + 1 < currentStep ? (
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 ) : (
                   index + 1
@@ -37,7 +42,7 @@ const StepIndicator = ({ currentStep, steps }) => {
             {index < steps.length - 1 && (
               <div
                 className={`flex-1 h-1 mx-2 transition-colors ${
-                  index + 1 < currentStep ? 'bg-green-500' : 'bg-gray-300'
+                  index + 1 < currentStep ? 'bg-primary' : 'bg-gray-300'
                 }`}
                 style={{ maxWidth: '100px' }}
               />

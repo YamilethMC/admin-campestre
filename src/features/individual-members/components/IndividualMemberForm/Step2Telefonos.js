@@ -26,9 +26,7 @@ const Step2Telefonos = ({ formData, handleChange }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Alias
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Alias</label>
               <input
                 type="text"
                 name="alias_movil"
@@ -41,14 +39,10 @@ const Step2Telefonos = ({ formData, handleChange }) => {
         </div>
 
         <div className="border border-gray-200 rounded-lg p-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Teléfono fijo
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono fijo</label>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Número
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Número</label>
               <input
                 type="text"
                 name="telefono_fijo"
@@ -61,9 +55,7 @@ const Step2Telefonos = ({ formData, handleChange }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Alias
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Alias</label>
               <input
                 type="text"
                 name="alias_fijo"
@@ -74,16 +66,14 @@ const Step2Telefonos = ({ formData, handleChange }) => {
             </div>
           </div>
         </div>
-        
+
         <div className="border border-gray-200 rounded-lg p-4 md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Teléfono de emergencia
           </label>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Número
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Número</label>
               <input
                 type="text"
                 name="telefono_emergencia"
@@ -96,9 +86,7 @@ const Step2Telefonos = ({ formData, handleChange }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Alias
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Alias</label>
               <input
                 type="text"
                 name="alias_emergencia"

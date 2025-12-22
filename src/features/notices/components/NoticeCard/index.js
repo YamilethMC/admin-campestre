@@ -8,25 +8,27 @@ const NoticeCard = ({ notice, onEdit, onToggleStatus, onDelete }) => {
   const menuRef = useRef(null);
   const buttonRef = useRef(null);
 
-  const formatDateForInput = (isoString) => {
+  const formatDateForInput = isoString => {
     console.log(notice.visibleUntil);
-    if (!isoString) return "";
+    if (!isoString) return '';
 
     const date = new Date(isoString);
-    const day = String(date.getUTCDate()).padStart(2, "0");
-    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
     const year = date.getUTCFullYear();
 
     return `${day}-${month}-${year}`;
   };
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (isMenuOpen && 
-          menuRef.current && 
-          !menuRef.current.contains(event.target) &&
-          buttonRef.current && 
-          !buttonRef.current.contains(event.target)) {
+    const handleClickOutside = event => {
+      if (
+        isMenuOpen &&
+        menuRef.current &&
+        !menuRef.current.contains(event.target) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target)
+      ) {
         setIsMenuOpen(false);
       }
     };
@@ -37,10 +39,8 @@ const NoticeCard = ({ notice, onEdit, onToggleStatus, onDelete }) => {
     };
   }, [isMenuOpen]);
 
-  const getStatusColor = (active) => {
-    return active 
-      ? cardStyles.statusTag.active 
-      : cardStyles.statusTag.inactive;
+  const getStatusColor = active => {
+    return active ? cardStyles.statusTag.active : cardStyles.statusTag.inactive;
   };
 
   const handleToggleStatus = async () => {
@@ -75,29 +75,44 @@ const NoticeCard = ({ notice, onEdit, onToggleStatus, onDelete }) => {
         <div className={cardStyles.contentContainer}>
           <h3 className={cardStyles.title}>{notice.title}</h3>
           <p className={cardStyles.description}>{notice.message}</p>
-          
+
           <div className={cardStyles.infoContainer}>
             <div className={cardStyles.infoItem}>
-              <svg className={cardStyles.infoIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                  d="M8 7V3m8 4V3m-9 8h10m-11 8h12a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              <svg
+                className={cardStyles.infoIcon}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 7V3m8 4V3m-9 8h10m-11 8h12a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
               </svg>
               {formatDateForInput(notice.sentDate)}
             </div>
 
             {notice.visibleUntil && (
-            <div className={cardStyles.infoItem}>
-              <svg className={cardStyles.infoIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              {formatDateForInput(notice.visibleUntil)}
-            </div>
+              <div className={cardStyles.infoItem}>
+                <svg
+                  className={cardStyles.infoIcon}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                {formatDateForInput(notice.visibleUntil)}
+              </div>
             )}
 
-            
-
-            
             {/*{notice.dateUpdated && notice.dateUpdated !== notice.dateCreated && (
               <div className={cardStyles.infoItem}>
                 <svg className={cardStyles.infoIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -107,20 +122,18 @@ const NoticeCard = ({ notice, onEdit, onToggleStatus, onDelete }) => {
               </div>
             )}*/}
           </div>
-          
+
           <div className={cardStyles.tagsContainer}>
             <span className={`${cardStyles.tag} ${getStatusColor(notice.active)}`}>
               {notice.active ? 'Activo' : 'Inactivo'}
             </span>
 
             {notice.type && (
-              <span className={`${cardStyles.tag} ${cardStyles.typeTag}`}>
-                {notice.type}
-              </span>
+              <span className={`${cardStyles.tag} ${cardStyles.typeTag}`}>{notice.type}</span>
             )}
           </div>
         </div>
-        
+
         {/* Options menu */}
         <div className="relative ml-4">
           <button
@@ -133,33 +146,24 @@ const NoticeCard = ({ notice, onEdit, onToggleStatus, onDelete }) => {
               <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
             </svg>
           </button>
-          
+
           {isMenuOpen && (
-            <div 
+            <div
               ref={menuRef}
               className={cardStyles.optionsMenu}
-              style={{ 
-                bottom: '100%', 
-                marginBottom: '0.5rem' 
+              style={{
+                bottom: '100%',
+                marginBottom: '0.5rem',
               }}
             >
-              <button
-                onClick={handleToggleStatus}
-                className={cardStyles.optionsMenuItem}
-              >
+              <button onClick={handleToggleStatus} className={cardStyles.optionsMenuItem}>
                 {notice.active ? 'Desactivar' : 'Activar'}
               </button>
-              <button
-                onClick={handleEdit}
-                className={cardStyles.optionsMenuItem}
-              >
+              <button onClick={handleEdit} className={cardStyles.optionsMenuItem}>
                 Editar
               </button>
               {onDelete && (
-                <button
-                  onClick={handleDeleteClick}
-                  className={cardStyles.deleteMenuItem}
-                >
+                <button onClick={handleDeleteClick} className={cardStyles.deleteMenuItem}>
                   Eliminar
                 </button>
               )}
@@ -167,7 +171,7 @@ const NoticeCard = ({ notice, onEdit, onToggleStatus, onDelete }) => {
           )}
         </div>
       </div>
-      
+
       {onDelete && (
         <Modal
           isOpen={showDeleteModal}
@@ -192,7 +196,10 @@ const NoticeCard = ({ notice, onEdit, onToggleStatus, onDelete }) => {
             </div>
           }
         >
-          <p>¿Está seguro de que desea eliminar el aviso "{notice.title}"? Esta acción no se puede deshacer.</p>
+          <p>
+            ¿Está seguro de que desea eliminar el aviso "{notice.title}"? Esta acción no se puede
+            deshacer.
+          </p>
         </Modal>
       )}
     </div>

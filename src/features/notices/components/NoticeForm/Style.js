@@ -1,5 +1,3 @@
-
-
 export const formStyles = {
   container: `max-w-2xl mx-auto`,
   backButton: `mr-4 p-2 rounded-md hover:bg-gray-100 transition-colors`,

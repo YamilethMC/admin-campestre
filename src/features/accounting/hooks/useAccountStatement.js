@@ -4,7 +4,7 @@ import { AppContext } from '../../../shared/context/AppContext';
 
 export const useAccountStatement = () => {
   const { members, addLog, addToast } = useContext(AppContext);
-  
+
   const [year, setYear] = useState(new Date().getFullYear());
   const [month, setMonth] = useState(new Date().getMonth() + 1); // Mes actual (1-12)
   const [selectedFile, setSelectedFile] = useState(null);
@@ -12,21 +12,31 @@ export const useAccountStatement = () => {
   const [uploadResults, setUploadResults] = useState([]);
   const [processingDone, setProcessingDone] = useState(false);
   const [sentResults, setSentResults] = useState(false);
-  
+
   // Generar opciones para años (últimos 5 años)
   const years = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i);
-  
+
   // Generar nombres de meses
   const months = [
-    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    'Enero',
+    'Febrero',
+    'Marzo',
+    'Abril',
+    'Mayo',
+    'Junio',
+    'Julio',
+    'Agosto',
+    'Septiembre',
+    'Octubre',
+    'Noviembre',
+    'Diciembre',
   ];
 
   /**
    * Handle file upload
    * @param {Object} e - File input event
    */
-  const handleFileUpload = (e) => {
+  const handleFileUpload = e => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -62,7 +72,12 @@ export const useAccountStatement = () => {
     }
 
     try {
-      const results = await accountStatementService.processAccountStatement(selectedFile, members, year, month);
+      const results = await accountStatementService.processAccountStatement(
+        selectedFile,
+        members,
+        year,
+        month,
+      );
       setUploadResults(results);
       setProcessingDone(true);
       setSentResults(false);
@@ -70,7 +85,7 @@ export const useAccountStatement = () => {
       const successful = results.filter(r => r.status === 'Asociado exitosamente').length;
       const failed = results.filter(r => r.status !== 'Asociado exitosamente').length;
 
-      const message = `Proceso completado: ${successful} estados asociados, ${failed} con errores. Año/Mes: ${year}/${months[month-1]}`;
+      const message = `Proceso completado: ${successful} estados asociados, ${failed} con errores. Año/Mes: ${year}/${months[month - 1]}`;
       addLog(message);
 
       return results;
@@ -97,7 +112,9 @@ export const useAccountStatement = () => {
     if (result.success) {
       // Check if the upload was successful
       if (result.data && result.data.success) {
-        addLog(`Estados de cuenta subidos exitosamente: ${result.data.processed} de ${result.data.totalFiles} archivos procesados`);
+        addLog(
+          `Estados de cuenta subidos exitosamente: ${result.data.processed} de ${result.data.totalFiles} archivos procesados`,
+        );
         addToast(result.message || 'Estados de cuenta subidos exitosamente', 'success');
       } else {
         const errorMessage = result.message || 'Error desconocido al subir el archivo';
@@ -130,7 +147,7 @@ export const useAccountStatement = () => {
     setUploadResults([]);
     setProcessingDone(false);
     setSentResults(false);
-    
+
     // Clear file input in the DOM
     const fileInput = document.getElementById('file-input-account-statement');
     if (fileInput) fileInput.value = '';
@@ -154,6 +171,6 @@ export const useAccountStatement = () => {
     handleUpload,
     resetForm,
     addLog,
-    addToast
+    addToast,
   };
 };

@@ -1,16 +1,15 @@
 export const helpCenterService = {
-
   // Get all help center entries
   fetchHelpCenter: async () => {
     const token = localStorage.getItem('authToken');
     const response = await fetch(`${process.env.REACT_APP_API_URL}/help-center`, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
     });
-    
+
     if (!response.ok) {
       const err = await response.json();
       let errorMessage = err.message || 'Error desconocido';
@@ -26,29 +25,29 @@ export const helpCenterService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
-    
+
     const data = await response.json();
     return {
       success: true,
       data: data.data,
-      status: response.status
+      status: response.status,
     };
   },
 
   // Get a single help center entry by ID
-  getHelpCenterById: async (id) => {
+  getHelpCenterById: async id => {
     const token = localStorage.getItem('authToken');
     const response = await fetch(`${process.env.REACT_APP_API_URL}/help-center/${id}`, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
     });
-    
+
     if (!response.ok) {
       const err = await response.json();
       let errorMessage = err.message || 'Error desconocido';
@@ -64,34 +63,34 @@ export const helpCenterService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
-    
+
     const data = await response.json();
     return {
       success: true,
       data: data.data,
-      status: response.status
+      status: response.status,
     };
   },
 
   // Create a new help center entry
-  createHelpCenter: async (helpCenterData) => {
+  createHelpCenter: async helpCenterData => {
     const token = localStorage.getItem('authToken');
     const response = await fetch(`${process.env.REACT_APP_API_URL}/help-center`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(helpCenterData)
+      body: JSON.stringify(helpCenterData),
     });
-    
+
     if (!response.ok) {
       const err = await response.json();
       let errorMessage = err.message || 'Error desconocido';
-      
+
       switch (response.status) {
         case 400:
           errorMessage = 'Datos inválidos';
@@ -106,7 +105,7 @@ export const helpCenterService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
 
@@ -115,7 +114,7 @@ export const helpCenterService = {
       success: true,
       data: result.data,
       message: result.message || 'Entrada de centro de ayuda creada exitosamente',
-      status: response.status
+      status: response.status,
     };
   },
 
@@ -123,14 +122,14 @@ export const helpCenterService = {
   updateHelpCenter: async (id, helpCenterData) => {
     const token = localStorage.getItem('authToken');
     const response = await fetch(`${process.env.REACT_APP_API_URL}/help-center/${id}`, {
-      method: "PATCH",
+      method: 'PATCH',
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(helpCenterData)
+      body: JSON.stringify(helpCenterData),
     });
-    
+
     if (!response.ok) {
       const err = await response.json();
       let errorMessage = err.message || 'Error desconocido';
@@ -153,37 +152,37 @@ export const helpCenterService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
-    
+
     const result = await response.json();
     return {
       success: true,
       data: result.data,
       message: result.message || 'Entrada de centro de ayuda actualizada exitosamente',
-      status: response.status
+      status: response.status,
     };
   },
 
   // Delete a help center entry
-  deleteHelpCenter: async (id) => {
-    const token = localStorage.getItem("authToken");
+  deleteHelpCenter: async id => {
+    const token = localStorage.getItem('authToken');
     if (!token) {
       return {
         success: false,
         error: 'No se encontró el token de autenticación',
-        status: 401
+        status: 401,
       };
     }
 
     const response = await fetch(`${process.env.REACT_APP_API_URL}/help-center/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
       headers: {
-        "accept": "application/json",
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
+        accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -205,14 +204,14 @@ export const helpCenterService = {
       return {
         success: false,
         error: errorMessage,
-        status: response.status
+        status: response.status,
       };
     }
-    
+
     return {
       success: true,
       message: 'Entrada de centro de ayuda eliminada exitosamente',
-      status: response.status
+      status: response.status,
     };
-  }
+  },
 };
