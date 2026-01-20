@@ -9,7 +9,6 @@ const NoticeCard = ({ notice, onEdit, onToggleStatus, onDelete }) => {
   const buttonRef = useRef(null);
 
   const formatDateForInput = isoString => {
-    console.log(notice.visibleUntil);
     if (!isoString) return '';
 
     const date = new Date(isoString);

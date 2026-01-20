@@ -22,7 +22,6 @@ export function useMembers() {
       active: activeParam,
       search: searchParam,
     });
-    console.log('loadMembers data:', data);
     if (data.success) {
       setMembers(data.data.members);
       setMeta(data.data.meta);

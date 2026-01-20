@@ -48,7 +48,6 @@ export const memberService = {
 
   async deleteMember(id) {
     const token = localStorage.getItem('authToken');
-    console.log('id member', id);
     const response = await fetch(`${process.env.REACT_APP_API_URL}/club-members/${id}`, {
       method: 'DELETE',
       headers: {

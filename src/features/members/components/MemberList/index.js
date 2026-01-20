@@ -69,7 +69,6 @@ const MemberList = () => {
   };
 
   const handleFormMember = (member = null) => {
-    console.log('handleFormMember called with member:', member);
     setEditingMember(member);
     setIsAddingDependent(false); // Estamos editando, no agregando dependiente
     setShowForm(true);
@@ -77,7 +76,6 @@ const MemberList = () => {
   };
 
   const handleAddDependent = member => {
-    console.log('handleAddDependent called with member:', member);
     setEditingMember(member); // Pasamos el socio principal para tener su ID
     setIsAddingDependent(true); // Indicamos que estamos agregando un dependiente
     setShowForm(true);

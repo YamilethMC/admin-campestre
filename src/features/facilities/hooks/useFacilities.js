@@ -121,7 +121,6 @@ export function useFacilities(initialFilters = {}) {
   const deleteReservation = async (facilityId, reservationId) => {
     try {
       // Placeholder for deleting reservation - in the future this would call a service method
-      console.log('Deleting reservation:', reservationId, 'from facility:', facilityId);
       return true;
     } catch (error) {
       addToast(error.message || 'Error al eliminar la reservación', 'error');
