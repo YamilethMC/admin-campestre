@@ -92,7 +92,7 @@ const LoginForm = () => {
             </div>
           </div>
 
-          {error && (
+          {error && ( 
             <div className="rounded-md bg-red-50 p-4">
               <div className="flex">
                 <div className="flex-shrink-0">
