@@ -1,29 +1,13 @@
+import api from '../../../shared/api/api';
+
 export const authService = {
-  /**
-   * Performs validation of credentials
-   * @param {Object} credentials - Login credentials
-   * @param {string} credentials.email - The user's email
-   * @param {string} credentials.password - The password
-   * @returns {Promise<Object>} Validation result
-   */
   validateCredentials: async ({ email, password }) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
+      const response = await api.post('/auth/login', { email, password });
 
-      const data = await response.json();
       if (!response.ok) {
-        let errorMessage = data.message || 'Error de autenticación';
+        let errorMessage = response.data?.message || 'Error de autenticación';
 
-        // Manejar códigos de error específicos en el servicio
         switch (response.status) {
           case 401:
             errorMessage = 'Credenciales incorrectas: Usuario o contraseña no válidos';
@@ -32,7 +16,7 @@ export const authService = {
             errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
             break;
           default:
-            errorMessage = data.message || 'Error de autenticación';
+            errorMessage = response.data?.message || 'Error de autenticación';
         }
 
         return {
@@ -45,15 +29,15 @@ export const authService = {
       return {
         success: true,
         user: {
-          id: data.data.user.id,
-          username: data.data.user.email, // Using email as username
-          name: data.data.user.name,
-          lastName: data.data.user.lastName,
-          role: data.data.user.role,
-          permissions: data.data.user.permissions,
-          accessToken: data.data.access_token,
+          id: response.data.data.user.id,
+          username: response.data.data.user.email,
+          name: response.data.data.user.name,
+          lastName: response.data.data.user.lastName,
+          role: response.data.data.user.role,
+          permissions: response.data.data.user.permissions,
+          accessToken: response.data.data.access_token,
         },
-        accessToken: data.data.access_token,
+        accessToken: response.data.data.access_token,
       };
     } catch (error) {
       console.error('Auth service error:', error);
@@ -66,21 +50,11 @@ export const authService = {
   },
 
   async logout() {
-    const token = localStorage.getItem("authToken");
-    if (!token) return;
-
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/logout`, {
-        method: "POST",
-        headers: {
-          "accept": "application/json",
-          "Authorization": `Bearer ${token}`
-        }
-      });
+      const response = await api.post('/auth/logout', {});
 
       if (!response.ok) {
-        const err = await response.json();
-        let errorMessage = err.message || 'Error al cerrar sesión';
+        let errorMessage = response.data?.message || 'Error al cerrar sesión';
 
         switch (response.status) {
           case 401:
@@ -90,7 +64,7 @@ export const authService = {
             errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
             break;
           default:
-            errorMessage = err.message || 'Error al cerrar sesión';
+            errorMessage = response.data?.message || 'Error al cerrar sesión';
         }
 
         return {

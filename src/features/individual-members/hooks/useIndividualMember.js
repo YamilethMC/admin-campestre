@@ -10,7 +10,7 @@ export const useIndividualMember = () => {
     nombre: '',
     apellidos: '',
     sexo: '',
-    rfc: '',
+    rfc: 'SINRFC0000001',
     fecha_nacimiento: '',
     email: '',
     telefono_movil: '',
@@ -20,14 +20,14 @@ export const useIndividualMember = () => {
     telefono_emergencia: '',
     alias_emergencia: '',
     foraneo: false,
-    calle: '',
-    numero_exterior: '',
+    calle: 'Sin calle',
+    numero_exterior: 'Sin numero',
     numero_interior: '',
-    codigo_postal: '',
-    colonia: '',
-    ciudad: '',
-    estado: '',
-    pais: '',
+    codigo_postal: 'Sin codigo postal',
+    colonia: 'Sin colonia',
+    ciudad: 'Sin ciudad',
+    estado: 'Sin estado',
+    pais: 'Sin pais',
     titulo: '',
     profesion: '',
     metodo_pago: '',
@@ -57,6 +57,10 @@ export const useIndividualMember = () => {
 
       if( name === "code_socio" || name === "codigo_postal" || name === "numero_exterior" || name === "numero_interior") {
         newValue = value.replace(/\D/g, "");
+      }
+
+      if (name === "rfc") {
+        newValue = value.replace(/[^a-zA-Z0-9]/g, "").slice(0, 13);
       }
 
       if(name === "fecha_nacimiento") {
@@ -202,7 +206,7 @@ export const useIndividualMember = () => {
       nombre: '',
       apellidos: '',
       sexo: '',
-      rfc: '',
+      rfc: 'SINRFC0000001',
       fecha_nacimiento: '',
       email: '',
       telefono_movil: '',

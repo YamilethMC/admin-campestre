@@ -23,6 +23,8 @@ const Navigation = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const menuItems = [
     { path: '/', label: 'Inicio', icon: HomeIcon, exact: true },
     { path: '/socios', label: 'Socios', icon: MemberListIcon },
+    { path: '/validaciones', label: 'Validaciones', icon: AccountStatementIcon },
+    { path: '/catalogo-documentos', label: 'Catálogo de documentos', icon: FileUploadIcon },
     { path: '/pases-temporales', label: 'Pases temporales', icon: TemporaryPassesIcon },
     { path: '/estados-cuenta', label: 'Estados de cuenta', icon: AccountStatementIcon },
     { path: '/eventos', label: 'Eventos', icon: EventsIcon },

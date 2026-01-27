@@ -1,4 +1,5 @@
-// Service functions to connect to real API
+import api from '../../../shared/api/api';
+
 export const noticeService = {
   // Get all notices with pagination, search, and filters
   fetchNotices: async ({
@@ -6,66 +7,26 @@ export const noticeService = {
     limit = 10,
     orderBy = 'title',
     order = 'asc',
-    active = true, // Default to active notices
+    active = true,
     search = ''
   } = {}) => {
-    const token = localStorage.getItem("authToken");
+    const params = new URLSearchParams({ page, limit, search, order, orderBy });
+    if (active !== false) params.append("active", active);
 
-    const params = new URLSearchParams({
-      page,
-      limit,
-      search,
-      order,
-      orderBy
-    });
-
-    if (active !== false) {
-      params.append("active", active);
-    }
-
-    const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/notify?${params.toString()}`,
-      {
-        method: "GET",
-        headers: {
-          "accept": "*/*",
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
+    const response = await api.get(`/notify?${params}`);
 
     if (!response.ok) {
-      const errorData = await response.json();
-      let errorMessage = errorData.message || 'Error al obtener avisos';
+      let errorMessage = response.data?.message || 'Error al obtener avisos';
+      if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
-      // Manejar códigos de error específicos en el servicio
-      switch (response.status) {
-        case 401:
-          errorMessage = 'No autorizado: Por favor inicia sesión para continuar';
-          break;
-        case 403:
-          errorMessage = 'Acceso prohibido: No tienes permisos para ver esta información';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = 'Error al obtener avisos';
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        status: response.status
-      };
+      return { success: false, error: errorMessage, status: response.status };
     }
 
-    const responseData = await response.json();
     return {
       success: true,
       data: {
-        data: responseData.data.notifications || [],
-        meta: responseData.data.meta || null
+        data: response.data.data.notifications || [],
+        meta: response.data.data.meta || null
       },
       status: response.status
     };
@@ -73,104 +34,37 @@ export const noticeService = {
 
   // Get notice by id
   getNoticeById: async (id) => {
-    const token = localStorage.getItem("authToken");
-
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/notify/${id}`, {
-      headers: {
-        "accept": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
-    });
+    const response = await api.get(`/notify/${id}`);
 
     if (!response.ok) {
-      const errorData = await response.json();
-      let errorMessage = errorData.message || 'Error al obtener aviso';
+      let errorMessage = response.data?.message || 'Error al obtener aviso';
+      if (response.status === 404) errorMessage = 'Aviso no encontrado';
+      else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
-      // Manejar códigos de error específicos en el servicio
-      switch (response.status) {
-        case 401:
-          errorMessage = 'No autorizado: Por favor inicia sesión para continuar';
-          break;
-        case 403:
-          errorMessage = 'Acceso prohibido: No tienes permisos para ver esta información';
-          break;
-        case 404:
-          errorMessage = 'Aviso no encontrado';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = 'Error al obtener aviso';
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        status: response.status
-      };
+      return { success: false, error: errorMessage, status: response.status };
     }
 
-    const responseData = await response.json();
-    return {
-      success: true,
-      data: responseData.data,
-      status: response.status
-    };
+    return { success: true, data: response.data.data, status: response.status };
   },
 
   // Create a new notice
   createNotice: async (noticeData) => {
-    const token = localStorage.getItem("authToken");
     noticeData.sentDate = new Date().toISOString();
     noticeData.visibleUntil = new Date(noticeData.visibleUntil).toISOString();
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/notify`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(noticeData),
-    });
+    
+    const response = await api.post('/notify', noticeData);
 
     if (!response.ok) {
-      const error = await response.json();
-      let errorMessage = 'Error al registrar aviso';
+      let errorMessage = response.data?.message || 'Error al registrar aviso';
+      if (response.status === 400) errorMessage = 'Solicitud incorrecta: Verifica los datos proporcionados';
+      else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
-      // Manejar códigos de error específicos en el servicio
-      switch (response.status) {
-        case 400:
-          errorMessage = 'Solicitud incorrecta: Verifica los datos proporcionados';
-          break;
-        case 401:
-          errorMessage = 'No autorizado: Por favor inicia sesión para continuar';
-          break;
-        case 403:
-          errorMessage = 'Acceso prohibido: No tienes permisos para registrar avisos';
-          break;
-        case 404:
-          errorMessage = 'Aviso no encontrado';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = 'Error al registrar aviso';
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        status: response.status
-      };
+      return { success: false, error: errorMessage, status: response.status };
     }
 
-    const result = await response.json();
-
-    // Mensaje de éxito para el toast
     return {
       success: true,
-      data: result.data,
+      data: response.data.data,
       message: 'Aviso registrado exitosamente',
       status: response.status
     };
@@ -178,43 +72,19 @@ export const noticeService = {
 
   // Update a notice
   updateNotice: async (id, noticeData) => {
-    const token = localStorage.getItem("authToken");
     noticeData.visibleUntil = new Date(noticeData.visibleUntil).toISOString();
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/notify/${id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(noticeData),
-    });
+    const response = await api.patch(`/notify/${id}`, noticeData);
 
     if (!response.ok) {
-      const error = await response.json();
-      let errorMessage = 'Error al actualizar aviso';
+      let errorMessage = response.data?.message || 'Error al actualizar aviso';
+      if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
-      // Manejar códigos de error específicos en el servicio
-      switch (response.status) {
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = 'Error al actualizar aviso';
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        status: response.status
-      };
+      return { success: false, error: errorMessage, status: response.status };
     }
 
-    const result = await response.json();
-
-    // Mensaje de éxito para el toast
     return {
       success: true,
-      data: result.data,
+      data: response.data.data,
       message: 'Aviso actualizado exitosamente',
       status: response.status
     };
@@ -222,42 +92,18 @@ export const noticeService = {
 
   // Toggle notice status (activate/deactivate)
   toggleNoticeStatus: async (id, active) => {
-    const token = localStorage.getItem("authToken");
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/notify/${id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ active }),
-    });
+    const response = await api.patch(`/notify/${id}`, { active });
 
     if (!response.ok) {
-      const error = await response.json();
-      let errorMessage = 'Error al actualizar estado del aviso';
+      let errorMessage = response.data?.message || 'Error al actualizar estado del aviso';
+      if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
-      // Manejar códigos de error específicos en el servicio
-      switch (response.status) {
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = 'Error al actualizar estado del aviso';
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        status: response.status
-      };
+      return { success: false, error: errorMessage, status: response.status };
     }
 
-    const result = await response.json();
-
-    // Mensaje de éxito para el toast
     return {
       success: true,
-      data: result.data,
+      data: response.data.data,
       message: active ? 'Aviso activado exitosamente' : 'Aviso desactivado exitosamente',
       status: response.status
     };
@@ -267,41 +113,15 @@ export const noticeService = {
 
   // Delete a notice
   deleteNotice: async (id) => {
-    const token = localStorage.getItem("authToken");
-
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/notify/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-    });
+    const response = await api.del(`/notify/${id}`);
 
     if (!response.ok) {
-      const error = await response.json();
-      let errorMessage = 'Error al eliminar el aviso';
+      let errorMessage = response.data?.message || 'Error al eliminar el aviso';
+      if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
-      // Manejar códigos de error específicos en el servicio
-      switch (response.status) {
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = 'Error al eliminar el aviso';
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        status: response.status
-      };
+      return { success: false, error: errorMessage, status: response.status };
     }
 
-    // Mensaje de éxito para el toast
-    return {
-      success: true,
-      message: 'Aviso eliminado exitosamente',
-      status: response.status
-    };
+    return { success: true, message: 'Aviso eliminado exitosamente', status: response.status };
   },
 };

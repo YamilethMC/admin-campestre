@@ -1,9 +1,8 @@
-// Mock service for individual member operations
+import api from '../../../shared/api/api';
+
 export const memberService = {
-  // Get gender options (would come from API)
   getGenderOptions: async () => {
     await new Promise(resolve => setTimeout(resolve, 300));
-    
     return [
       { value: 'MASCULINO', label: 'Masculino' },
       { value: 'FEMENINO', label: 'Femenino' }
@@ -12,7 +11,6 @@ export const memberService = {
 
   getTituloOptions: async () => {
     await new Promise(resolve => setTimeout(resolve, 300));
-    
     return [
       { value: 'C', label: 'Ciudadano' },
       { value: 'DR', label: 'Doctor' },
@@ -25,29 +23,17 @@ export const memberService = {
 
   getPaymentMethodOptions: async () => {
     await new Promise(resolve => setTimeout(resolve, 300));
-    
     return [
       { value: 'PPD', label: 'PPD' },
     ];
   },
   
-  // Add a new member
   addMember: async (memberData) => {
-    const token = localStorage.getItem("authToken");
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/club-members`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(memberData),
-    });
+    const response = await api.post('/club-members', memberData);
 
     if (!response.ok) {
-      const error = await response.json();
-      let errorMessage = error.message || 'Error al registrar socio';
+      let errorMessage = response.data?.message || 'Error al registrar socio';
 
-      // Manejar códigos de error específicos en el servicio
       switch (response.status) {
         case 400:
           errorMessage = 'Solicitud incorrecta: Verifica los datos proporcionados';
@@ -59,7 +45,7 @@ export const memberService = {
           errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
           break;
         default:
-          errorMessage = error.message || 'Error al registrar socio';
+          errorMessage = response.data?.message || 'Error al registrar socio';
       }
 
       return {
@@ -69,36 +55,20 @@ export const memberService = {
       };
     }
 
-    const result = await response.json();
-
-    // Mensaje de éxito para el toast
     return {
       success: true,
-      data: result,
+      data: response.data,
       message: 'Socio registrado exitosamente',
       status: response.status
     };
   },
 
-  // Get member by ID (for editing)
   getMemberById: async (id) => {
-    const token = localStorage.getItem("authToken");
-
-    const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/club-members/${id}`,
-      {
-        headers: {
-          "accept": "*/*",
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
+    const response = await api.get(`/club-members/${id}`);
 
     if (!response.ok) {
-      const errorData = await response.json();
       let errorMessage = "Error al obtener miembro";
 
-      // Manejar códigos de error específicos en el servicio
       switch (response.status) {
         case 404:
           errorMessage = 'Miembro no encontrado';
@@ -107,7 +77,7 @@ export const memberService = {
           errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
           break;
         default:
-          errorMessage = errorData.message || "Error al obtener miembro";
+          errorMessage = response.data?.message || "Error al obtener miembro";
       }
 
       return {
@@ -117,21 +87,14 @@ export const memberService = {
       };
     }
 
-    const result = await response.json();
-
     return {
       success: true,
-      data: result.data,
+      data: response.data.data,
       status: response.status
     };
   },
 
-  // Update existing member
   updateMember: async (id, memberData) => {
-    const token = localStorage.getItem("authToken");
-
-    // Prepare the update payload - we need to separate user data from member data
-    // The endpoint expects a PATCH to users/{id}, so we need to update the user data
     const updatePayload = {
       email: memberData.email,
       name: memberData.name,
@@ -141,35 +104,20 @@ export const memberService = {
       birthDate: memberData.birthDate,
       gender: memberData.gender,
       RFC: memberData.RFC,
-      // Include the member-specific fields that need to be updated
       title: memberData.title,
       profession: memberData.profession,
       paymentMethod: memberData.paymentMethod,
       dateOfAdmission: memberData.dateOfAdmission,
       memberCode: memberData.memberCode,
-      // For invitedBy and relationship, these would only be set when creating dependents
       ...(memberData.invitedById && { invitedById: memberData.invitedById }),
       ...(memberData.relationship && { relationship: memberData.relationship })
     };
 
-    const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/users/${id}`,
-      {
-        method: "PATCH",
-        headers: {
-          "accept": "*/*",
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(updatePayload)
-      }
-    );
+    const response = await api.patch(`/users/${id}`, updatePayload);
 
     if (!response.ok) {
-      const errorData = await response.json();
       let errorMessage = "Error al actualizar socio";
 
-      // Manejar códigos de error específicos en el servicio
       switch (response.status) {
         case 404:
           errorMessage = 'Miembro no encontrado';
@@ -181,7 +129,7 @@ export const memberService = {
           errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
           break;
         default:
-          errorMessage = errorData.message || "Error al actualizar socio";
+          errorMessage = response.data?.message || "Error al actualizar socio";
       }
 
       return {
@@ -191,11 +139,9 @@ export const memberService = {
       };
     }
 
-    const result = await response.json();
-
     return {
       success: true,
-      data: result.data,
+      data: response.data.data,
       message: 'Socio actualizado exitosamente',
       status: response.status
     };

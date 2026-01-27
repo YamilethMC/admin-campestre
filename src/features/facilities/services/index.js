@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL;
+import api from '../../../shared/api/api';
 
 export const facilityService = {
   async fetchFacilities({
@@ -11,8 +11,6 @@ export const facilityService = {
     order = 'asc',
     orderBy = 'name'
   } = {}) {
-    const token = localStorage.getItem("authToken");
-
     const params = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
@@ -24,27 +22,12 @@ export const facilityService = {
       ...(date && { date })
     });
 
-    const response = await fetch(
-      `${API_BASE_URL}/facilities?${params}`,
-      {
-        headers: {
-          "accept": "*/*",
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
+    const response = await api.get(`/facilities?${params}`);
 
     if (!response.ok) {
-      const errorData = await response.json();
-      let errorMessage = "Error al obtener instalaciones";
-
-      // Manejar códigos de error específicos en el servicio
-      switch (response.status) {
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = "Error al obtener instalaciones";
+      let errorMessage = response.data?.message || "Error al obtener instalaciones";
+      if (response.status === 500) {
+        errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
       }
 
       return {
@@ -54,45 +37,22 @@ export const facilityService = {
       };
     }
 
-    const data = await response.json();
-
     return {
       success: true,
-      data: data.data, // contains facilities data + meta
+      data: response.data.data,
       status: response.status
     };
   },
 
   async createFacility(facilityData) {
-    const token = localStorage.getItem("authToken");
-
-    const response = await fetch(
-      `${API_BASE_URL}/facilities`,
-      {
-        method: "POST",
-        headers: {
-          "accept": "*/*",
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(facilityData)
-      }
-    );
+    const response = await api.post('/facilities', facilityData);
 
     if (!response.ok) {
-      const errorData = await response.json();
-      let errorMessage = "Error al crear instalación";
-
-      // Manejar códigos de error específicos en el servicio
-      switch (response.status) {
-        case 400:
-          errorMessage = 'Solicitud incorrecta: Verifica los datos de la instalación';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = "Error al crear instalación";
+      let errorMessage = response.data?.message || "Error al crear instalación";
+      if (response.status === 400) {
+        errorMessage = 'Solicitud incorrecta: Verifica los datos de la instalación';
+      } else if (response.status === 500) {
+        errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
       }
 
       return {
@@ -102,46 +62,23 @@ export const facilityService = {
       };
     }
 
-    const result = await response.json();
-
     return {
       success: true,
-      data: result.data,
+      data: response.data.data,
       message: 'Instalación creada exitosamente',
       status: response.status
     };
   },
 
   async updateFacility(id, facilityData) {
-    const token = localStorage.getItem("authToken");
-
-    const response = await fetch(
-      `${API_BASE_URL}/facilities/${id}`,
-      {
-        method: "PATCH",
-        headers: {
-          "accept": "*/*",
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(facilityData)
-      }
-    );
+    const response = await api.patch(`/facilities/${id}`, facilityData);
 
     if (!response.ok) {
-      const errorData = await response.json();
-      let errorMessage = "Error al actualizar instalación";
-
-      // Manejar códigos de error específicos en el servicio
-      switch (response.status) {
-        case 404:
-          errorMessage = 'Instalación no encontrada';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = "Error al actualizar instalación";
+      let errorMessage = response.data?.message || "Error al actualizar instalación";
+      if (response.status === 404) {
+        errorMessage = 'Instalación no encontrada';
+      } else if (response.status === 500) {
+        errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
       }
 
       return {
@@ -151,46 +88,23 @@ export const facilityService = {
       };
     }
 
-    const result = await response.json();
-
     return {
       success: true,
-      data: result.data,
+      data: response.data.data,
       message: 'Instalación actualizada exitosamente',
       status: response.status
     };
   },
 
   async getFacilityById(id) {
-    const token = localStorage.getItem("authToken");
-
-    const response = await fetch(
-      `${API_BASE_URL}/facilities/${id}`,
-      {
-        headers: {
-          "accept": "*/*",
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
+    const response = await api.get(`/facilities/${id}`);
 
     if (!response.ok) {
-      const errorData = await response.json();
-      let errorMessage = "Error al obtener instalación";
-
-      // Manejar códigos de error específicos en el servicio
-      switch (response.status) {
-        case 400:
-          errorMessage = 'Solicitud incorrecta: Verifica los datos proporcionados';
-          break;
-        case 404:
-          errorMessage = 'Instalación no encontrada';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = "Error al obtener instalación";
+      let errorMessage = response.data?.message || "Error al obtener instalación";
+      if (response.status === 404) {
+        errorMessage = 'Instalación no encontrada';
+      } else if (response.status === 500) {
+        errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
       }
 
       return {
@@ -200,43 +114,22 @@ export const facilityService = {
       };
     }
 
-    const result = await response.json();
-
     return {
       success: true,
-      data: result.data,
+      data: response.data.data,
       status: response.status
     };
   },
 
   async deleteFacility(id) {
-    const token = localStorage.getItem("authToken");
-
-    const response = await fetch(
-      `${API_BASE_URL}/facilities/${id}`,
-      {
-        method: "DELETE",
-        headers: {
-          "accept": "*/*",
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
+    const response = await api.del(`/facilities/${id}`);
 
     if (!response.ok) {
-      const errorData = await response.json();
-      let errorMessage = "Error al eliminar instalación";
-
-      // Manejar códigos de error específicos en el servicio
-      switch (response.status) {
-        case 404:
-          errorMessage = 'Instalación no encontrada';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = "Error al eliminar instalación";
+      let errorMessage = response.data?.message || "Error al eliminar instalación";
+      if (response.status === 404) {
+        errorMessage = 'Instalación no encontrada';
+      } else if (response.status === 500) {
+        errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
       }
 
       return {
@@ -253,39 +146,16 @@ export const facilityService = {
     };
   },
 
-  // Get facility by ID with date filter for reservations
   async getFacilityWithReservations(id, date) {
-    const token = localStorage.getItem("authToken");
-
     const params = new URLSearchParams({ date });
-
-    const response = await fetch(
-      `${API_BASE_URL}/facilities/${id}?${params}`,
-      {
-        headers: {
-          "accept": "*/*",
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
+    const response = await api.get(`/facilities/${id}?${params}`);
 
     if (!response.ok) {
-      const errorData = await response.json();
-      let errorMessage = "Error al obtener instalación";
-
-      // Manejar códigos de error específicos en el servicio
-      switch (response.status) {
-        case 400:
-          errorMessage = 'Solicitud incorrecta: Verifica los datos proporcionados';
-          break;
-        case 404:
-          errorMessage = 'Instalación no encontrada';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = "Error al obtener instalación";
+      let errorMessage = response.data?.message || "Error al obtener instalación";
+      if (response.status === 404) {
+        errorMessage = 'Instalación no encontrada';
+      } else if (response.status === 500) {
+        errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
       }
 
       return {
@@ -295,37 +165,18 @@ export const facilityService = {
       };
     }
 
-    const result = await response.json();
-
     return {
       success: true,
-      data: result.data,
+      data: response.data.data,
       status: response.status
     };
   },
 
-  // Create facility reservation
   async createFacilityReservation(facilityId, memberId, reservationData) {
-    const token = localStorage.getItem("authToken");
-
-    const response = await fetch(
-      `${API_BASE_URL}/facilities/${facilityId}/club-members/${memberId}/reservations`,
-      {
-        method: "POST",
-        headers: {
-          "accept": "*/*",
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(reservationData)
-      }
-    );
+    const response = await api.post(`/facilities/${facilityId}/club-members/${memberId}/reservations`, reservationData);
 
     if (!response.ok) {
-      const errorData = await response.json();
-      let errorMessage = "Error al crear reservación";
-
-      // Manejar códigos de error específicos en el servicio
+      let errorMessage = response.data?.message || "Error al crear reservación";
       switch (response.status) {
         case 400:
           errorMessage = 'Rango de tiempo inválido o instalación no disponible';
@@ -339,8 +190,6 @@ export const facilityService = {
         case 500:
           errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
           break;
-        default:
-          errorMessage = errorData.message || "Error al crear reservación";
       }
 
       return {
@@ -350,38 +199,19 @@ export const facilityService = {
       };
     }
 
-    const result = await response.json();
-
     return {
       success: true,
-      data: result.data,
+      data: response.data.data,
       message: 'Reservación creada exitosamente',
       status: response.status
     };
   },
 
-  // Update facility reservation (to cancel)
   async updateFacilityReservation(reservationId, clubMemberId, reservationData) {
-    const token = localStorage.getItem("authToken");
-
-    const response = await fetch(
-      `${API_BASE_URL}/facilities/reservations/${reservationId}/club-member/${clubMemberId}`,
-      {
-        method: "PATCH",
-        headers: {
-          "accept": "*/*",
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(reservationData)
-      }
-    );
+    const response = await api.patch(`/facilities/reservations/${reservationId}/club-member/${clubMemberId}`, reservationData);
 
     if (!response.ok) {
-      const errorData = await response.json();
-      let errorMessage = "Error al actualizar reservación";
-
-      // Manejar códigos de error específicos en el servicio
+      let errorMessage = response.data?.message || "Error al actualizar reservación";
       switch (response.status) {
         case 400:
           errorMessage = 'Rango de tiempo inválido o instalación no disponible';
@@ -398,8 +228,6 @@ export const facilityService = {
         case 500:
           errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
           break;
-        default:
-          errorMessage = errorData.message || "Error al actualizar reservación";
       }
 
       return {
@@ -409,20 +237,15 @@ export const facilityService = {
       };
     }
 
-    const result = await response.json();
-
     return {
       success: true,
-      data: result.data,
+      data: response.data.data,
       message: 'Reservación actualizada exitosamente',
       status: response.status
     };
   },
 
-  // Search club members for reservations
   async searchClubMembers(search = '') {
-    const token = localStorage.getItem("authToken");
-
     const params = new URLSearchParams({
       page: '1',
       limit: '10',
@@ -431,33 +254,12 @@ export const facilityService = {
       active: 'true'
     });
 
-    const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/club-members?${params}`,
-      {
-        headers: {
-          "accept": "*/*",
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
+    const response = await api.get(`/club-members?${params}`);
 
     if (!response.ok) {
-      const errorData = await response.json();
-      let errorMessage = "Error al obtener miembros";
-
-      // Manejar códigos de error específicos en el servicio
-      switch (response.status) {
-        case 400:
-          errorMessage = 'Datos de entrada inválidos';
-          break;
-        case 404:
-          errorMessage = 'No se encontraron miembros';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = errorData.message || "Error al obtener miembros";
+      let errorMessage = response.data?.message || "Error al obtener miembros";
+      if (response.status === 500) {
+        errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
       }
 
       return {
@@ -467,22 +269,11 @@ export const facilityService = {
       };
     }
 
-    const result = await response.json();
-
-    if (result.success) {
-      // Filter out members without memberCode
-      const filteredMembers = (result.data.members || []).filter(m => m.memberCode !== null);
-      return {
-        success: true,
-        data: { members: filteredMembers },
-        status: response.status
-      };
-    } else {
-      return {
-        success: false,
-        error: result.message || "Error al obtener miembros",
-        status: response.status
-      };
-    }
+    const filteredMembers = (response.data.data?.members || []).filter(m => m.memberCode !== null);
+    return {
+      success: true,
+      data: { members: filteredMembers },
+      status: response.status
+    };
   }
 };

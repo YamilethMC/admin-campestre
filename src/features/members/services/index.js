@@ -1,6 +1,7 @@
+import api from '../../../shared/api/api';
+
 export const memberService = {
-    async fetchMembers
-    ({
+    async fetchMembers({
         page = 1,
         limit = 10,
         orderBy = 'name',
@@ -8,26 +9,21 @@ export const memberService = {
         active = true,
         search = ''
     } = {}) {
-        const token = localStorage.getItem("authToken");
-        const response = await fetch(
-            `${process.env.REACT_APP_API_URL}/club-members?page=${page}&limit=${limit}&search=${search}&order=${order}&orderBy=${orderBy}&active=${active}`,
-            {
-            headers: {
-                "accept": "*/*",
-                "Authorization": `Bearer ${token}`
-            }}
-        );
+        const params = new URLSearchParams({
+            page,
+            limit,
+            search,
+            order,
+            orderBy,
+            active
+        });
+
+        const response = await api.get(`/club-members?${params.toString()}`);
 
         if (!response.ok) {
-            const error = await response.json();
-            let errorMessage = error.message || 'Error al obtener miembros';
-
-            switch (response.status) {
-                case 500:
-                    errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-                    break;
-                default:
-                    errorMessage = error.message || 'Error al obtener miembros';
+            let errorMessage = response.data?.message || 'Error al obtener miembros';
+            if (response.status === 500) {
+                errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
             }
 
             return {
@@ -37,33 +33,21 @@ export const memberService = {
             };
         }
 
-        const data = await response.json();
-
+        const payload = response.data?.data || {};
         return {
             success: true,
-            data: data.data,
+            members: payload.members || [],
+            meta: payload.meta || {},
             status: response.status
         };
     },
 
     async deleteMember(id) {
-        const token = localStorage.getItem("authToken");
-console.log('id member', id);
-        const response = await fetch(
-            `${process.env.REACT_APP_API_URL}/club-members/${id}`,
-            {
-                method: "DELETE",
-                headers: {
-                    "accept": "*/*",
-                    "Authorization": `Bearer ${token}`
-                }
-            }
-        );
+        const response = await api.del(`/club-members/${id}`);
 
         if (!response.ok) {
-            const error = await response.json();
-            let errorMessage = error.message || 'Error al eliminar miembro';
-
+            let errorMessage = response.data?.message || 'Error al eliminar miembro';
+            
             switch (response.status) {
                 case 404:
                     errorMessage = 'Miembro no encontrado';
@@ -72,7 +56,7 @@ console.log('id member', id);
                     errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
                     break;
                 default:
-                    errorMessage = error.message || 'Error al eliminar miembro';
+                    errorMessage = response.data?.message || 'Error al eliminar miembro';
             }
 
             return {
@@ -88,5 +72,4 @@ console.log('id member', id);
             status: response.status
         };
     }
-
 };

@@ -1,10 +1,13 @@
 import React, { useState, useContext, useEffect } from 'react';
 import MemberFilters from '../MemberFilters';
 import IndividualMember from '../../../individual-members';
+import MemberDocuments from '../../../member-documents';
 import { useMembers } from '../../hooks/useMembers';
 import { memberService } from '../../services';
 import BulkMemberUploadContainer from '../../../bulk-upload';
 import { AppContext } from '../../../../shared/context/AppContext';
+import validationService from '../../../validations/services';
+import { useValidation } from '../../../validations/hooks/useValidation';
 
 const MemberList = () => {
   const [filters, setFilters] = useState({
@@ -18,39 +21,43 @@ const MemberList = () => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
+  const [memberValidations, setMemberValidations] = useState({});
   const { addToast } = useContext(AppContext);
 
   const { members, meta, page, setPage, loadMembers, setActive, search, setSearch } = useMembers();
+  const { formatStatus, getStatusBadge } = useValidation();
 
   useEffect(() => {
     loadMembers({ active: filters.active, search: filters.search });
   }, [filters.active, filters.search]);
 
+  // Cargar datos de validación para todos los miembros
+  useEffect(() => {
+    const loadMemberValidations = async () => {
+      if (members.length === 0) return;
+
+      const validationsMap = {};
+      for (const member of members) {
+        try {
+          const validationData = await validationService.getMemberValidationData(member.id);
+          validationsMap[member.id] = validationData;
+        } catch (error) {
+          // Si no hay datos de validación, asignar estado por defecto
+          validationsMap[member.id] = {
+            status: 'NOT_STARTED',
+            documentsUploaded: 0,
+            totalDocuments: 0
+          };
+        }
+      }
+      setMemberValidations(validationsMap);
+    };
+
+    loadMemberValidations();
+  }, [members]);
+
   const filteredMembers = members;
-  // Apply filters to members
- /* const filteredMembers = useMemo(() => {
-    let result = [...members];
 
-    // Apply status filter
-    /*if (filters.status === 'activos') {
-      result = result.filter(member => member.activo);
-    } else if (filters.status === 'inactivos') {
-      result = result.filter(member => !member.activo);
-    }*/
-
-    // Apply search filter
-   /* if (filters.search) {
-      const searchTerm = filters.search.toLowerCase();
-      result = result.filter(member =>
-        member.user.name.toLowerCase().includes(searchTerm) ||
-        member.user.lastName.toLowerCase().includes(searchTerm) ||
-        member.user.email.toLowerCase().includes(searchTerm) ||
-        String(member.memberCode).toLowerCase().includes(searchTerm)
-      );
-    }
-
-    return result;
-  }, [members, filters]);*/
 
   const updateFilters = (newFilters) => {
     setFilters(prev => ({
@@ -82,6 +89,40 @@ const MemberList = () => {
     setIsAddingDependent(true); // Indicamos que estamos agregando un dependiente
     setShowForm(true);
     setDropdownOpen(null);
+  };
+
+  const handleMemberDocuments = (member) => {
+    console.log('handleMemberDocuments called with member:', member);
+    // Mostrar pantalla de documentos del socio
+    setEditingMember(member);
+    setShowForm('documents'); // Nuevo estado para mostrar documentos
+    setDropdownOpen(null);
+  };
+
+  const getValidationStatusDisplay = (member) => {
+    if (member.documentStats) {
+      const statusKey = member.validationStatus || 'NOT_STARTED';
+      return {
+        status: formatStatus(statusKey),
+        badge: getStatusBadge(statusKey),
+        progress: `${member.documentStats.uploaded}/${member.documentStats.total}`
+      };
+    }
+
+    const validation = memberValidations[member.id];
+    if (!validation) {
+      return {
+        status: 'No iniciado',
+        badge: 'bg-gray-100 text-gray-800',
+        progress: `0/0`
+      };
+    }
+
+    const status = formatStatus(validation.status || 'NOT_STARTED');
+    const badge = getStatusBadge(validation.status || 'NOT_STARTED');
+    const progress = `${validation.documentsUploaded || 0}/${validation.totalDocuments || 0}`;
+
+    return { status, badge, progress };
   };
 
   const handleBulkMember = () => {
@@ -144,9 +185,19 @@ const MemberList = () => {
     setShowForm(false);
     setShowBulkForm(false);
     setEditingMember(null);
+    setIsAddingDependent(false);
   };
 
-  if (showForm) {
+  if (showForm === 'documents') {
+    return (
+      <MemberDocuments
+        memberId={editingMember?.id}
+        onBack={handleBack}
+      />
+    );
+  }
+
+  if (showForm === true) {
     return (
         <IndividualMember
           initialData={null} // Always pass null to trigger API fetch for editing
@@ -205,15 +256,16 @@ const MemberList = () => {
 
       {filteredMembers.length === 0 ? (
         <>
-        <p className="text-gray-500">No hay socios registrados con los filtros aplicados.</p>
+          <p className="text-gray-500">No hay socios registrados con los filtros aplicados.</p>
         </>
       ) : (
         <>
-        <div className="border border-gray-200 rounded-lg overflow-x-auto overflow-y-hidden">
-          <div className="min-w-full">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50 sticky top-0 z-10">
-                <tr>
+          <div className="border border-gray-200 rounded-lg">
+            <div className="max-h-[60vh] overflow-y-auto">
+              <div className="min-w-full overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50 sticky top-0 z-10">
+                    <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Número de acción</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellidos</th>
@@ -222,6 +274,7 @@ const MemberList = () => {
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profesión</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Método pago</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha admisión</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documentos</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                 </tr>
               </thead>
@@ -248,6 +301,21 @@ const MemberList = () => {
 
                         return `${day}-${month}-${year}`;
                       })() : ''}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm">
+                      {(() => {
+                        const { status, badge, progress } = getValidationStatusDisplay(member);
+                        return (
+                          <div className="flex flex-col space-y-1">
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${badge}`}>
+                              {status}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {progress}
+                            </span>
+                          </div>
+                        );
+                      })()}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 relative">
                       <div className="relative inline-block text-left">
@@ -294,12 +362,13 @@ const MemberList = () => {
                   </tr>
                 ))}
               </tbody>
-            </table>
+                </table>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {meta && (
-        <div className="flex justify-center items-center gap-3 mt-4">
+          {meta && (
+            <div className="flex justify-center items-center gap-3 mt-4">
 
           {/* Botón Anterior */}
           <button

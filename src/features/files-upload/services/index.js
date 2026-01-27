@@ -1,52 +1,24 @@
-// File upload service with real API calls
+import api from '../../../shared/api/api';
+
 export const fileUploadService = {
-  // Get list of files with pagination and search
   getFiles: async (params) => {
-    // Extract params with defaults
     const { page = 1, limit = 10, search = '', order = 'asc', orderBy = 'name' } = params;
+    const query = new URLSearchParams({ page, limit, search, order, orderBy });
 
-    // Get auth token
-    const token = localStorage.getItem('authToken');
-
-    // Build query parameters
-    let query = `${process.env.REACT_APP_API_URL}/files?page=${page}&limit=${limit}&search=${search}&order=${order}&orderBy=${orderBy}`;
-
-    const response = await fetch(query, {
-      headers: {
-        "accept": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
-    });
+    const response = await api.get(`/files?${query}`);
 
     if (!response.ok) {
-      const errorData = await response.json();
-      let errorMessage = 'Error al obtener archivos';
+      let errorMessage = response.data?.message || 'Error al obtener archivos';
+      if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
-      // Manejar códigos de error específicos en el servicio
-      switch (response.status) {
-        case 400:
-          errorMessage = 'Error al obtener archivos';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = 'Error al obtener archivos';
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        status: response.status
-      };
+      return { success: false, error: errorMessage, status: response.status };
     }
 
-    const responseJson = await response.json();
     return {
       success: true,
       data: {
-        data: responseJson.data.files,
-        meta: responseJson.data.meta
+        data: response.data.data.files,
+        meta: response.data.data.meta
       },
       status: response.status
     };
@@ -110,142 +82,54 @@ export const fileUploadService = {
     };
   },
 
-  // Get a single file by ID
   getFileById: async (id) => {
-    // Get auth token
-    const token = localStorage.getItem('authToken');
-
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/files/${id}`, {
-      headers: {
-        "accept": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
-    });
+    const response = await api.get(`/files/${id}`);
 
     if (!response.ok) {
-      const errorData = await response.json();
-      let errorMessage = 'Error al obtener archivo';
+      let errorMessage = response.data?.message || 'Error al obtener archivo';
+      if (response.status === 404) errorMessage = 'Archivo no encontrado';
+      else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
-      // Manejar códigos de error específicos en el servicio
-      switch (response.status) {
-        case 404:
-          errorMessage = 'Archivo no encontrado';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = 'Error al obtener archivo';
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        status: response.status
-      };
+      return { success: false, error: errorMessage, status: response.status };
     }
 
-    const data = await response.json();
-
-    return {
-      success: true,
-      data: data.data,
-      status: response.status
-    };
+    return { success: true, data: response.data.data, status: response.status };
   },
 
-  // Update an existing file
   updateFile: async (id, fileData) => {
-    // Get auth token
-    const token = localStorage.getItem('authToken');
-
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/files/${id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        name: fileData.name,
-        description: fileData.description,
-        type: fileData.type || 'pdf'  // Default to 'pdf' if not provided
-      })
+    const response = await api.patch(`/files/${id}`, {
+      name: fileData.name,
+      description: fileData.description,
+      type: fileData.type || 'pdf'
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      let errorMessage = 'Error al actualizar archivo';
+      let errorMessage = response.data?.message || 'Error al actualizar archivo';
+      if (response.status === 404) errorMessage = 'Archivo no encontrado';
+      else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
-      // Manejar códigos de error específicos en el servicio
-      switch (response.status) {
-        case 400:
-          errorMessage = 'Solicitud incorrecta: Verifica los datos del archivo';
-          break;
-        case 404:
-          errorMessage = 'Archivo no encontrado';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = 'Error al actualizar archivo';
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        status: response.status
-      };
+      return { success: false, error: errorMessage, status: response.status };
     }
 
-    const result = await response.json();
-
-    // Mensaje de éxito para el toast
     return {
       success: true,
-      data: {data: result.data.files, meta: result.data.meta},
+      data: { data: response.data.data.files, meta: response.data.data.meta },
       message: 'Archivo actualizado exitosamente',
       status: response.status
     };
   },
 
-  // Delete a file
   deleteFile: async (id) => {
-    // Get auth token
-    const token = localStorage.getItem('authToken');
-
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/files/${id}`, {
-      method: "DELETE",
-      headers: {
-        "accept": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
-    });
+    const response = await api.del(`/files/${id}`);
 
     if (!response.ok) {
-      const errorData = await response.json();
-      let errorMessage = 'Error al eliminar archivo';
+      let errorMessage = response.data?.message || 'Error al eliminar archivo';
+      if (response.status === 404) errorMessage = 'Archivo no encontrado';
+      else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
-      // Manejar códigos de error específicos en el servicio
-      switch (response.status) {
-        case 404:
-          errorMessage = 'Archivo no encontrado';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = 'Error al eliminar archivo';
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        status: response.status
-      };
+      return { success: false, error: errorMessage, status: response.status };
     }
 
-    // Mensaje de éxito para el toast
     return {
       success: true,
       message: 'Archivo eliminado exitosamente',

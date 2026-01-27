@@ -12,10 +12,9 @@ export function useMembers() {
 
   const loadMembers = async ({page = 1, limit = 10, active: activeParam = active, search: searchParam = search  } = {})=> {
     const data = await memberService.fetchMembers({ page, limit, active: activeParam, search: searchParam });
-    console.log('loadMembers data:', data);
     if (data.success) {
-      setMembers(data.data.members);
-      setMeta(data.data.meta);
+      setMembers(data.members || []);
+      setMeta(data.meta || null);
     } else {
       addToast(data.error || 'Error al cargar miembros', 'error');
     }

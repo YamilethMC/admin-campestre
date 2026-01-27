@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL;
+import api from '../../../shared/api/api';
 
 export const eventService = {
   // Fetch all events with pagination, search, filters, and date
@@ -9,10 +9,8 @@ export const eventService = {
     order = 'asc',
     orderBy = 'name',
     type = '',
-    date = new Date().toISOString().slice(0, 7) // Current year-month as default
+    date = new Date().toISOString().slice(0, 7)
   } = {}) {
-    const token = localStorage.getItem("authToken");
-
     const params = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
@@ -23,21 +21,10 @@ export const eventService = {
       ...(date && { date })
     });
 
-    const response = await fetch(
-      `${API_BASE_URL}/events?${params}`,
-      {
-        headers: {
-          "accept": "application/json",
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
+    const response = await api.get(`/events?${params}`);
 
     if (!response.ok) {
-      const errorData = await response.json();
       let errorMessage = "Error al obtener eventos";
-
-      // Manejar códigos de error específicos en el servicio
       switch (response.status) {
         case 400:
           errorMessage = 'Datos de entrada inválidos';
@@ -49,7 +36,7 @@ export const eventService = {
           errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
           break;
         default:
-          errorMessage = errorData.message || "Error al obtener eventos";
+          errorMessage = response.data?.message || "Error al obtener eventos";
       }
 
       return {
@@ -59,37 +46,18 @@ export const eventService = {
       };
     }
 
-    const result = await response.json();
-    
     return {
       success: true,
-      data: result.data,
+      data: response.data.data,
       status: response.status
     };
   },
 
-  // Create a new event
   async createEvent(eventData) {
-    const token = localStorage.getItem("authToken");
-
-    const response = await fetch(
-      `${API_BASE_URL}/events`,
-      {
-        method: "POST",
-        headers: {
-          "accept": "*/*",
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(eventData)
-      }
-    );
+    const response = await api.post('/events', eventData);
 
     if (!response.ok) {
-      const errorData = await response.json();
       let errorMessage = "Error al crear evento";
-
-      // Manejar códigos de error específicos en el servicio
       switch (response.status) {
         case 400:
           errorMessage = 'Datos de entrada inválidos';
@@ -101,7 +69,7 @@ export const eventService = {
           errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
           break;
         default:
-          errorMessage = errorData.message || "Error al crear evento";
+          errorMessage = response.data?.message || "Error al crear evento";
       }
 
       return {
@@ -111,38 +79,19 @@ export const eventService = {
       };
     }
 
-    const result = await response.json();
-
     return {
       success: true,
-      data: result.data,
+      data: response.data.data,
       message: 'Evento creado exitosamente',
       status: response.status
     };
   },
 
-  // Update an existing event
   async updateEvent(id, eventData) {
-    const token = localStorage.getItem("authToken");
-
-    const response = await fetch(
-      `${API_BASE_URL}/events/${id}`,
-      {
-        method: "PATCH",
-        headers: {
-          "accept": "*/*",
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(eventData)
-      }
-    );
+    const response = await api.patch(`/events/${id}`, eventData);
 
     if (!response.ok) {
-      const errorData = await response.json();
       let errorMessage = "Error al actualizar evento";
-
-      // Manejar códigos de error específicos en el servicio
       switch (response.status) {
         case 400:
           errorMessage = 'Datos de entrada inválidos';
@@ -154,7 +103,7 @@ export const eventService = {
           errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
           break;
         default:
-          errorMessage = errorData.message || "Error al actualizar evento";
+          errorMessage = response.data?.message || "Error al actualizar evento";
       }
 
       return {
@@ -164,35 +113,19 @@ export const eventService = {
       };
     }
 
-    const result = await response.json();
-
     return {
       success: true,
-      data: result.data,
+      data: response.data.data,
       message: 'Evento actualizado exitosamente',
       status: response.status
     };
   },
 
-  // Get a single event by ID
   async getEventById(id) {
-    const token = localStorage.getItem("authToken");
-
-    const response = await fetch(
-      `${API_BASE_URL}/events/${id}`,
-      {
-        headers: {
-          "accept": "application/json",
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
+    const response = await api.get(`/events/${id}`);
 
     if (!response.ok) {
-      const errorData = await response.json();
       let errorMessage = "Error al obtener evento";
-
-      // Manejar códigos de error específicos en el servicio
       switch (response.status) {
         case 400:
           errorMessage = 'Datos de entrada inválidos';
@@ -204,7 +137,7 @@ export const eventService = {
           errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
           break;
         default:
-          errorMessage = errorData.message || "Error al obtener evento";
+          errorMessage = response.data?.message || "Error al obtener evento";
       }
 
       return {
@@ -214,35 +147,18 @@ export const eventService = {
       };
     }
 
-    const result = await response.json();
-
     return {
       success: true,
-      data: result.data,
+      data: response.data.data,
       status: response.status
     };
   },
 
-  // Delete an event
   async deleteEvent(id) {
-    const token = localStorage.getItem("authToken");
-
-    const response = await fetch(
-      `${API_BASE_URL}/events/${id}`,
-      {
-        method: "DELETE",
-        headers: {
-          "accept": "*/*",
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
+    const response = await api.del(`/events/${id}`);
 
     if (!response.ok) {
-      const errorData = await response.json();
       let errorMessage = "Error al eliminar evento";
-
-      // Manejar códigos de error específicos en el servicio
       switch (response.status) {
         case 404:
           errorMessage = 'No se encontró el evento';
@@ -251,7 +167,7 @@ export const eventService = {
           errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
           break;
         default:
-          errorMessage = errorData.message || "Error al eliminar evento";
+          errorMessage = response.data?.message || "Error al eliminar evento";
       }
 
       return {
@@ -268,28 +184,11 @@ export const eventService = {
     };
   },
 
-  // Update event registration
   async updateEventRegistration(eventId, memberId, registrationData) {
-    const token = localStorage.getItem("authToken");
-
-    const response = await fetch(
-      `${API_BASE_URL}/events/${eventId}/registrations/members/${memberId}`,
-      {
-        method: "PATCH",
-        headers: {
-          "accept": "application/json",
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(registrationData)
-      }
-    );
+    const response = await api.patch(`/events/${eventId}/registrations/members/${memberId}`, registrationData);
 
     if (!response.ok) {
-      const errorData = await response.json();
       let errorMessage = "Error al actualizar registro";
-
-      // Manejar códigos de error específicos en el servicio
       switch (response.status) {
         case 404:
           errorMessage = 'Registro no encontrado';
@@ -301,7 +200,7 @@ export const eventService = {
           errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
           break;
         default:
-          errorMessage = errorData.message || "Error al actualizar registro";
+          errorMessage = response.data?.message || "Error al actualizar registro";
       }
 
       return {
@@ -311,36 +210,19 @@ export const eventService = {
       };
     }
 
-    const result = await response.json();
-
     return {
       success: true,
-      data: result.data,
-      message: result.data.message || 'Registro actualizado exitosamente',
+      data: response.data.data,
+      message: response.data.data?.message || 'Registro actualizado exitosamente',
       status: response.status
     };
   },
 
-  // Delete event registration
   async deleteEventRegistration(eventId, memberId) {
-    const token = localStorage.getItem("authToken");
-
-    const response = await fetch(
-      `${API_BASE_URL}/events/${eventId}/registrations/members/${memberId}`,
-      {
-        method: "DELETE",
-        headers: {
-          "accept": "*/*",
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
+    const response = await api.del(`/events/${eventId}/registrations/members/${memberId}`);
 
     if (!response.ok) {
-      const errorData = await response.json();
       let errorMessage = "Error al cancelar registro";
-
-      // Manejar códigos de error específicos en el servicio
       switch (response.status) {
         case 404:
           errorMessage = 'Registro no encontrado';
@@ -349,7 +231,7 @@ export const eventService = {
           errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
           break;
         default:
-          errorMessage = errorData.message || "Error al cancelar registro";
+          errorMessage = response.data?.message || "Error al cancelar registro";
       }
 
       return {
@@ -359,38 +241,19 @@ export const eventService = {
       };
     }
 
-    const result = await response.json();
-
     return {
       success: true,
-      data: result.data,
-      message: result.data.message || 'Registro cancelado exitosamente',
+      data: response.data.data,
+      message: response.data.data?.message || 'Registro cancelado exitosamente',
       status: response.status
     };
   },
 
-  // Create event registration
   async createEventRegistration(eventId, registrationData) {
-    const token = localStorage.getItem("authToken");
-
-    const response = await fetch(
-      `${API_BASE_URL}/events/${eventId}/registration`,
-      {
-        method: "POST",
-        headers: {
-          "accept": "application/json",
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(registrationData)
-      }
-    );
+    const response = await api.post(`/events/${eventId}/registration`, registrationData);
 
     if (!response.ok) {
-      const errorData = await response.json();
       let errorMessage = "Error al crear registro";
-
-      // Manejar códigos de error específicos en el servicio
       switch (response.status) {
         case 400:
           errorMessage = 'Datos de entrada inválidos';
@@ -405,7 +268,7 @@ export const eventService = {
           errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
           break;
         default:
-          errorMessage = errorData.message || "Error al crear registro";
+          errorMessage = response.data?.message || "Error al crear registro";
       }
 
       return {
@@ -415,35 +278,19 @@ export const eventService = {
       };
     }
 
-    const result = await response.json();
-
     return {
       success: true,
-      data: result.data,
-      message: result.data.message || 'Registro creado exitosamente',
+      data: response.data.data,
+      message: response.data.data?.message || 'Registro creado exitosamente',
       status: response.status
     };
   },
 
-  // Get club member by ID with guests
   async getClubMemberById(memberId) {
-    const token = localStorage.getItem("authToken");
-
-    const response = await fetch(
-      `${API_BASE_URL}/club-members/${memberId}`,
-      {
-        headers: {
-          "accept": "*/*",
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
+    const response = await api.get(`/club-members/${memberId}`);
 
     if (!response.ok) {
-      const errorData = await response.json();
       let errorMessage = "Error al obtener miembro";
-
-      // Manejar códigos de error específicos en el servicio
       switch (response.status) {
         case 404:
           errorMessage = 'Miembro no encontrado';
@@ -452,7 +299,7 @@ export const eventService = {
           errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
           break;
         default:
-          errorMessage = errorData.message || "Error al obtener miembro";
+          errorMessage = response.data?.message || "Error al obtener miembro";
       }
 
       return {
@@ -462,19 +309,14 @@ export const eventService = {
       };
     }
 
-    const result = await response.json();
-
     return {
       success: true,
-      data: result.data,
+      data: response.data.data,
       status: response.status
     };
   },
 
-  // Search club members
   async searchClubMembers(search = '') {
-    const token = localStorage.getItem("authToken");
-
     const params = new URLSearchParams({
       page: '1',
       limit: '10',
@@ -483,27 +325,14 @@ export const eventService = {
       active: 'true'
     });
 
-    const response = await fetch(
-      `${API_BASE_URL}/club-members?${params}`,
-      {
-        headers: {
-          "accept": "*/*",
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
+    const response = await api.get(`/club-members?${params}`);
 
     if (!response.ok) {
-      const errorData = await response.json();
       let errorMessage = "Error al obtener miembros";
-
-      // Manejar códigos de error específicos en el servicio
-      switch (response.status) {
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = errorData.message || "Error al obtener miembros";
+      if (response.status === 500) {
+        errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
+      } else {
+        errorMessage = response.data?.message || "Error al obtener miembros";
       }
 
       return {
@@ -513,22 +342,11 @@ export const eventService = {
       };
     }
 
-    const result = await response.json();
-
-    if (result.success) {
-      // Filter out members without memberCode
-      const filteredMembers = (result.data.members || []).filter(m => m.memberCode !== null);
-      return {
-        success: true,
-        data: { members: filteredMembers },
-        status: response.status
-      };
-    } else {
-      return {
-        success: false,
-        error: result.message || "Error al obtener miembros",
-        status: response.status
-      };
-    }
+    const filteredMembers = (response.data.data?.members || []).filter(m => m.memberCode !== null);
+    return {
+      success: true,
+      data: { members: filteredMembers },
+      status: response.status
+    };
   }
 };

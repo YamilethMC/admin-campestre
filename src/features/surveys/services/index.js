@@ -1,8 +1,8 @@
-export const surveyService = {
+import api from '../../../shared/api/api';
 
+export const surveyService = {
   getSurveyCategoryOptions: async () => {
     await new Promise(resolve => setTimeout(resolve, 300));
-    
     return [
       { value: 'TODAS', label: 'Todas' },
       { value: 'SERVICES', label: 'Servicios' },
@@ -14,7 +14,6 @@ export const surveyService = {
 
   getSurveyPriorityOptions: async () => {
     await new Promise(resolve => setTimeout(resolve, 300));
-    
     return [
       { value: 'HIGH', label: 'Importante' },
       { value: 'MEDIUM', label: 'Normal' },
@@ -23,374 +22,132 @@ export const surveyService = {
   },
 
   getSurveyById: async (id) => {
-    const token = localStorage.getItem('authToken');
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/survey/${id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-    });
+    const response = await api.get(`/survey/${id}`);
+    
     if (!response.ok) {
-      const err = await response.json();
-      let errorMessage = err.message || 'Error desconocido';
+      let errorMessage = response.data?.message || 'Error desconocido';
+      if (response.status === 404) errorMessage = 'Encuesta no encontrada';
+      else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
-      switch (response.status) {
-        case 401:
-          errorMessage = 'No autorizado: Por favor inicia sesión para continuar';
-          break;
-        case 404:
-          errorMessage = 'Encuesta no encontrada';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = err.message || 'Error desconocido';
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        status: response.status
-      };
+      return { success: false, error: errorMessage, status: response.status };
     }
-    const data = await response.json();
-    return {
-      success: true,
-      data: data.data,
-      status: response.status
-    };
+    
+    return { success: true, data: response.data.data, status: response.status };
   },
 
   createSurvey: async (surveyData) => {
-    const token = localStorage.getItem('authToken');
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/survey`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify(surveyData)
-    });
+    const response = await api.post('/survey', surveyData);
+    
     if (!response.ok) {
-      const err = await response.json();
-      let errorMessage = err.message || 'Error desconocido';
-      switch (response.status) {
-        case 400:
-          errorMessage = 'No se encontró la encuesta';
-          break;
-        case 401:
-          errorMessage = 'No autorizado: Por favor inicia sesión para continuar';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = err.message || 'Error desconocido';
-      }
+      let errorMessage = response.data?.message || 'Error desconocido';
+      if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
-      return {
-        success: false,
-        error: errorMessage,
-        status: response.status
-      };
+      return { success: false, error: errorMessage, status: response.status };
     }
 
-    const result = await response.json();
     return {
       success: true,
-      data: result,
-      message: result.message || 'Encuesta creada exitosamente',
+      data: response.data,
+      message: response.data.message || 'Encuesta creada exitosamente',
       status: response.status
     };
   },
 
   updateSurvey: async (id, surveyData) => {
-    const token = localStorage.getItem('authToken');
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/survey/${id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify(surveyData)
-    });
+    const response = await api.patch(`/survey/${id}`, surveyData);
+    
     if (!response.ok) {
-      const err = await response.json();
-      let errorMessage = err.message || 'Error desconocido';
+      let errorMessage = response.data?.message || 'Error desconocido';
+      if (response.status === 404) errorMessage = 'Encuesta no encontrada';
+      else if (response.status === 409) errorMessage = 'Ya existe una encuesta con ese título';
+      else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
-      // Manejar códigos de error específicos en el servicio
-      switch (response.status) {
-        case 400:
-          errorMessage = 'No se encontró la encuesta';
-          break;
-        case 401:
-          errorMessage = 'No autorizado: Por favor inicia sesión para continuar';
-          break;
-        case 403:
-          errorMessage = 'Acceso prohibido: No tienes permisos para actualizar esta encuesta';
-          break;
-        case 404:
-          errorMessage = 'Encuesta no encontrada';
-          break;
-        case 409:
-          errorMessage = 'Ya existe una encuesta con ese título';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = err.message || 'Error desconocido';
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        status: response.status
-      };
+      return { success: false, error: errorMessage, status: response.status };
     }
-    const result = await response.json();
+    
     return {
       success: true,
-      data: result,
-      message: result.message || 'Encuesta actualizada exitosamente',
+      data: response.data,
+      message: response.data.message || 'Encuesta actualizada exitosamente',
       status: response.status
     };
   },
 
   toggleSurveyStatus: async (id) => {
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      return {
-        success: false,
-        error: 'No se encontró el token de autenticación',
-        status: 401
-      };
-    }
-
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/survey/${id}/toggle-active`, {
-      method: "PATCH",
-      headers: {
-        "accept": "application/json",
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
-    });
+    const response = await api.patch(`/survey/${id}/toggle-active`, {});
 
     if (!response.ok) {
-      const err = await response.json();
-      let errorMessage = err.message || 'Error desconocido';
+      let errorMessage = response.data?.message || 'Error desconocido';
+      if (response.status === 404) errorMessage = 'Encuesta no encontrada';
+      else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
-      // Manejar códigos de error específicos en el servicio
-      switch (response.status) {
-        case 401:
-          errorMessage = 'No autorizado: Por favor inicia sesión para continuar';
-          break;
-        case 403:
-          errorMessage = 'Acceso prohibido: No tienes permisos para cambiar el estado de esta encuesta';
-          break;
-        case 404:
-          errorMessage = 'Encuesta no encontrada';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = err.message || 'Error desconocido';
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        status: response.status
-      };
+      return { success: false, error: errorMessage, status: response.status };
     }
 
-    return {
-      success: true,
-      message: 'Estado de encuesta actualizado exitosamente',
-      status: response.status
-    };
+    return { success: true, message: 'Estado de encuesta actualizado exitosamente', status: response.status };
   },
 
-  // Delete a survey
   deleteSurvey: async (id) => {
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      return {
-        success: false,
-        error: 'No se encontró el token de autenticación',
-        status: 401
-      };
-    }
-
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/survey/${id}`, {
-      method: "DELETE",
-      headers: {
-        "accept": "application/json",
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
-    });
+    const response = await api.del(`/survey/${id}`);
 
     if (!response.ok) {
-      const err = await response.json();
-      let errorMessage = err.message || 'Error desconocido';
+      let errorMessage = response.data?.message || 'Error desconocido';
+      if (response.status === 404) errorMessage = 'Encuesta no encontrada';
+      else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
-      // Manejar códigos de error específicos en el servicio
-      switch (response.status) {
-        case 401:
-          errorMessage = 'No autorizado: Por favor inicia sesión para continuar';
-          break;
-        case 403:
-          errorMessage = 'Acceso prohibido: No tienes permisos para eliminar esta encuesta';
-          break;
-        case 404:
-          errorMessage = 'Encuesta no encontrada';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = err.message || 'Error desconocido';
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        status: response.status
-      };
+      return { success: false, error: errorMessage, status: response.status };
     }
-    return {
-      success: true,
-      message: 'Encuesta eliminada exitosamente',
-      status: response.status
-    };
+    
+    return { success: true, message: 'Encuesta eliminada exitosamente', status: response.status };
   },
   
-  // Get all responses for a survey (for the responses view)
   getSurveyResponses: async (surveyId) => {
-    const token = localStorage.getItem('authToken');
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/survey/${surveyId}/responses`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-    });
+    const response = await api.get(`/survey/${surveyId}/responses`);
+    
     if (!response.ok) {
-      const err = await response.json();
-      let errorMessage = err.message || 'Error desconocido';
+      let errorMessage = response.data?.message || 'Error desconocido';
+      if (response.status === 404) errorMessage = 'Encuesta no encontrada';
+      else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
-      switch (response.status) {
-        case 401:
-          errorMessage = 'No autorizado: Por favor inicia sesión para continuar';
-          break;
-        case 403:
-          errorMessage = 'Acceso prohibido: No tienes permisos para ver esta información';
-          break;
-        case 404:
-          errorMessage = 'Encuesta no encontrada';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = err.message || 'Error desconocido';
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        status: response.status
-      };
+      return { success: false, error: errorMessage, status: response.status };
     }
-    const data = await response.json();
-    return {
-      success: true,
-      data: data.data,
-      status: response.status
-    };
+    
+    return { success: true, data: response.data.data, status: response.status };
   },
 
-  // Fetch surveys with pagination, filtering and search
-  async fetchSurveys({
-    page = 1,
-    limit = 10,
-    search = '',
-    category = '',
-    status = '' // 'true', 'false', or empty for all
-  } = {}) {
-    const token = localStorage.getItem("authToken");
-
-    // Build query parameters
-    let query = `${process.env.REACT_APP_API_URL}/survey?page=${page}&limit=${limit}`;
-    if (search) query += `&search=${encodeURIComponent(search)}`;
-    if (category && category !== 'TODAS') query += `&category=${encodeURIComponent(category)}`;
-    if (status) query += `&active=${encodeURIComponent(status)}`;
-    const response = await fetch(query, {
-      headers: {
-        "accept": "*/*",
-        "Authorization": `Bearer ${token}`
-      }
-    });
+  async fetchSurveys({ page = 1, limit = 10, search = '', category = '', status = '' } = {}) {
+    const params = new URLSearchParams({ page, limit });
+    if (search) params.append('search', search);
+    if (category && category !== 'TODAS') params.append('category', category);
+    if (status) params.append('active', status);
+    
+    const response = await api.get(`/survey?${params}`);
 
     if (!response.ok) {
-      const err = await response.json();
-      let errorMessage = err.message || 'Error desconocido';
+      let errorMessage = response.data?.message || 'Error desconocido';
+      if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
-      switch (response.status) {
-        case 401:
-          errorMessage = 'No autorizado: Por favor inicia sesión para continuar';
-          break;
-        case 400:
-          errorMessage = 'No se encontraron encuestas';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = err.message || 'Error desconocido';
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        status: response.status
-      };
+      return { success: false, error: errorMessage, status: response.status };
     }
 
-    const data = await response.json();
-
-    // The API returns { surveysActive, surveysInactive, meta }
+    const data = response.data.data;
     let surveys = [];
-    let activeCount = 0;
-    let inactiveCount = 0;
-
-    // Handle the different status filter scenarios
+    
     if (status === 'true') {
-      // Only active surveys
-      surveys = data.data.surveysActive || [];
+      surveys = data.surveysActive || [];
     } else if (status === 'false') {
-      // Only inactive surveys
-      surveys = data.data.surveysInactive || [];
+      surveys = data.surveysInactive || [];
     } else {
-      // All surveys (active first)
-      surveys = [...(data.data.surveysActive || []), ...(data.data.surveysInactive || [])];
+      surveys = [...(data.surveysActive || []), ...(data.surveysInactive || [])];
     }
-
-    // Calculate counts based on data returned
-    activeCount = data.data.surveysActive ? data.data.surveysActive.length : 0;
-    inactiveCount = data.data.surveysInactive ? data.data.surveysInactive.length : 0;
 
     return {
       success: true,
       data: {
-        surveys: surveys,
-        meta: data.data.meta,
-        activeCount,
-        inactiveCount
+        surveys,
+        meta: data.meta,
+        activeCount: data.surveysActive?.length || 0,
+        inactiveCount: data.surveysInactive?.length || 0
       },
       status: response.status
     };

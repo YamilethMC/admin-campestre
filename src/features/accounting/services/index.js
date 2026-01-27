@@ -65,20 +65,11 @@ export const accountStatementService = {
    * @returns {Promise<Object>} API response
    */
   uploadAccountStatements: async (file) => {
-    const token = localStorage.getItem('authToken');
-
-    if (!token) {
-      return {
-        success: false,
-        error: 'No se encontró token de autorización',
-        status: null
-      };
-    }
-
     const formData = new FormData();
     formData.append('zipFile', file, file.name);
 
     try {
+      const token = localStorage.getItem('authToken');
       const response = await fetch(`${process.env.REACT_APP_API_URL}/account-statements/upload-bulk`, {
         method: 'POST',
         headers: {
@@ -87,50 +78,44 @@ export const accountStatementService = {
         body: formData
       });
 
-      if (!response.ok) {
-        const errorResult = await response.json().catch(() => ({}));
-        let errorMessage = errorResult.message || `Error HTTP ${response.status}`;
+      const handleResponse = async (response) => {
+        const text = await response.text();
+        const data = text ? JSON.parse(text) : null;
+        return {
+          ok: response.ok,
+          status: response.status,
+          data,
+        };
+      };
 
-        // Manejar códigos de error específicos en el servicio
-        switch (response.status) {
-          case 400:
-            errorMessage = errorResult.message || 'Error en la validación del archivo o formato no soportado';
-            break;
-          case 500:
-            errorMessage = errorResult.message || 'Error interno del servidor: Por favor intenta más tarde';
-            break;
-          default:
-            errorMessage = errorResult.message || `Error HTTP ${response.status}`;
+      const result = await handleResponse(response);
+
+      if (!result.ok) {
+        let errorMessage = result.data?.message || `Error HTTP ${result.status}`;
+        if (result.status === 400) {
+          errorMessage = result.data?.message || 'Error en la validación del archivo o formato no soportado';
+        } else if (result.status === 500) {
+          errorMessage = result.data?.message || 'Error interno del servidor: Por favor intenta más tarde';
         }
 
         return {
           success: false,
           error: errorMessage,
-          status: response.status
+          status: result.status
         };
       }
 
-      const result = await response.json();
-
       return {
         success: true,
-        data: result,
-        message: result.message || 'Estados de cuenta subidos exitosamente',
-        status: response.status
+        data: result.data,
+        message: result.data?.message || 'Estados de cuenta subidos exitosamente',
+        status: result.status
       };
     } catch (error) {
       console.error('Error uploading account statements:', error);
-      let errorMessage = 'Error de conexión. Por favor, intente de nuevo más tarde.';
-
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        errorMessage = 'No se pudo conectar con el servidor. Verifique su conexión a internet y que la API esté disponible.';
-      } else {
-        errorMessage = error.message || errorMessage;
-      }
-
       return {
         success: false,
-        error: errorMessage,
+        error: error.message || 'Error de conexión. Por favor, intente de nuevo más tarde.',
         status: null
       };
     }
