@@ -9,9 +9,10 @@ const ValidationTable = ({
   onReject 
 }) => {
   const getProgressPercentage = (validation) => {
-    if (!validation.documents || validation.documents.length === 0) return 0;
-    const completedDocs = validation.documents.filter(doc => doc.status === 'VALIDATED').length;
-    return Math.round((completedDocs / validation.documents.length) * 100);
+    const requestedTotal = validation.stats?.requestedTotal || 0;
+    const requestedValidated = validation.stats?.requestedValidated || 0;
+    if (requestedTotal === 0) return 0;
+    return Math.round((requestedValidated / requestedTotal) * 100);
   };
 
   const validationsArray = Array.isArray(validations) ? validations : [];
@@ -77,8 +78,8 @@ const ValidationTable = ({
                         <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
                           <span>{getProgressPercentage(validation)}%</span>
                           <span>
-                            {validation.documents?.filter(d => d.status === 'VALIDATED').length || 0}/
-                            {validation.documents?.length || 0}
+                            {validation.stats?.requestedValidated || 0}/
+                            {validation.stats?.requestedTotal || 0}
                           </span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">

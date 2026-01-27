@@ -220,16 +220,32 @@ const MemberList = () => {
   }
 
   return (
-    <div className="bg-white p-4 rounded-xl shadow-md border border-gray-200">
-      {/* Filters Section */}
-      <MemberFilters
-        filters={filters}
-        onFilterChange={updateFilters}
-      />
+    <div>
+      {/* Header Section */}
+      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="flex items-center space-x-4">
+          <div>
+            <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">Socios</h1>
+            <p className="text-gray-600">Gestión de socios del club</p>
+          </div>
+        </div>
+      </div>
 
-      {/* Members List */}
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-gray-800">Lista de socios</h2>
+      <div className="bg-white p-4 rounded-xl shadow-md border border-gray-200">
+        {/* Filters Section */}
+        <MemberFilters
+          filters={filters}
+          onFilterChange={updateFilters}
+        />
+
+        {/* Members List */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold text-gray-800">Lista de socios</h2>
 
         <div className="flex space-x-2">
           <button
@@ -274,7 +290,6 @@ const MemberList = () => {
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profesión</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Método pago</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha admisión</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documentos</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                 </tr>
               </thead>
@@ -301,21 +316,6 @@ const MemberList = () => {
 
                         return `${day}-${month}-${year}`;
                       })() : ''}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm">
-                      {(() => {
-                        const { status, badge, progress } = getValidationStatusDisplay(member);
-                        return (
-                          <div className="flex flex-col space-y-1">
-                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${badge}`}>
-                              {status}
-                            </span>
-                            <span className="text-xs text-gray-500">
-                              {progress}
-                            </span>
-                          </div>
-                        );
-                      })()}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 relative">
                       <div className="relative inline-block text-left">
@@ -441,6 +441,7 @@ const MemberList = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

@@ -57,15 +57,25 @@ const ValidationsDashboard = () => {
   }
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Panel de Validaciones</h1>
-          <p className="text-gray-600">Gestiona las validaciones de documentos de los socios</p>
+    <div>
+      {/* Header Section */}
+      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="flex items-center space-x-4">
+          <div>
+            <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">Validaciones</h1>
+            <p className="text-gray-600">Gestión de validaciones de documentos</p>
+          </div>
         </div>
       </div>
 
-      <StatsCards stats={stats} />
+      <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+
+      {/* <StatsCards stats={stats} /> */}
 
       <FiltersBar
         filters={filters}
@@ -81,6 +91,7 @@ const ValidationsDashboard = () => {
         onApprove={() => {}}
         onReject={() => {}}
       />
+      </div>
     </div>
   );
 };

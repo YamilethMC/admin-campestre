@@ -126,6 +126,10 @@ const MemberValidationDetail = ({ memberId, onBack }) => {
   const requiredApproved = requiredDocs.filter(d => d.document?.status === 'VALIDATED').length;
   const totalRequired = requiredDocs.length;
 
+  // Use stats from backend for accurate counts
+  const requestedValidated = validationData?.stats?.requestedValidated || documents.filter(d => d.document?.status === 'VALIDATED').length;
+  const requestedTotal = validationData?.stats?.requestedTotal || documents.length;
+
   return (
     <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
       {/* Header */}
@@ -152,7 +156,7 @@ const MemberValidationDetail = ({ memberId, onBack }) => {
             {getValidationStatusLabel(validation.status)}
           </span>
           <p className="text-sm text-gray-600 mt-2">
-            Documentos requeridos: {requiredApproved}/{totalRequired}
+            Documentos: {requestedValidated}/{requestedTotal}
           </p>
         </div>
       </div>
