@@ -37,6 +37,10 @@ export const useBulkUpload = () => {
       addLog(message);
       addToast(message, 'success');
     } else {
+      if (result.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
       const errorMessage = result.error || 'Error al subir el archivo';
       addLog(errorMessage);
       addToast(errorMessage, 'error');

@@ -36,7 +36,7 @@ const VerifyAccess = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Error al verificar el pase');
+        console.error('Error verifying pass:', response.statusText);
       }
 
       const data = await response.json();
@@ -66,7 +66,7 @@ const VerifyAccess = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al registrar entrada');
+        console.error('Error registering entry:', errorData);
       }
 
       const data = await response.json();

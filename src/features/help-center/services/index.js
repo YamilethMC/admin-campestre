@@ -1,10 +1,21 @@
 import api from '../../../shared/api/api';
+import { handleAuthError } from '../../../shared/utils/authErrorHandler';
 
 export const helpCenterService = {
   fetchHelpCenter: async () => {
     const response = await api.get('/help-center');
     
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error desconocido';
       if (response.status === 500) errorMessage = 'Error interno del servidor';
 
@@ -18,6 +29,16 @@ export const helpCenterService = {
     const response = await api.get(`/help-center/${id}`);
     
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error desconocido';
       if (response.status === 404) errorMessage = 'Artículo no encontrado';
 
@@ -31,6 +52,16 @@ export const helpCenterService = {
     const response = await api.post('/help-center', helpCenterData);
     
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error desconocido';
       if (response.status === 400) errorMessage = 'Datos inválidos';
 
@@ -49,6 +80,16 @@ export const helpCenterService = {
     const response = await api.patch(`/help-center/${id}`, helpCenterData);
     
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error desconocido';
       if (response.status === 404) errorMessage = 'Artículo no encontrado';
       else if (response.status === 400) errorMessage = 'Datos inválidos';
@@ -68,6 +109,16 @@ export const helpCenterService = {
     const response = await api.del(`/help-center/${id}`);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error desconocido';
       if (response.status === 404) errorMessage = 'Artículo no encontrado';
 

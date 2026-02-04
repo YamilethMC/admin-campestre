@@ -30,6 +30,17 @@ export const useValidation = () => {
       setLoadingValidations(true);
       const filterData = customFilters || filters;
       const response = await validationService.getValidations(filterData);
+      
+      if (!response.success) {
+        // Verificar si es un error de autenticación
+        if (response.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
+        addToast(response.error, 'error');
+        return;
+      }
+
       const validationsArray = response?.data ?? [];
 
       setValidations(validationsArray);
@@ -47,8 +58,16 @@ export const useValidation = () => {
     try {
       setLoadingDetails(true);
       const response = await validationService.getValidationDetails(validationId);
-      setValidationDetails(response);
-      return response;
+      if (!response.success) {
+        // Verificar si es un error de autenticación
+        if (response.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return response;
+        }
+        addToast(response.error, 'error');
+        return response;
+      }
+      setValidationDetails(response.data);
     } catch (error) {
       console.error('Error loading validation details:', error);
       addToast('Error al cargar los detalles de la validación', 'error');
@@ -60,7 +79,16 @@ export const useValidation = () => {
 
   const updateValidationStatus = async (validationId, status, rejectionReason = null) => {
     try {
-      await validationService.updateValidationStatus(validationId, status, rejectionReason);
+      const response = await validationService.updateValidationStatus(validationId, status, rejectionReason);
+      if (!response.success) {
+        // Verificar si es un error de autenticación
+        if (response.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return false;
+        }
+        addToast(response.error, 'error');
+        return false;
+      }
       addLog(`Estado de validación actualizado: ${validationService.formatStatus(status)}`);
       addToast('Estado de validación actualizado correctamente', 'success');
       
@@ -79,7 +107,16 @@ export const useValidation = () => {
 
   const updateDocumentStatus = async (documentId, status, notes = null) => {
     try {
-      await validationService.updateDocumentStatus(documentId, status, notes);
+      const response = await validationService.updateDocumentStatus(documentId, status, notes);
+      if (!response.success) {
+        // Verificar si es un error de autenticación
+        if (response.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return false;
+        }
+        addToast(response.error, 'error');
+        return false;
+      }
       addLog(`Estado de documento actualizado: ${validationService.formatStatus(status)}`);
       addToast('Estado de documento actualizado correctamente', 'success');
       

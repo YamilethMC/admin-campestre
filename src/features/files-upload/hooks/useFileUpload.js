@@ -27,6 +27,11 @@ export const useFileUpload = () => {
       setFiles(response.data.data || []);
       setMeta(response.data.meta || null);
     } else {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
       addToast(response.error || 'Error al cargar archivos', 'error');
       console.error('Error loading files:', response.error);
       return;
@@ -45,6 +50,11 @@ export const useFileUpload = () => {
       setUploading(false);
       return response;
     } else {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
       addToast(response.error || 'Error al subir archivo', 'error');
       setUploading(false);
       return;
@@ -57,6 +67,11 @@ export const useFileUpload = () => {
     if (response.success) {
       return response.data;
     } else {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
       addToast(response.error || 'Error al obtener archivo', 'error');
       return
     }
@@ -70,6 +85,11 @@ export const useFileUpload = () => {
       await loadFiles();
       return response;
     } else {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
       addToast(response.error || 'Error al actualizar archivo', 'error');
       return;
     }
@@ -89,6 +109,11 @@ export const useFileUpload = () => {
       }
       return response;
     } else {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
       addToast(response.error || 'Error al eliminar archivo', 'error');
       return;
     }

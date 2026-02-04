@@ -1,4 +1,5 @@
 import api from '../../../shared/api/api';
+import { handleAuthError } from '../../../shared/utils/authErrorHandler';
 
 export const facilityService = {
   async fetchFacilities({
@@ -25,6 +26,16 @@ export const facilityService = {
     const response = await api.get(`/facilities?${params}`);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || "Error al obtener instalaciones";
       if (response.status === 500) {
         errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
@@ -48,6 +59,16 @@ export const facilityService = {
     const response = await api.post('/facilities', facilityData);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || "Error al crear instalación";
       if (response.status === 400) {
         errorMessage = 'Solicitud incorrecta: Verifica los datos de la instalación';
@@ -74,6 +95,16 @@ export const facilityService = {
     const response = await api.patch(`/facilities/${id}`, facilityData);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || "Error al actualizar instalación";
       if (response.status === 404) {
         errorMessage = 'Instalación no encontrada';
@@ -100,6 +131,16 @@ export const facilityService = {
     const response = await api.get(`/facilities/${id}`);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || "Error al obtener instalación";
       if (response.status === 404) {
         errorMessage = 'Instalación no encontrada';
@@ -125,6 +166,16 @@ export const facilityService = {
     const response = await api.del(`/facilities/${id}`);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || "Error al eliminar instalación";
       if (response.status === 404) {
         errorMessage = 'Instalación no encontrada';
@@ -151,6 +202,16 @@ export const facilityService = {
     const response = await api.get(`/facilities/${id}?${params}`);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || "Error al obtener instalación";
       if (response.status === 404) {
         errorMessage = 'Instalación no encontrada';
@@ -176,6 +237,16 @@ export const facilityService = {
     const response = await api.post(`/facilities/${facilityId}/club-members/${memberId}/reservations`, reservationData);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || "Error al crear reservación";
       switch (response.status) {
         case 400:
@@ -211,6 +282,16 @@ export const facilityService = {
     const response = await api.patch(`/facilities/reservations/${reservationId}/club-member/${clubMemberId}`, reservationData);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || "Error al actualizar reservación";
       switch (response.status) {
         case 400:
@@ -257,6 +338,16 @@ export const facilityService = {
     const response = await api.get(`/club-members?${params}`);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || "Error al obtener miembros";
       if (response.status === 500) {
         errorMessage = 'Error interno del servidor: Por favor intenta más tarde';

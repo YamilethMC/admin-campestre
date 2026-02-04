@@ -18,6 +18,11 @@ export const useHelpCenter = () => {
       if (result.success) {
         setHelpCenters(result.data);
       } else {
+        // Verificar si es un error de autenticación
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addLog('Error al cargar las entradas del centro de ayuda');
         addToast(result.error || 'Error desconocido', 'error');
         return;
@@ -46,6 +51,11 @@ export const useHelpCenter = () => {
         loadHelpCenters(); // Reload the list
         return result.data;
       } else {
+        // Verificar si es un error de autenticación
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error || 'Error desconocido', 'error');
         return null;
       }
@@ -67,6 +77,11 @@ export const useHelpCenter = () => {
         loadHelpCenters(); // Reload the list
         return result.data;
       } else {
+        // Verificar si es un error de autenticación
+        if (result.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
         addToast(result.error || 'Error desconocido', 'error');
         return null;
       }
@@ -87,6 +102,11 @@ export const useHelpCenter = () => {
       if (result.success) {
         return result.data;
       } else {
+        // Verificar si es un error de autenticación
+        if (result.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
         addToast(result.error || 'Error desconocido', 'error');
         return null;
       }
@@ -106,6 +126,11 @@ export const useHelpCenter = () => {
         loadHelpCenters(); // Reload the list
         return true;
       } else {
+        // Verificar si es un error de autenticación
+        if (result.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return false;
+      }
         addToast(result.error || 'Error desconocido', 'error');
         return false;
       }

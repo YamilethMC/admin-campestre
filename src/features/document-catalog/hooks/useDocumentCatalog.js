@@ -23,6 +23,16 @@ export const useDocumentCatalog = () => {
     try {
       setLoadingCatalog(true);
       const response = await documentCatalogService.getDocumentCatalog(activeOnly);
+      if (!response.success) {
+        if (response.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
+        addToast(response.error || 'Error al cargar el catálogo de documentos', 'error');
+        setCatalog([]);
+        return;
+      }
+      
       const catalogData = response?.data ?? response ?? [];
       setCatalog(catalogData);
       addLog(`Catálogo cargado: ${catalogData.length} documentos`);
@@ -37,8 +47,16 @@ export const useDocumentCatalog = () => {
 
   const createDocument = async (documentData) => {
     try {
-      await documentCatalogService.createDocumentCatalog(documentData);
-      addLog(`Documento creado: ${documentData.label}`);
+      const response = await documentCatalogService.createDocumentCatalog(documentData);
+      if (!response.success) {
+        if (response.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
+        addToast(response.error || 'Error al crear el documento', 'error');
+        return false;
+      }
+
       addToast('Documento agregado al catálogo correctamente', 'success');
       
       await loadCatalog();
@@ -53,7 +71,15 @@ export const useDocumentCatalog = () => {
 
   const updateDocument = async (catalogId, documentData) => {
     try {
-      await documentCatalogService.updateDocumentCatalog(catalogId, documentData);
+      const response = await documentCatalogService.updateDocumentCatalog(catalogId, documentData);
+      if (!response.success) {
+        if (response.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return false;
+        }
+        addToast(response.error || 'Error al actualizar el documento', 'error');
+        return false;
+      }
       addLog(`Documento actualizado: ${documentData.label}`);
       addToast('Documento actualizado correctamente', 'success');
       
@@ -68,7 +94,15 @@ export const useDocumentCatalog = () => {
 
   const deleteDocument = async (catalogId, documentLabel) => {
     try {
-      await documentCatalogService.deleteDocumentCatalog(catalogId);
+      const response = await documentCatalogService.deleteDocumentCatalog(catalogId);
+      if (!response.success) {
+        if (response.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return false;
+        }
+        addToast(response.error || 'Error al eliminar el documento', 'error');
+        return false;
+      }
       addLog(`Documento eliminado: ${documentLabel}`);
       addToast('Documento eliminado del catálogo', 'success');
       

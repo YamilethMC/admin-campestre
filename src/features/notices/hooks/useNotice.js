@@ -32,6 +32,11 @@ export const useNotice = () => {
       setNotices(response.data.data || []);
       setMeta(response.data.meta || null);
     } else {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
       addToast(response.error || 'Error al cargar avisos', 'error');
       console.error('Error loading notices:', response.error);
     }
@@ -48,6 +53,11 @@ export const useNotice = () => {
       // Refresh the list to maintain consistency
       await loadNotices();
     } else {
+      // Verificar si es un error de autenticación
+      if (result.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
       addToast(result.error || 'Error al actualizar estado del aviso', 'error');
     }
   };
@@ -61,6 +71,11 @@ export const useNotice = () => {
       // Refresh the list
       await loadNotices();
     } else {
+      // Verificar si es un error de autenticación
+      if (result.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
       addToast(result.error || 'Error al registrar aviso', 'error');
       //setLoading(false);
     }
@@ -75,6 +90,11 @@ export const useNotice = () => {
       // Refresh the list to maintain consistency
       await loadNotices();
     } else {
+      // Verificar si es un error de autenticación
+      if (result.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
       addToast(result.error || 'Error al actualizar aviso', 'error');
       //setLoading(false);
     }
@@ -87,6 +107,11 @@ export const useNotice = () => {
     if (result.success) {
       return result.data;
     } else {
+      // Verificar si es un error de autenticación
+      if (result.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
       addToast(result.error || 'Error al obtener aviso', 'error');
     }
   };
@@ -105,6 +130,11 @@ export const useNotice = () => {
       }
       return true;
     } else {
+      // Verificar si es un error de autenticación
+      if (result.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
       addToast(result.error || 'Error al eliminar el aviso', 'error');
     }
   };

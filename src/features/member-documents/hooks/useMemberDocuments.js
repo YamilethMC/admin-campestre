@@ -19,7 +19,15 @@ export const useMemberDocuments = (memberId) => {
         memberDocumentsService.getMemberValidationData(memberId),
         memberDocumentsService.getMemberDocuments(memberId)
       ]);
-
+      if(!memberResponse || !documentsResponse) {
+        // Verificar si es un error de autenticación
+        if (response.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
+        addToast('Error al cargar los datos del socio o sus documentos', 'error');
+        return;
+      }
       setMemberData(memberResponse);
       setDocuments(documentsResponse.documents || []);
       addLog(`Documentos del socio cargados: ${documentsResponse.documents?.length || 0}`);
@@ -33,7 +41,18 @@ export const useMemberDocuments = (memberId) => {
 
   const updateDocumentStatus = async (documentId, newStatus, notes = null) => {
     try {
-      await memberDocumentsService.updateDocumentStatus(documentId, newStatus, notes);
+      const response = await memberDocumentsService.updateDocumentStatus(documentId, newStatus, notes);
+
+      if (!response.success) {
+        // Verificar si es un error de autenticación
+        if (response.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
+        addToast(response.error || 'Error al actualizar el estado del documento', 'error');
+        return false;
+      }
+
       addLog(`Estado de documento actualizado: ${memberDocumentsService.formatStatus(newStatus)}`);
       addToast('Estado actualizado correctamente', 'success');
       
@@ -48,7 +67,16 @@ export const useMemberDocuments = (memberId) => {
 
   const updateValidationStatus = async (validationId, newStatus, rejectionReason = null) => {
     try {
-      await memberDocumentsService.updateValidationStatus(validationId, newStatus, rejectionReason);
+      const response = await memberDocumentsService.updateValidationStatus(validationId, newStatus, rejectionReason);
+      if (!response.success) {
+        // Verificar si es un error de autenticación
+        if (response.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return false;
+        }
+        addToast(response.error || 'Error al actualizar el estado de validación', 'error');
+        return false;
+      }
       addLog(`Estado de validación actualizado: ${memberDocumentsService.formatStatus(newStatus)}`);
       addToast('Validación actualizada correctamente', 'success');
       

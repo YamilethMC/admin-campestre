@@ -1,3 +1,5 @@
+import { handleAuthError } from '../../../shared/utils/authErrorHandler';
+
 export const accountStatementService = {
   /**
    * Process a ZIP file containing account statements
@@ -91,6 +93,15 @@ export const accountStatementService = {
       const result = await handleResponse(response);
 
       if (!result.ok) {
+        if (result.status === 401) {
+          // Llamar a la función global para manejar el error de autenticación
+          handleAuthError();
+          return {
+            success: false,
+            error: 'No autorizado: Sesión expirada',
+            status: response.status
+          };
+        }
         let errorMessage = result.data?.message || `Error HTTP ${result.status}`;
         if (result.status === 400) {
           errorMessage = result.data?.message || 'Error en la validación del archivo o formato no soportado';

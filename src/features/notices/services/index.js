@@ -1,4 +1,5 @@
 import api from '../../../shared/api/api';
+import { handleAuthError } from '../../../shared/utils/authErrorHandler';
 
 export const noticeService = {
   // Get all notices with pagination, search, and filters
@@ -16,6 +17,16 @@ export const noticeService = {
     const response = await api.get(`/notify?${params}`);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error al obtener avisos';
       if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
@@ -37,6 +48,16 @@ export const noticeService = {
     const response = await api.get(`/notify/${id}`);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error al obtener aviso';
       if (response.status === 404) errorMessage = 'Aviso no encontrado';
       else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
@@ -55,6 +76,16 @@ export const noticeService = {
     const response = await api.post('/notify', noticeData);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error al registrar aviso';
       if (response.status === 400) errorMessage = 'Solicitud incorrecta: Verifica los datos proporcionados';
       else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
@@ -76,6 +107,16 @@ export const noticeService = {
     const response = await api.patch(`/notify/${id}`, noticeData);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error al actualizar aviso';
       if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
@@ -95,6 +136,16 @@ export const noticeService = {
     const response = await api.patch(`/notify/${id}`, { active });
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error al actualizar estado del aviso';
       if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
@@ -116,6 +167,16 @@ export const noticeService = {
     const response = await api.del(`/notify/${id}`);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error al eliminar el aviso';
       if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 

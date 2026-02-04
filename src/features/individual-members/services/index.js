@@ -1,4 +1,5 @@
 import api from '../../../shared/api/api';
+import { handleAuthError } from '../../../shared/utils/authErrorHandler';
 
 export const memberService = {
   getGenderOptions: async () => {
@@ -32,6 +33,16 @@ export const memberService = {
     const response = await api.post('/club-members', memberData);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error al registrar socio';
 
       switch (response.status) {
@@ -67,6 +78,16 @@ export const memberService = {
     const response = await api.get(`/club-members/${id}`);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = "Error al obtener miembro";
 
       switch (response.status) {
@@ -116,6 +137,16 @@ export const memberService = {
     const response = await api.patch(`/users/${id}`, updatePayload);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = "Error al actualizar socio";
 
       switch (response.status) {

@@ -33,6 +33,10 @@ export const useBanner = () => {
       setBanners(response.data.data || []);
       setMeta(response.data.meta || null);
     } else {
+      if (response.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
       addToast(response.error || 'Error al cargar banners', 'error');
       console.error('Error loading banners:', response.error);
     }
@@ -49,6 +53,10 @@ export const useBanner = () => {
       // Refresh the list
       await loadBanners();
     } else {
+      if (result.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
       addToast(result.error || 'Error al registrar banner', 'error');
       // Don't navigate away on error - let the form handle navigation
       setLoading(false);
@@ -66,6 +74,10 @@ export const useBanner = () => {
       // Refresh the list to maintain consistency
       await loadBanners();
     } else {
+      if(result.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
       addToast(result.error || 'Error al actualizar banner', 'error');
       // Don't navigate away on error - let the form handle navigation
       setLoading(false);
@@ -81,6 +93,10 @@ export const useBanner = () => {
     if (result.success) {
       return result.data;
     } else {
+      if (result.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      } 
       addToast(result.error || 'Error al obtener banner', 'error');
     }
   };
@@ -99,6 +115,10 @@ export const useBanner = () => {
       }
       return true;
     } else {
+      if (result.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
       addToast(result.error || 'Error al eliminar el banner', 'error');
     }
   };

@@ -1,4 +1,5 @@
 import api from '../../../shared/api/api';
+import { handleAuthError } from '../../../shared/utils/authErrorHandler';
 
 export const surveyService = {
   getSurveyCategoryOptions: async () => {
@@ -25,6 +26,16 @@ export const surveyService = {
     const response = await api.get(`/survey/${id}`);
     
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error desconocido';
       if (response.status === 404) errorMessage = 'Encuesta no encontrada';
       else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
@@ -39,6 +50,16 @@ export const surveyService = {
     const response = await api.post('/survey', surveyData);
     
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error desconocido';
       if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
@@ -57,6 +78,16 @@ export const surveyService = {
     const response = await api.patch(`/survey/${id}`, surveyData);
     
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error desconocido';
       if (response.status === 404) errorMessage = 'Encuesta no encontrada';
       else if (response.status === 409) errorMessage = 'Ya existe una encuesta con ese título';
@@ -77,6 +108,16 @@ export const surveyService = {
     const response = await api.patch(`/survey/${id}/toggle-active`, {});
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error desconocido';
       if (response.status === 404) errorMessage = 'Encuesta no encontrada';
       else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
@@ -91,6 +132,16 @@ export const surveyService = {
     const response = await api.del(`/survey/${id}`);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error desconocido';
       if (response.status === 404) errorMessage = 'Encuesta no encontrada';
       else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
@@ -105,6 +156,16 @@ export const surveyService = {
     const response = await api.get(`/survey/${surveyId}/responses`);
     
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error desconocido';
       if (response.status === 404) errorMessage = 'Encuesta no encontrada';
       else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
@@ -124,6 +185,16 @@ export const surveyService = {
     const response = await api.get(`/survey?${params}`);
 
     if (!response.ok) {
+       // Verificar si es un error de autenticación
+        if (response.status === 401) {
+          // Llamar a la función global para manejar el error de autenticación
+          handleAuthError();
+          return {
+            success: false,
+            error: 'No autorizado: Sesión expirada',
+            status: response.status
+          };
+        }
       let errorMessage = response.data?.message || 'Error desconocido';
       if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 

@@ -33,6 +33,11 @@ export const useSurvey = () => {
         setActiveCount(result.data.activeCount);
         setInactiveCount(result.data.inactiveCount);
       } else {
+        // Verificar si es un error de autenticación
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addLog('Error al cargar las encuestas');
         addToast(result.error || 'Error desconocido', 'error');
         return;
@@ -97,6 +102,11 @@ export const useSurvey = () => {
       if (result.success) {
         loadSurveys();
       } else {
+        // Verificar si es un error de autenticación
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error || 'Error desconocido', 'error');
         return;
       }
@@ -198,6 +208,11 @@ export const useSurvey = () => {
         loadSurveys();
         return result.data;
       } else {
+        // Verificar si es un error de autenticación
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error || 'Error desconocido', 'error');
         return null;
       }
@@ -220,6 +235,11 @@ export const useSurvey = () => {
         loadSurveys();
         return result.data;
       } else {
+        // Verificar si es un error de autenticación
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error || 'Error desconocido', 'error');
         return null;
       }
@@ -240,6 +260,11 @@ export const useSurvey = () => {
       if (result.success) {
         return result.data;
       } else {
+        // Verificar si es un error de autenticación
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error || 'Error desconocido', 'error');
         return null;
       }
@@ -260,6 +285,11 @@ export const useSurvey = () => {
       if (result.success) {
         return result.data;
       } else {
+        // Verificar si es un error de autenticación
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error || 'Error desconocido', 'error');
         return null;
       }
@@ -283,6 +313,11 @@ export const useSurvey = () => {
         }
         return true;
       } else {
+        // Verificar si es un error de autenticación
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error || 'Error desconocido', 'error');
         return false;
       }

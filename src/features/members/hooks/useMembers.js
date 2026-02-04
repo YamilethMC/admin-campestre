@@ -16,6 +16,11 @@ export function useMembers() {
       setMembers(data.members || []);
       setMeta(data.meta || null);
     } else {
+      // Verificar si es un error de autenticación
+      if (data.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
       addToast(data.error || 'Error al cargar miembros', 'error');
     }
   };

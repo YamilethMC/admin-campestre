@@ -189,6 +189,11 @@ export const useIndividualMember = () => {
         }
         return true;
       }else{
+        // Verificar si es un error de autenticación
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error, "error");
         return false;
       }

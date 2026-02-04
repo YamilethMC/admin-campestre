@@ -77,7 +77,6 @@ export const useAccountStatement = () => {
     } catch (error) {
       addLog(`Error procesando estados de cuenta: ${error.message}`);
       addToast(`Error procesando estados de cuenta: ${error.message}`, 'error');
-      throw error;
     }
   };
 
@@ -112,6 +111,11 @@ export const useAccountStatement = () => {
       // Reset form fields after successful send
       resetForm();
     } else {
+      if (result.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
+
       const errorMessage = result.error || 'Error desconocido al subir el archivo';
       addLog(`Error al subir estados de cuenta: ${errorMessage}`);
       addToast(errorMessage, 'error');

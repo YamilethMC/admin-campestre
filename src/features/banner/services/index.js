@@ -1,4 +1,5 @@
 import api from '../../../shared/api/api';
+import { handleAuthError } from '../../../shared/utils/authErrorHandler';
 
 export const bannerService = {
   fetchBanners: async ({ page = 1, limit = 10, orderBy = 'createdAt', order = 'asc', active = true, search = '' } = {}) => {
@@ -8,6 +9,15 @@ export const bannerService = {
     const response = await api.get(`/banner?${params}`);
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error al obtener banners';
       if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
@@ -28,6 +38,15 @@ export const bannerService = {
     const response = await api.get(`/banner/${id}`);
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error al obtener banner';
       if (response.status === 404) errorMessage = 'Banner no encontrado';
       else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
@@ -48,6 +67,15 @@ export const bannerService = {
     const response = await api.post('/banner', formattedData);
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error al registrar banner';
       if (response.status === 400) errorMessage = 'Solicitud incorrecta: Verifica los datos proporcionados';
       else if (response.status === 409) errorMessage = 'El banner ya existe';
@@ -74,6 +102,15 @@ export const bannerService = {
     const response = await api.patch(`/banner/${id}`, formattedData);
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error al actualizar banner';
       if (response.status === 404) errorMessage = 'Banner no encontrado';
       else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
@@ -93,6 +130,15 @@ export const bannerService = {
     const response = await api.del(`/banner/${id}`);
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error al eliminar el banner';
       if (response.status === 404) errorMessage = 'Banner no encontrado';
       else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';

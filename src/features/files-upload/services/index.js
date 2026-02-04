@@ -1,4 +1,5 @@
 import api from '../../../shared/api/api';
+import { handleAuthError } from '../../../shared/utils/authErrorHandler';
 
 export const fileUploadService = {
   getFiles: async (params) => {
@@ -8,6 +9,16 @@ export const fileUploadService = {
     const response = await api.get(`/files?${query}`);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error al obtener archivos';
       if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
 
@@ -46,6 +57,16 @@ export const fileUploadService = {
     });
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       const errorData = await response.json();
       let errorMessage = 'Error al subir archivo';
 
@@ -86,6 +107,16 @@ export const fileUploadService = {
     const response = await api.get(`/files/${id}`);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error al obtener archivo';
       if (response.status === 404) errorMessage = 'Archivo no encontrado';
       else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
@@ -104,6 +135,16 @@ export const fileUploadService = {
     });
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error al actualizar archivo';
       if (response.status === 404) errorMessage = 'Archivo no encontrado';
       else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
@@ -123,6 +164,16 @@ export const fileUploadService = {
     const response = await api.del(`/files/${id}`);
 
     if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = response.data?.message || 'Error al eliminar archivo';
       if (response.status === 404) errorMessage = 'Archivo no encontrado';
       else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';

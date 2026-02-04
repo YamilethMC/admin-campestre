@@ -1,4 +1,5 @@
 import api from '../../../shared/api/api';
+import { handleAuthError } from '../../../shared/utils/authErrorHandler';
 
 export const eventService = {
   // Fetch all events with pagination, search, filters, and date
@@ -24,6 +25,15 @@ export const eventService = {
     const response = await api.get(`/events?${params}`);
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = "Error al obtener eventos";
       switch (response.status) {
         case 400:
@@ -57,6 +67,15 @@ export const eventService = {
     const response = await api.post('/events', eventData);
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = "Error al crear evento";
       switch (response.status) {
         case 400:
@@ -91,6 +110,15 @@ export const eventService = {
     const response = await api.patch(`/events/${id}`, eventData);
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = "Error al actualizar evento";
       switch (response.status) {
         case 400:
@@ -125,6 +153,15 @@ export const eventService = {
     const response = await api.get(`/events/${id}`);
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = "Error al obtener evento";
       switch (response.status) {
         case 400:
@@ -158,6 +195,15 @@ export const eventService = {
     const response = await api.del(`/events/${id}`);
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = "Error al eliminar evento";
       switch (response.status) {
         case 404:
@@ -188,6 +234,15 @@ export const eventService = {
     const response = await api.patch(`/events/${eventId}/registrations/members/${memberId}`, registrationData);
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = "Error al actualizar registro";
       switch (response.status) {
         case 404:
@@ -222,6 +277,15 @@ export const eventService = {
     const response = await api.del(`/events/${eventId}/registrations/members/${memberId}`);
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = "Error al cancelar registro";
       switch (response.status) {
         case 404:
@@ -253,6 +317,15 @@ export const eventService = {
     const response = await api.post(`/events/${eventId}/registration`, registrationData);
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = "Error al crear registro";
       switch (response.status) {
         case 400:
@@ -290,6 +363,15 @@ export const eventService = {
     const response = await api.get(`/club-members/${memberId}`);
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = "Error al obtener miembro";
       switch (response.status) {
         case 404:
@@ -328,6 +410,15 @@ export const eventService = {
     const response = await api.get(`/club-members?${params}`);
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
       let errorMessage = "Error al obtener miembros";
       if (response.status === 500) {
         errorMessage = 'Error interno del servidor: Por favor intenta más tarde';

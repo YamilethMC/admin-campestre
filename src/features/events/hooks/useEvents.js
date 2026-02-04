@@ -30,6 +30,10 @@ export const useEvents = () => {
         setEvents(data.data.events);
         setMeta(data.data.meta);
       } else {
+        if (data.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
         addLog(data.error);
         addToast(data.error, 'error');
       }
@@ -67,12 +71,14 @@ export const useEvents = () => {
         addToast(result.message || 'Evento creado exitosamente', 'success');
         return result.data;
       } else {
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error, 'error');
-        throw new Error(result.error); // Throw error to be caught in container
       }
     } catch (err) {
       addToast(err.message || 'Error desconocido', 'error');
-      throw err; // Re-throw error to be caught in container
     } finally {
       setLoading(false);
     }
@@ -89,12 +95,14 @@ export const useEvents = () => {
         addToast(result.message || 'Evento actualizado exitosamente', 'success');
         return result.data;
       } else {
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error, 'error');
-        throw new Error(result.error); // Throw error to be caught in container
       }
     } catch (err) {
       addToast(err.message || 'Error desconocido', 'error');
-      throw err; // Re-throw error to be caught in container
     } finally {
       setLoading(false);
     }
@@ -108,6 +116,10 @@ export const useEvents = () => {
       if (result.success) {
         return result.data;
       } else {
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error, 'error');
         return null;
       }
@@ -134,6 +146,10 @@ export const useEvents = () => {
         }
         return true;
       } else {
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error, 'error');
         return false;
       }
@@ -153,6 +169,10 @@ export const useEvents = () => {
       if (result.success) {
         return result.data;
       } else {
+        if (result.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
         addToast(result.error, 'error');
         return null;
       }
@@ -172,6 +192,10 @@ export const useEvents = () => {
       if (result.success) {
         return result.data;
       } else {
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error, 'error');
         return null;
       }
@@ -191,6 +215,10 @@ export const useEvents = () => {
       if (result.success) {
         return result.data;
       } else {
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error, 'error');
         return null;
       }
@@ -210,6 +238,10 @@ export const useEvents = () => {
       if (result.success) {
         return result.data;
       } else {
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error, 'error');
         return null;
       }
@@ -230,6 +262,10 @@ export const useEvents = () => {
       if (result.success) {
         return result.data.members || [];
       } else {
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error, 'error');
         return [];
       }

@@ -1,3 +1,5 @@
+import { handleAuthError } from '../../../shared/utils/authErrorHandler';
+
 export const bulkUploadService = {
   uploadMembers: async (file) => {
     const formData = new FormData();
@@ -26,6 +28,15 @@ export const bulkUploadService = {
       const result = await handleResponse(response);
 
       if (!result.ok) {
+        if (response.status === 401) {
+          // Llamar a la función global para manejar el error de autenticación
+          handleAuthError();
+          return {
+            success: false,
+            error: 'No autorizado: Sesión expirada',
+            status: response.status
+          };
+        }
         let errorMessage = result.data?.message || 'Error al subir archivo de socios';
         if (result.status === 400) {
           errorMessage = 'Solicitud incorrecta: Verifica que el archivo esté en el formato correcto';

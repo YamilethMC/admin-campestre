@@ -30,6 +30,10 @@ export function useFacilities(initialFilters = {}) {
       setFacilities(response.data.data);
       setMeta(response.data.meta);
     } else {
+      if (response.status === 401) {
+        // No mostramos alerta aquí porque el servicio ya la maneja
+        return;
+      }
       addToast(response.error || 'Error al cargar instalaciones', 'error');
       return;
     }
@@ -57,6 +61,10 @@ export function useFacilities(initialFilters = {}) {
       if (result.success) {
         return result.data;
       } else {
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error || 'Error al cargar la instalación', 'error');
         return null;
       }
@@ -74,6 +82,10 @@ export function useFacilities(initialFilters = {}) {
       if (result.success) {
         return result.data;
       } else {
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error || 'Error al crear instalación', 'error');
         return null;
       }
@@ -91,6 +103,10 @@ export function useFacilities(initialFilters = {}) {
       if (result.success) {
         return result.data;
       } else {
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error || 'Error al actualizar instalación', 'error');
         return null;
       }
@@ -108,6 +124,10 @@ export function useFacilities(initialFilters = {}) {
       if (result.success) {
         return true;
       } else {
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error || 'Error al eliminar instalación', 'error');
         return false;
       }
@@ -137,6 +157,10 @@ export function useFacilities(initialFilters = {}) {
       if (result.success) {
         return result.data;
       } else {
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error || 'Error al cargar la instalación', 'error');
         return null;
       }
@@ -154,6 +178,10 @@ export function useFacilities(initialFilters = {}) {
       if (result.success) {
         return result.data;
       } else {
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error || 'Error al crear reservación', 'error');
         return null;
       }
@@ -171,6 +199,10 @@ export function useFacilities(initialFilters = {}) {
       if (result.success) {
         return result.data;
       } else {
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error || 'Error al actualizar reservación', 'error');
         return null;
       }
@@ -188,6 +220,10 @@ export function useFacilities(initialFilters = {}) {
       if (result.success) {
         return result.data.members || [];
       } else {
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error || 'Error al buscar socios', 'error');
         return [];
       }

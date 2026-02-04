@@ -1,4 +1,5 @@
 import api from '../../../shared/api/api';
+import { handleAuthError } from '../../../shared/utils/authErrorHandler';
 
 export const memberService = {
     async fetchMembers({
@@ -21,6 +22,16 @@ export const memberService = {
         const response = await api.get(`/club-members?${params.toString()}`);
 
         if (!response.ok) {
+            // Verificar si es un error de autenticación
+            if (response.status === 401) {
+                // Llamar a la función global para manejar el error de autenticación
+                handleAuthError();
+                return {
+                    success: false,
+                    error: 'No autorizado: Sesión expirada',
+                    status: response.status
+                };
+            }
             let errorMessage = response.data?.message || 'Error al obtener miembros';
             if (response.status === 500) {
                 errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
@@ -46,6 +57,16 @@ export const memberService = {
         const response = await api.del(`/club-members/${id}`);
 
         if (!response.ok) {
+            // Verificar si es un error de autenticación
+            if (response.status === 401) {
+            // Llamar a la función global para manejar el error de autenticación
+            handleAuthError();
+            return {
+                success: false,
+                error: 'No autorizado: Sesión expirada',
+                status: response.status
+            };
+            }
             let errorMessage = response.data?.message || 'Error al eliminar miembro';
             
             switch (response.status) {

@@ -16,6 +16,11 @@ export const useTemporaryPasses = () => {
         setPasses(result.data);
         setTotal(result.total);
       } else {
+        // Verificar si es un error de autenticación
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error || 'Error al cargar pases temporales', 'error');
       }
     } catch (error) {
@@ -38,6 +43,11 @@ export const useTemporaryPasses = () => {
         await loadPasses(); // Reload the list
         return true;
       } else {
+        // Verificar si es un error de autenticación
+        if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error || 'Error al aprobar el pase temporal', 'error');
         return false;
       }
@@ -57,6 +67,11 @@ export const useTemporaryPasses = () => {
         await loadPasses(); // Reload the list
         return true;
       } else {
+          // Verificar si es un error de autenticación
+          if (result.status === 401) {
+          // No mostramos alerta aquí porque el servicio ya la maneja
+          return;
+        }
         addToast(result.error || 'Error al rechazar el pase temporal', 'error');
         return false;
       }
