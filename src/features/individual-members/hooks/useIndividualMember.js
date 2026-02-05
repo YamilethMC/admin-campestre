@@ -276,17 +276,17 @@ export const useIndividualMember = () => {
       return false;
     }
 
-    if (!formData.email) {
+    /*if (!formData.email) {
       addLog('Error: El email es obligatorio');
       addToast('Error: El email es obligatorio', 'error');
       return false;
-    }
+    }*/
 
-    if (!formData.telefono_movil) {
+    /*if (!formData.telefono_movil) {
       addLog('Error: El teléfono móvil es obligatorio');
       addToast('Error: El teléfono móvil es obligatorio', 'error');
       return false;
-    }
+    }*/
 
     if (!formData.calle) {
       addLog('Error: La calle es obligatoria');

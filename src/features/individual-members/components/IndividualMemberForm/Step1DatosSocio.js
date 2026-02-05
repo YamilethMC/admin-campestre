@@ -15,7 +15,6 @@ const Step1DatosSocio = ({ formData, handleChange, genderOptions, loadingGender,
             value={formData.code_socio}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-            required
           />
         </div>
 
@@ -29,7 +28,6 @@ const Step1DatosSocio = ({ formData, handleChange, genderOptions, loadingGender,
             value={formData.nombre}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-            required
           />
         </div>
         
@@ -55,7 +53,6 @@ const Step1DatosSocio = ({ formData, handleChange, genderOptions, loadingGender,
             value={formData.sexo}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-            required
             disabled={loadingGender}
           >
             <option value="">Seleccione una opción...</option>
@@ -95,7 +92,7 @@ const Step1DatosSocio = ({ formData, handleChange, genderOptions, loadingGender,
         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email <span className="text-red-500">*</span>
+            Email {/*<span className="text-red-500">*</span>*/}
           </label>
           <input
             type="email"
@@ -116,7 +113,6 @@ const Step1DatosSocio = ({ formData, handleChange, genderOptions, loadingGender,
               value={formData.relationship}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-              required
             >
               <option value="">Seleccione una relación...</option>
               <option value="WIFE">Esposa</option>
@@ -143,10 +139,9 @@ const Step1DatosSocio = ({ formData, handleChange, genderOptions, loadingGender,
               value={formData.notificationMethod}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-              required
             >
-              <option value="email">📧 Email</option>
-              <option value="whatsapp">📱 WhatsApp</option>
+              <option value="email">Email</option>
+              {/*<option value="whatsapp">WhatsApp</option>*/}
             </select>
             <p className="text-xs text-gray-500 mt-1">
               El usuario recibirá sus credenciales de acceso por este medio

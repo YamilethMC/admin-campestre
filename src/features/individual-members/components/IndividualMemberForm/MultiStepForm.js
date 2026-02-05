@@ -19,6 +19,7 @@ const MultiStepForm = ({
   isEditing
 }) => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [allowSubmit, setAllowSubmit] = useState(false);
 
   const steps = [
     { title: 'Datos del Socio', component: Step1DatosSocio },
@@ -37,11 +38,12 @@ const MultiStepForm = ({
           formData.sexo &&
           formData.rfc &&
           formData.fecha_nacimiento &&
-          formData.email &&
+          /*formData.email &&*/
           (!isDependent || formData.relationship)
         );
       case 2:
-        return formData.telefono_movil;
+        return true;
+        /*return formData.telefono_movil;*/
       case 3:
         return (
           formData.calle &&
@@ -65,6 +67,7 @@ const MultiStepForm = ({
 
   const handleNext = () => {
     if (validateStep(currentStep)) {
+      setAllowSubmit(false);
       if (currentStep < steps.length) {
         setCurrentStep(currentStep + 1);
       }
@@ -81,6 +84,9 @@ const MultiStepForm = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!allowSubmit) {
+      return;
+    }
     if (validateStep(currentStep)) {
       handleFormSubmit(e);
     } else {
@@ -130,6 +136,7 @@ const MultiStepForm = ({
           ) : (
             <button
               type="submit"
+              onClick={() => setAllowSubmit(true)}
               className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
             >
               {isDependent ? "Agregar dependiente" : isEditing ? "Editar socio" : "Agregar socio"}

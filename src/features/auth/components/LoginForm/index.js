@@ -3,6 +3,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { AppContext } from '../../../../shared/context/AppContext';
 import { UserIcon, LockIcon, RefreshIcon } from '../../../../shared/components/icons/icons';
 import Toast from '../../../../shared/components/toast/Toast';
+import logo from '../../../../assets/images/logo-cct.jpeg';
 
 const LoginForm = () => {
   const {
@@ -40,10 +41,14 @@ const LoginForm = () => {
 
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
         <div className="text-center">
-          <div className="mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-primary">
-            <div className="text-white text-2xl font-bold">S</div>
+          <div className="mx-auto h-40 w-40 flex items-center justify-center mb-4">
+            <img
+              src={logo}
+              alt="Logo"
+              className="h-32 w-32 object-contain"
+            />
           </div>
-          <h2 className="mt-6 text-2xl font-bold text-gray-900">
+          <h2 className="mt-2 text-2xl font-bold text-gray-900">
             Iniciar sesión
           </h2>
           <p className="mt-2 text-sm text-gray-600">
@@ -64,7 +69,6 @@ const LoginForm = () => {
                   id="username"
                   name="username"
                   type="text"
-                  required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   disabled={loading}

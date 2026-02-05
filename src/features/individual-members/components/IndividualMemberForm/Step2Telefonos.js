@@ -7,12 +7,12 @@ const Step2Telefonos = ({ formData, handleChange }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="border border-gray-200 rounded-lg p-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Teléfono móvil <span className="text-red-500">*</span>
+            Teléfono móvil {/*<span className="text-red-500">*</span>*/}
           </label>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Número<span className="text-red-500">*</span>
+                Número{/*<span className="text-red-500">*</span>*/}
               </label>
               <input
                 type="text"

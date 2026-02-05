@@ -14,7 +14,6 @@ const Step4InfoAdicional = ({ formData, handleChange, tituloOptions, loadingTitu
             value={formData.titulo}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-            required
             disabled={loadingTitulo}
           >
             <option value="">Seleccione una opción...</option>
@@ -51,7 +50,6 @@ const Step4InfoAdicional = ({ formData, handleChange, tituloOptions, loadingTitu
             value={formData.metodo_pago}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-            required
             disabled={loadingPaymentMethod}
           >
             <option value="">Seleccione una opción...</option>
