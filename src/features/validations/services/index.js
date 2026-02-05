@@ -46,6 +46,7 @@ class ValidationService {
 
       const payload = response.data?.data ?? {};
       return {
+        success: true,
         data: payload.data ?? [],
         meta: payload.meta ?? {},
       };
