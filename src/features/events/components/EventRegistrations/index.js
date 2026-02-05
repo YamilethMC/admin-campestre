@@ -250,17 +250,26 @@ const EventRegistrations = ({
   };
 
   // Format date for display
-  const formatDate = (dateStr) => {
+  const formatDate = (dateStr, includeTime = false) => {
+    console.log('dateStr:', dateStr);
     if (!dateStr) return 'No especificada';
     try {
+      const timeMatch = dateStr.match(/T(\d{2}:\d{2})/);
+      const timePart = timeMatch ? timeMatch[1] : null;
+      
       const date = new Date(dateStr);
-      return date.toLocaleDateString('es-ES', { 
+      const datePart = date.toLocaleDateString('es-ES', { 
         weekday: 'long', 
         day: 'numeric', 
         month: 'long', 
         year: 'numeric' 
       });
-    } catch {
+
+      if (!timePart || !includeTime) {
+        return datePart;
+      }
+      return `${datePart} a las ${timePart} hrs.`;
+    } catch (error) {
       return dateStr;
     }
   };
@@ -294,7 +303,7 @@ const EventRegistrations = ({
             </div>
             <div>
               <h3 className="text-sm font-medium text-blue-700">Fecha</h3>
-              <p className="text-lg font-semibold text-gray-900">{formatDate(event?.date)}</p>
+              <p className="text-lg font-semibold text-gray-900">{formatDate(event?.date, 1)}</p>
             </div>
           </div>
         </div>
@@ -374,7 +383,7 @@ const EventRegistrations = ({
                                 {registration.clubMember.user.name} {registration.clubMember.user.lastName}
                               </p>
                               <p className="text-sm text-gray-500">
-                                <span className="font-medium">Código:</span> {registration.clubMember.memberCode || 'N/A'}
+                                <span className="font-medium">Número de acción:</span> {registration.clubMember.memberCode || 'N/A'}
                               </p>
                               <p className="text-sm text-gray-500 flex items-center mt-1">
                                 <svg className="h-4 w-4 text-gray-400 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -386,7 +395,7 @@ const EventRegistrations = ({
                                 <svg className="h-4 w-4 text-gray-400 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                Fecha: {formatDate(registration.createdAt || registration.updatedAt)}
+                                Fecha de registro: {formatDate(registration.createdAt || registration.updatedAt)}
                               </p>
                             </div>
                           </div>
@@ -413,7 +422,7 @@ const EventRegistrations = ({
                             {openDropdown === registration.id && (
                               <div className="origin-bottom-right absolute right-0 bottom-full mb-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50 border border-gray-200">
                                 <div className="py-1" role="none">
-                                  <button
+                                  {/*<button
                                     onClick={() => {
                                       handleUpdateRegistrations(registration);
                                       setOpenDropdown(null);
@@ -424,7 +433,7 @@ const EventRegistrations = ({
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
                                     Actualizar número de inscripciones
-                                  </button>
+                                  </button>*/}
                                   <button
                                     onClick={() => {
                                       handleDeleteRegistration(registration.id);
