@@ -3,18 +3,43 @@ import { temporaryPassesService } from '../services';
 import { AppContext } from '../../../shared/context/AppContext';
 
 export const useTemporaryPasses = () => {
-  const [passes, setPasses] = useState([]);
+  const [allPasses, setAllPasses] = useState([]); // Almacenar todos los pases
+  const [currentPagePasses, setCurrentPagePasses] = useState([]); // Pases de la página actual
   const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState(0);
+  const [meta, setMeta] = useState(null);
+  const [page, setPage] = useState(1);
+  const limit = 10; // 10 registros por página
   const { addToast } = useContext(AppContext);
+
+  // Función para calcular y actualizar los pases de la página actual
+  const updateCurrentPagePasses = (allPasses, currentPage) => {
+    const startIndex = (currentPage - 1) * limit;
+    const endIndex = startIndex + limit;
+    const pagePasses = allPasses.slice(startIndex, endIndex);
+
+    setCurrentPagePasses(pagePasses);
+
+    // Actualizar metadatos de paginación
+    const totalPages = Math.ceil(allPasses.length / limit);
+    setMeta({
+      total: allPasses.length,
+      page: currentPage,
+      limit: limit,
+      totalPages: totalPages
+    });
+  };
 
   const loadPasses = async () => {
     setLoading(true);
     try {
       const result = await temporaryPassesService.getPendingPasses();
       if (result.success) {
-        setPasses(result.data);
+        setAllPasses(result.data); // Guardar todos los pases
         setTotal(result.total);
+
+        // Actualizar los pases de la página actual
+        updateCurrentPagePasses(result.data, page);
       } else {
         // Verificar si es un error de autenticación
         if (result.status === 401) {
@@ -82,15 +107,26 @@ export const useTemporaryPasses = () => {
     }
   };
 
+  // Recalcular los pases de la página actual cuando cambia la página
+  useEffect(() => {
+    if (allPasses.length > 0) {
+      updateCurrentPagePasses(allPasses, page);
+    }
+  }, [page, allPasses]);
+
+  // Load data initially
   useEffect(() => {
     loadPasses();
   }, []);
 
   return {
-    passes,
+    passes: currentPagePasses, // Devolver los pases de la página actual
     loading,
     total,
-    loadPasses,
+    meta,
+    page,
+    setPage,
+    loadPasses, // Esta función ahora recarga todos los datos
     approvePass,
     rejectPass,
   };
