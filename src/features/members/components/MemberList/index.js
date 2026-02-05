@@ -24,7 +24,7 @@ const MemberList = () => {
   const [memberValidations, setMemberValidations] = useState({});
   const { addToast } = useContext(AppContext);
 
-  const { members, meta, page, setPage, loadMembers, setActive, search, setSearch } = useMembers();
+  const { members, meta, page, setPage, loadMembers, setActive, search, setSearch, loading } = useMembers();
   const { formatStatus, getStatusBadge } = useValidation();
 
   useEffect(() => {
@@ -127,7 +127,7 @@ const MemberList = () => {
 
   const handleBulkMember = () => {
     setShowBulkForm(true);
-    setDropdownOpen(null); 
+    setDropdownOpen(null);
   };
 
   const handleDeleteMember = async (memberId) => {
@@ -142,7 +142,7 @@ const MemberList = () => {
     } else {
       loadMembers();
     }
-    setDropdownOpen(null); 
+    setDropdownOpen(null);
   };
 
   const handleSaveMember = (memberData) => {
@@ -243,189 +243,200 @@ const MemberList = () => {
           onFilterChange={updateFilters}
         />
 
-        {/* Members List */}
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-gray-800">Lista de socios</h2>
+        {/* Loading indicator */}
+        {loading && (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          </div>
+        )}
 
-        <div className="flex space-x-2">
-          <button
-            onClick={() => handleFormMember()}
-            className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md flex items-center transition-colors"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            Agregar socio
-          </button>
+        {/* Members List - only show when not loading */}
+        {!loading && (
+          <>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-800">Lista de socios</h2>
 
-          <button
-            onClick={() => handleBulkMember()}
-            className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md flex items-center transition-colors"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            Cargar masivamente
-          </button>
-        </div>
-      </div>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => handleFormMember()}
+                className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md flex items-center transition-colors"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Agregar socio
+              </button>
 
-      {filteredMembers.length === 0 ? (
-        <>
-          <p className="text-gray-500">No hay socios registrados con los filtros aplicados.</p>
-        </>
-      ) : (
-        <>
-          <div className="border border-gray-200 rounded-lg">
-            <div className="max-h-[60vh] overflow-y-auto">
-              <div className="min-w-full overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50 sticky top-0 z-10">
-                    <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Número de acción</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellidos</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profesión</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Método pago</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha admisión</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredMembers.map((member, index) => (
-                  <tr key={member.id} className={member.id % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{member.memberCode}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.user.name}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.user.lastName}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.user.email}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.title}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.profession}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.paymentMethod}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                      {member.dateOfAdmission ? (() => {
-                        const date = new Date(member.dateOfAdmission);
-                        // Check if the date is valid
-                        if (isNaN(date.getTime())) return '';
-
-                        // Extract UTC date components to avoid timezone conversion
-                        const day = String(date.getUTCDate()).padStart(2, '0');
-                        const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Month is 0-indexed
-                        const year = date.getUTCFullYear();
-
-                        return `${day}-${month}-${year}`;
-                      })() : ''}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 relative">
-                      <div className="relative inline-block text-left">
-                        <button
-                          onClick={() => setDropdownOpen(dropdownOpen === member.id ? null : member.id)}
-                          className="text-gray-500 hover:text-gray-700 focus:outline-none"
-                        >
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                          </svg>
-                        </button>
-                        {dropdownOpen === member.id && (
-                          <div className={`origin-top-right absolute right-0 ${index === 0 ? 'top-full mt-2' : 'bottom-full mb-2'} w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50 max-h-60 overflow-y-auto`}>
-                            <div className="py-1" role="menu">
-                              <button
-                                onClick={() => handleFormMember(member)}
-                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                                role="menuitem"
-                              >
-                                Editar
-                              </button>
-                              <button
-                                onClick={() => handleAddDependent(member)}
-                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                                role="menuitem"
-                              >
-                                Agregar dependiente
-                              </button>
-                              <button
-                                onClick={() => {
-                                  confirmAction('delete', member.id);
-                                  setDropdownOpen(null);
-                                }}
-                                className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
-                                role="menuitem"
-                              >
-                                Eliminar
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-                </table>
-              </div>
+              <button
+                onClick={() => handleBulkMember()}
+                className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md flex items-center transition-colors"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Cargar masivamente
+              </button>
             </div>
           </div>
 
-          {meta && (
-            <div className="flex justify-center items-center gap-3 mt-4">
-              {/* Calculate total pages and set up sliding window */}
-              {(() => {
-                const totalPages = meta.totalPages;
-                const maxVisiblePages = 5;
-                let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2));
-                let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+          {filteredMembers.length === 0 ? (
+            <>
+              <p className="text-gray-500">No hay socios registrados con los filtros aplicados.</p>
+            </>
+          ) : (
+            <>
+              <div className="border border-gray-200 rounded-lg">
+                <div className="max-h-[60vh] overflow-y-auto">
+                  <div className="min-w-full overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50 sticky top-0 z-10">
+                        <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Número de acción</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellidos</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profesión</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Método pago</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha admisión</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredMembers.map((member, index) => (
+                      <tr key={member.id} className={member.id % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{member.memberCode}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.user.name}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.user.lastName}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.user.email}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.title}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.profession}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.paymentMethod}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                          {member.dateOfAdmission ? (() => {
+                            const date = new Date(member.dateOfAdmission);
+                            // Check if the date is valid
+                            if (isNaN(date.getTime())) return '';
 
-                // Adjust start if range exceeds total pages
-                if (endPage - startPage + 1 < maxVisiblePages) {
-                  startPage = Math.max(1, endPage - maxVisiblePages + 1);
-                }
+                            // Extract UTC date components to avoid timezone conversion
+                            const day = String(date.getUTCDate()).padStart(2, '0');
+                            const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+                            const year = date.getUTCFullYear();
 
-                return (
-                  <>
-                    {/* Previous button */}
-                    <button
-                      disabled={page === 1}
-                      onClick={() => setPage(page - 1)}
-                      className={`px-3 py-1 rounded border text-sm ${
-                        page === 1 ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
-                      }`}
-                    >
-                      Anterior
-                    </button>
+                            return `${day}-${month}-${year}`;
+                          })() : ''}
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 relative">
+                          <div className="relative inline-block text-left">
+                            <button
+                              onClick={() => setDropdownOpen(dropdownOpen === member.id ? null : member.id)}
+                              className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                            >
+                              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                              </svg>
+                            </button>
+                            {dropdownOpen === member.id && (
+                              <div className={`origin-top-right absolute right-0 ${index === 0 ? 'top-full mt-2' : 'bottom-full mb-2'} w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50 max-h-60 overflow-y-auto`}>
+                                <div className="py-1" role="menu">
+                                  <button
+                                    onClick={() => handleFormMember(member)}
+                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                                    role="menuitem"
+                                  >
+                                    Editar
+                                  </button>
+                                  <button
+                                    onClick={() => handleAddDependent(member)}
+                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                                    role="menuitem"
+                                  >
+                                    Agregar dependiente
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      confirmAction('delete', member.id);
+                                      setDropdownOpen(null);
+                                    }}
+                                    className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
+                                    role="menuitem"
+                                  >
+                                    Eliminar
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
 
-                    {/* Visible page buttons */}
-                    {Array.from({ length: endPage - startPage + 1 }, (_, i) => {
-                      const pageNum = startPage + i;
-                      return (
+              {meta && (
+                <div className="flex justify-center items-center gap-3 mt-4">
+                  {/* Calculate total pages and set up sliding window */}
+                  {(() => {
+                    const totalPages = meta.totalPages;
+                    const maxVisiblePages = 5;
+                    let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2));
+                    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+                    // Adjust start if range exceeds total pages
+                    if (endPage - startPage + 1 < maxVisiblePages) {
+                      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                    }
+
+                    return (
+                      <>
+                        {/* Previous button */}
                         <button
-                          key={`page-${pageNum}`}
-                          onClick={() => setPage(pageNum)}
+                          disabled={page === 1}
+                          onClick={() => setPage(page - 1)}
                           className={`px-3 py-1 rounded border text-sm ${
-                            page === pageNum ? 'bg-primary text-white border-primary' : 'border-gray-300 text-gray-700'
+                            page === 1 ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
                           }`}
                         >
-                          {pageNum}
+                          Anterior
                         </button>
-                      );
-                    })}
 
-                    {/* Next button */}
-                    <button
-                      disabled={page === totalPages}
-                      onClick={() => setPage(page + 1)}
-                      className={`px-3 py-1 rounded border text-sm ${
-                        page === totalPages ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
-                      }`}
-                    >
-                      Siguiente
-                    </button>
-                  </>
-                );
-              })()}
-            </div>
-      )}</>
-      )}
+                        {/* Visible page buttons */}
+                        {Array.from({ length: endPage - startPage + 1 }, (_, i) => {
+                          const pageNum = startPage + i;
+                          return (
+                            <button
+                              key={`page-${pageNum}`}
+                              onClick={() => setPage(pageNum)}
+                              className={`px-3 py-1 rounded border text-sm ${
+                                page === pageNum ? 'bg-primary text-white border-primary' : 'border-gray-300 text-gray-700'
+                              }`}
+                            >
+                              {pageNum}
+                            </button>
+                          );
+                        })}
+
+                        {/* Next button */}
+                        <button
+                          disabled={page === totalPages}
+                          onClick={() => setPage(page + 1)}
+                          className={`px-3 py-1 rounded border text-sm ${
+                            page === totalPages ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
+                          }`}
+                        >
+                          Siguiente
+                        </button>
+                      </>
+                    );
+                  })()}
+                </div>
+          )}</>
+          )}
+          </>
+        )}
 
       {/*<div className="mt-4 text-sm text-gray-600">
         Total de socios: {filteredMembers.length} de {members.length}

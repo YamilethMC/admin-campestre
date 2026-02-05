@@ -41,14 +41,6 @@ const ValidationsDashboard = () => {
     loadValidations();
   };
 
-  if (loadingValidations) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
   if (selectedMemberId) {
     return (
       <MemberValidationDetail
@@ -85,77 +77,94 @@ const ValidationsDashboard = () => {
         onClearFilters={clearFilters}
       />
 
-      <ValidationTable
-        validations={validations}
-        getStatusBadge={getStatusBadge}
-        formatStatus={formatStatus}
-        onViewDetails={handleViewDetails}
-        onApprove={() => {}}
-        onReject={() => {}}
-      />
+      {/* Show loading indicator when loading, after filters */}
+      {loadingValidations && (
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      )}
 
-      {meta && meta.limit && (
-      <div className="flex justify-center items-center gap-3 mt-4">
-        {/* Calcular el número total de páginas */}
-        {(() => {
-          const totalPages = Math.ceil(meta.total / meta.limit);
+      {/* Only show content when not loading */}
+      {!loadingValidations && (
+        <>
+          <ValidationTable
+            validations={validations}
+            getStatusBadge={getStatusBadge}
+            formatStatus={formatStatus}
+            onViewDetails={handleViewDetails}
+            onApprove={() => {}}
+            onReject={() => {}}
+          />
 
-          // Configurar la ventana de paginación (mostrar 5 páginas a la vez)
-          const maxVisiblePages = 5;
-          let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2));
-          let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+          {meta && meta.limit && (
+          <div className="flex justify-center items-center gap-3 mt-4">
+            {/* Calcular el número total de páginas */}
+            {(() => {
+              const totalPages = Math.ceil(meta.total / meta.limit);
 
-          // Ajustar el inicio si el rango excede el total de páginas
-          if (endPage - startPage + 1 < maxVisiblePages) {
-            startPage = Math.max(1, endPage - maxVisiblePages + 1);
-          }
+              // Deshabilitar paginación si no hay registros
+              const hasRecords = validations && validations.length > 0;
 
-          return (
-            <>
-              {/* Botón Anterior */}
-              <button
-                key="prev-btn"
-                disabled={page === 1}
-                onClick={() => setPage(page - 1)}
-                className={`px-3 py-1 rounded border text-sm ${
-                  page === 1 ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
-                }`}
-              >
-                Anterior
-              </button>
+              // Configurar la ventana de paginación (mostrar 5 páginas a la vez)
+              const maxVisiblePages = 5;
+              let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2));
+              let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
-              {/* Botones de página visibles */}
-              {Array.from({ length: endPage - startPage + 1 }, (_, i) => {
-                const pageNum = startPage + i;
-                return (
+              // Ajustar el inicio si el rango excede el total de páginas
+              if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+              }
+
+              return (
+                <>
+                  {/* Botón Anterior */}
                   <button
-                    key={`page-${pageNum}`}
-                    onClick={() => setPage(pageNum)}
+                    key="prev-btn"
+                    disabled={!hasRecords || page === 1}
+                    onClick={() => setPage(page - 1)}
                     className={`px-3 py-1 rounded border text-sm ${
-                      page === pageNum ? 'bg-primary text-white border-primary' : 'border-gray-300 text-gray-700'
+                      !hasRecords || page === 1 ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
                     }`}
                   >
-                    {pageNum}
+                    Anterior
                   </button>
-                );
-              })}
 
-              {/* Botón Siguiente */}
-              <button
-                key="next-btn"
-                disabled={page === totalPages}
-                onClick={() => setPage(page + 1)}
-                className={`px-3 py-1 rounded border text-sm ${
-                  page === totalPages ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
-                }`}
-              >
-                Siguiente
-              </button>
-            </>
-          );
-        })()}
-      </div>
-    )}
+                  {/* Botones de página visibles */}
+                  {Array.from({ length: endPage - startPage + 1 }, (_, i) => {
+                    const pageNum = startPage + i;
+                    return (
+                      <button
+                        key={`page-${pageNum}`}
+                        disabled={!hasRecords}
+                        onClick={() => setPage(pageNum)}
+                        className={`px-3 py-1 rounded border text-sm ${
+                          !hasRecords ? 'text-gray-300 border-gray-200' :
+                          page === pageNum ? 'bg-primary text-white border-primary' : 'border-gray-300 text-gray-700'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+
+                  {/* Botón Siguiente */}
+                  <button
+                    key="next-btn"
+                    disabled={!hasRecords || page === totalPages}
+                    onClick={() => setPage(page + 1)}
+                    className={`px-3 py-1 rounded border text-sm ${
+                      !hasRecords || page === totalPages ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
+                    }`}
+                  >
+                    Siguiente
+                  </button>
+                </>
+              );
+            })()}
+          </div>
+        )}
+        </>
+      )}
       </div>
 
 
