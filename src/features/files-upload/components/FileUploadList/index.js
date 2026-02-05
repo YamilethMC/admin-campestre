@@ -106,40 +106,60 @@ const FileUploadList = ({
           {/* Pagination controls */}
           {meta && (
             <div className="flex justify-center items-center gap-3 mt-4">
-              {/* Botón Anterior */}
-              <button
-                disabled={page === 1}
-                onClick={() => setPage(page - 1)}
-                className={`px-3 py-1 rounded border text-sm ${
-                  page === 1 ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
-                }`}
-              >
-                Anterior
-              </button>
+              {/* Calculate total pages and set up sliding window */}
+              {(() => {
+                const totalPages = meta.totalPages;
+                const maxVisiblePages = 5;
+                let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2));
+                let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
-              {/* Botones numerados */}
-              {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map(num => (
-                <button
-                  key={num}
-                  onClick={() => setPage(num)}
-                  className={`px-3 py-1 rounded border text-sm ${
-                    page === num ? 'bg-primary text-white border-primary' : 'border-gray-300 text-gray-700'
-                  }`}
-                >
-                  {num}
-                </button>
-              ))}
+                // Adjust start if range exceeds total pages
+                if (endPage - startPage + 1 < maxVisiblePages) {
+                  startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                }
 
-              {/* Botón Siguiente */}
-              <button
-                disabled={page === meta.totalPages}
-                onClick={() => setPage(page + 1)}
-                className={`px-3 py-1 rounded border text-sm ${
-                  page === meta.totalPages ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
-                }`}
-              >
-                Siguiente
-              </button>
+                return (
+                  <>
+                    {/* Previous button */}
+                    <button
+                      disabled={page === 1}
+                      onClick={() => setPage(page - 1)}
+                      className={`px-3 py-1 rounded border text-sm ${
+                        page === 1 ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
+                      }`}
+                    >
+                      Anterior
+                    </button>
+
+                    {/* Visible page buttons */}
+                    {Array.from({ length: endPage - startPage + 1 }, (_, i) => {
+                      const pageNum = startPage + i;
+                      return (
+                        <button
+                          key={`page-${pageNum}`}
+                          onClick={() => setPage(pageNum)}
+                          className={`px-3 py-1 rounded border text-sm ${
+                            page === pageNum ? 'bg-primary text-white border-primary' : 'border-gray-300 text-gray-700'
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+
+                    {/* Next button */}
+                    <button
+                      disabled={page === totalPages}
+                      onClick={() => setPage(page + 1)}
+                      className={`px-3 py-1 rounded border text-sm ${
+                        page === totalPages ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
+                      }`}
+                    >
+                      Siguiente
+                    </button>
+                  </>
+                );
+              })()}
             </div>
           )}
         </div>
