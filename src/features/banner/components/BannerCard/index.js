@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Modal from '../../../../shared/components/modal';
 
-const BannerCard = ({ banner, onEdit, onDelete }) => {
+const BannerCard = ({ banner, onEdit, onDelete, onToggleStatus }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const menuRef = useRef(null);
@@ -62,6 +62,12 @@ const BannerCard = ({ banner, onEdit, onDelete }) => {
       return spanishLabels[typeActionId - 1];
     }
     return actionTypes[typeActionId - 1] || "Desconocido";
+  };
+
+  // Toggle active status
+  const handleToggleStatus = async () => {
+    await onToggleStatus(banner.id, !banner.active);
+    setIsMenuOpen(false);
   };
 
   const handleEdit = () => {
@@ -152,6 +158,12 @@ const BannerCard = ({ banner, onEdit, onDelete }) => {
                 marginBottom: '0.5rem'
               }}
             >
+              <button
+                onClick={handleToggleStatus}
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                {banner.active ? 'Desactivar' : 'Activar'}
+              </button>
               <button
                 onClick={handleEdit}
                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

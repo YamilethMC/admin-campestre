@@ -148,4 +148,32 @@ export const bannerService = {
 
     return { success: true, message: 'Banner eliminado exitosamente', status: response.status };
   },
+
+  toggleBannerStatus: async (id, active) => {
+    const formattedData = {
+      active: active
+    };
+    console.log('formattedData:', formattedData);
+    const response = await api.patch(`/banner/${id}`, formattedData);
+
+    if (!response.ok) {
+      // Verificar si es un error de autenticación
+      if (response.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: response.status
+        };
+      }
+      let errorMessage = response.data?.message || 'Error desconocido';
+      if (response.status === 404) errorMessage = 'Encuesta no encontrada';
+      else if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
+
+      return { success: false, error: errorMessage, status: response.status };
+    }
+
+    return { success: true, message: 'Estado de encuesta actualizado exitosamente', status: response.status };
+  },
 };

@@ -123,6 +123,28 @@ export const useBanner = () => {
     }
   };
 
+  // Toggle banner status
+    const toggleBannerStatus = async (id, active) => {
+      try {
+        const result = await bannerService.toggleBannerStatus(id, active);
+  
+        if (result.success) {
+          loadBanners();
+        } else {
+          // Verificar si es un error de autenticación
+          if (result.status === 401) {
+            // No mostramos alerta aquí porque el servicio ya la maneja
+            return;
+          }
+          addToast(result.error || 'Error desconocido', 'error');
+          return;
+        }
+      } catch (err) {
+        addToast(err.message || 'Error desconocido', 'error');
+        return;
+      }
+    };
+
   // Set up auto-refresh every 30 minutes (1800000 ms)
   useEffect(() => {
     const autoRefreshInterval = setInterval(() => {
@@ -153,6 +175,7 @@ export const useBanner = () => {
     createBanner,
     updateBanner,
     getBannerById,
-    deleteBanner
+    deleteBanner,
+    toggleBannerStatus
   };
 };

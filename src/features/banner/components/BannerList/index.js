@@ -10,7 +10,8 @@ const BannerList = ({
   setPage,
   onEdit,
   onDelete,
-  onAddBanner
+  onAddBanner,
+  onToggleStatus
 }) => {
   if (loading && banners.length === 0) {
     // Show a skeleton loading state when loading and no banners are displayed yet
@@ -84,6 +85,7 @@ const BannerList = ({
               banner={banner}
               onEdit={onEdit}
               onDelete={onDelete}
+              onToggleStatus={onToggleStatus}
             />
           ))}
 
