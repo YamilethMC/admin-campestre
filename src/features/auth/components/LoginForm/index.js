@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import { AppContext } from '../../../../shared/context/AppContext';
 import { UserIcon, LockIcon, RefreshIcon } from '../../../../shared/components/icons/icons';
+import Toast from '../../../../shared/components/toast/Toast';
 
 const LoginForm = () => {
   const {
@@ -13,10 +15,29 @@ const LoginForm = () => {
     handleSubmit
   } = useAuth();
 
+  const { toasts, setToasts } = useContext(AppContext);
+
   const [showPassword, setShowPassword] = useState(false);
 
+  const removeToast = (id) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 relative">
+      {/* Toast container para la pantalla de login */}
+      <div className="fixed top-20 right-4 z-50 space-y-2 pointer-events-none">
+        {toasts.map(toast => (
+          <div key={toast.id} className="pointer-events-auto">
+            <Toast
+                message={toast.message}
+                type={toast.type}
+                onClose={() => removeToast(toast.id)}
+            />
+          </div>
+        ))}
+      </div>
+
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
         <div className="text-center">
           <div className="mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-primary">

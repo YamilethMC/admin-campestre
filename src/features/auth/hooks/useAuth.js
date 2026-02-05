@@ -1,4 +1,5 @@
 import { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { authService } from '../services';
 import { AppContext } from '../../../shared/context/AppContext';
 
@@ -8,6 +9,7 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { login: contextLogin, addToast } = useContext(AppContext);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,14 +18,9 @@ export const useAuth = () => {
     setError('');
 
     const result = await authService.validateCredentials({ email: username, password });
-
     if (result.success) {
-      contextLogin(result.user, result.accessToken);
+      contextLogin(result.user, result.accessToken, navigate);
     } else {
-      if (result.status === 401) {
-        // No mostramos alerta aquí porque el servicio ya la maneja
-        return;
-      }
       addToast(result.error || 'Error de autenticación', 'error');
     }
     setLoading(false);

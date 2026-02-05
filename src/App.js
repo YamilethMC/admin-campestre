@@ -59,7 +59,7 @@ function AppContent() {
         <Route path="ayuda" element={<HelpCenterContainer />} />
         <Route path="logs" element={<LogPanel />} />
         <Route path="404" element={<NotFound />} />
-        <Route path="*" element={<Navigate to="/404" replace />} />
+        {/*<Route path="*" element={<Navigate to="/404" replace />} />*/}
       </Route>
     </Routes>
   );

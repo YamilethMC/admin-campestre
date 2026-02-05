@@ -7,16 +7,6 @@ export const authService = {
       const response = await api.post('/auth/login', { email, password });
 
       if (!response.ok) {
-        if (response.status === 401) {
-          // Llamar a la función global para manejar el error de autenticación
-          handleAuthError();
-          return {
-            success: false,
-            error: 'No autorizado: Sesión expirada',
-            status: response.status
-          };
-        }
-
         let errorMessage = response.data?.message || 'Error de autenticación';
 
         switch (response.status) {
@@ -65,19 +55,7 @@ export const authService = {
       const response = await api.post('/auth/logout', {});
 
       if (!response.ok) {
-
-        if (response.status === 401) {
-          // Llamar a la función global para manejar el error de autenticación
-          handleAuthError();
-          return {
-            success: false,
-            error: 'No autorizado: Sesión expirada',
-            status: response.status
-          };
-        }
-        
         let errorMessage = response.data?.message || 'Error al cerrar sesión';
-
         switch (response.status) {
           case 401:
             errorMessage = 'No autorizado: Token inválido o expirado';
