@@ -68,7 +68,7 @@ export const useEvents = () => {
       if (result.success) {
         // Reload events after creation
         loadEvents();
-        addToast(result.message || 'Evento creado exitosamente', 'success');
+        //addToast(result.message || 'Evento creado exitosamente', 'success');
         return result.data;
       } else {
         if (result.status === 401) {
@@ -92,7 +92,7 @@ export const useEvents = () => {
       if (result.success) {
         // Reload events after update
         loadEvents();
-        addToast(result.message || 'Evento actualizado exitosamente', 'success');
+        //addToast(result.message || 'Evento actualizado exitosamente', 'success');
         return result.data;
       } else {
         if (result.status === 401) {
@@ -137,7 +137,7 @@ export const useEvents = () => {
       setLoading(true);
       const result = await eventService.deleteEvent(id);
       if (result.success) {
-        addToast(result.message, 'success');
+        //addToast(result.message, 'success');
         // If the list is empty and we're not on page 1, go back a page
         if (events.length === 1 && page > 1) {
           setPage(page - 1);
