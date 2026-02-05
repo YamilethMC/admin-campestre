@@ -100,7 +100,7 @@ const EventList = ({
         minute: '2-digit'
       });
 
-      return `${datePart} a las ${timePart}`;
+      return `${datePart} a las ${timePart} hrs.`;
     } catch {
       return dateStr;
     }
