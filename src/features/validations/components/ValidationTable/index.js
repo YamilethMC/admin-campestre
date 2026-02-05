@@ -50,10 +50,10 @@ const ValidationTable = ({
               </td>
             </tr>
           ) : (
-            validationsArray.map((validation) => {
+            validationsArray.map((validation, index) => {
               const member = validation.clubMember ?? validation.member ?? {};
               return (
-                <tr key={validation.id} className="hover:bg-gray-50">
+                <tr key={`${validation.id || 'validation'}-${index}`} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <div>
                       <div className="text-sm font-medium text-gray-900">
@@ -94,7 +94,7 @@ const ValidationTable = ({
                   <td className="px-6 py-4 text-sm text-gray-500">
                     <div className="space-y-1">
                       {validation.documents?.slice(0, 3).map((doc, idx) => (
-                        <div key={idx} className="flex items-center gap-2">
+                        <div key={`${validation.id}-doc-${doc.id || idx}`} className="flex items-center gap-2">
                           <span className={`w-2 h-2 rounded-full ${
                             doc.status === 'VALIDATED' ? 'bg-green-400' :
                             doc.status === 'REJECTED' ? 'bg-red-400' :

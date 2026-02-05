@@ -9,6 +9,8 @@ export const useValidation = () => {
   const [validationDetails, setValidationDetails] = useState(null);
   const [loadingValidations, setLoadingValidations] = useState(false);
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [meta, setMeta] = useState(null);
+  const [page, setPage] = useState(1);
 
   const [stats, setStats] = useState({
     total: 0,
@@ -24,6 +26,15 @@ export const useValidation = () => {
     page: 1,
     limit: 10
   });
+
+  // Función personalizada para actualizar la página y recargar las validaciones
+  const setPageAndLoad = (newPage) => {
+    setPage(newPage);
+    // Actualizar el filtro de página y recargar las validaciones
+    const updatedFilters = { ...filters, page: newPage };
+    setFilters(updatedFilters);
+    loadValidations(updatedFilters);
+  };
 
   const loadValidations = async (customFilters = null) => {
     try {
@@ -42,6 +53,7 @@ export const useValidation = () => {
       }
 
       const validationsArray = response?.data ?? [];
+      setMeta(response.meta);
 
       setValidations(validationsArray);
       addLog(`Validaciones cargadas: ${validationsArray.length} registros`);
@@ -166,6 +178,7 @@ export const useValidation = () => {
 
   return {
     validations,
+    meta,
     validationDetails,
     stats,
     filters,
@@ -179,6 +192,8 @@ export const useValidation = () => {
     applyFilters,
     clearFilters,
     setFilters,
+    page,
+    setPage: setPageAndLoad,
     formatStatus: validationService.formatStatus,
     getStatusColor: validationService.getStatusColor,
     getStatusBadge: validationService.getStatusBadge
