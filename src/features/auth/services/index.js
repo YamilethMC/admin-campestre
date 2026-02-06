@@ -4,7 +4,7 @@ import { handleAuthError } from '../../../shared/utils/authErrorHandler';
 export const authService = {
   validateCredentials: async ({ email, password }) => {
     try {
-      const response = await api.post('/auth/login', { email, password });
+      const response = await api.post('/auth/login', { username: email, password });
 
       if (!response.ok) {
         let errorMessage = response.data?.message || 'Error de autenticación';
