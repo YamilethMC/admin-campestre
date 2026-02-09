@@ -135,7 +135,13 @@ const EventRegistrations = ({
     XLSX.utils.book_append_sheet(wb, ws, 'Registros');
     
     // Generar y descargar archivo
-    const fileName = `Registros_${event?.name || 'evento'}.xlsx`;
+    const safeEventName = (event?.name || 'evento')
+      .trim()
+      .replace(/\s+/g, '_');
+
+    const fileName = `Registros_${safeEventName}.xlsx`;
+
+    //const fileName = `Registros_${event?.name || 'evento'}.xlsx`;
     XLSX.writeFile(wb, fileName);
   };
 
