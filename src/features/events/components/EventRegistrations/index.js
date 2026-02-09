@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import * as XLSX from 'xlsx';
 
 const EventRegistrations = ({
   event,
@@ -103,6 +104,39 @@ const EventRegistrations = ({
   const handleSearch = async (e) => {
     e?.preventDefault();
     fetchMembers(searchTerm);
+  };
+
+  // Función para descargar la lista de registros en Excel
+  const downloadExcel = () => {
+    // Crear hoja de cálculo con la información del evento y los registros
+    const ws_data = [
+      ['Nombre del Evento:', event?.name || ''],
+      ['Descripción:', event?.description || ''],
+      [''],
+      ['Número de Acción', 'Nombre Completo'],
+      ...registrations.map(reg => [
+        reg.clubMember.memberCode || 'N/A',
+        `${reg.clubMember.user.name || ''} ${reg.clubMember.user.lastName || ''}`.trim()
+      ])
+    ];
+
+    // Crear libro de trabajo y hoja
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+    
+    // Ajustar ancho de columnas
+    const colWidths = [
+      { wch: 20 }, // Número de Acción
+      { wch: 40 }  // Nombre Completo
+    ];
+    ws['!cols'] = colWidths;
+    
+    // Agregar hoja al libro
+    XLSX.utils.book_append_sheet(wb, ws, 'Registros');
+    
+    // Generar y descargar archivo
+    const fileName = `Registros_${event?.name || 'evento'}.xlsx`;
+    XLSX.writeFile(wb, fileName);
   };
 
   // Handle guest selection
@@ -355,12 +389,12 @@ const EventRegistrations = ({
           >
             Agregar socio
           </button>
-          {/*<button
-            onClick={() => alert('Funcionalidad de ver lista no implementada aún')}
+          <button
+            onClick={downloadExcel}
             className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
           >
-            Ver lista
-          </button>*/}
+            Descargar lista
+          </button>
         </div>
       </div>
 
