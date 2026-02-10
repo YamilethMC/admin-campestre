@@ -376,23 +376,20 @@ const MemberList = () => {
                 </div>
               </div>
 
-              {meta && (
+              {/*{meta && (
                 <div className="flex justify-center items-center gap-3 mt-4">
-                  {/* Calculate total pages and set up sliding window */}
                   {(() => {
                     const totalPages = meta.totalPages;
                     const maxVisiblePages = 5;
                     let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2));
                     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
-                    // Adjust start if range exceeds total pages
                     if (endPage - startPage + 1 < maxVisiblePages) {
                       startPage = Math.max(1, endPage - maxVisiblePages + 1);
                     }
 
                     return (
                       <>
-                        {/* Previous button */}
                         <button
                           disabled={page === 1}
                           onClick={() => setPage(page - 1)}
@@ -403,7 +400,6 @@ const MemberList = () => {
                           Anterior
                         </button>
 
-                        {/* Visible page buttons */}
                         {Array.from({ length: endPage - startPage + 1 }, (_, i) => {
                           const pageNum = startPage + i;
                           return (
@@ -419,7 +415,6 @@ const MemberList = () => {
                           );
                         })}
 
-                        {/* Next button */}
                         <button
                           disabled={page === totalPages}
                           onClick={() => setPage(page + 1)}
@@ -433,7 +428,95 @@ const MemberList = () => {
                     );
                   })()}
                 </div>
-          )}</>
+                
+          )}*/}
+          {meta && (
+  <div className="flex justify-center items-center gap-2 mt-4 flex-wrap">
+    {(() => {
+      const totalPages = meta.totalPages;
+      const maxVisiblePages = 10;
+      const half = Math.floor(maxVisiblePages / 2);
+
+      let startPage = Math.max(1, page - half);
+      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+      // Ajustar inicio si no hay suficientes páginas al final
+      if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      }
+
+      return (
+        <>
+          {/* Anterior */}
+          <button
+            disabled={page === 1}
+            onClick={() => setPage(page - 1)}
+            className="px-3 py-1 rounded border text-sm disabled:text-gray-300"
+          >
+            Anterior
+          </button>
+
+          {/* Primera página */}
+          {startPage > 1 && (
+            <>
+              <button
+                onClick={() => setPage(1)}
+                className="px-3 py-1 rounded border text-sm"
+              >
+                1
+              </button>
+              <span className="px-2">...</span>
+            </>
+          )}
+
+          {/* Páginas visibles */}
+          {Array.from(
+            { length: endPage - startPage + 1 },
+            (_, i) => {
+              const pageNum = startPage + i;
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => setPage(pageNum)}
+                  className={`px-3 py-1 rounded border text-sm ${
+                    page === pageNum
+                      ? 'bg-primary text-white border-primary'
+                      : 'border-gray-300 text-gray-700'
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              );
+            }
+          )}
+
+          {/* Última página */}
+          {endPage < totalPages && (
+            <>
+              <span className="px-2">...</span>
+              <button
+                onClick={() => setPage(totalPages)}
+                className="px-3 py-1 rounded border text-sm"
+              >
+                {totalPages}
+              </button>
+            </>
+          )}
+
+          {/* Siguiente */}
+          <button
+            disabled={page === totalPages}
+            onClick={() => setPage(page + 1)}
+            className="px-3 py-1 rounded border text-sm disabled:text-gray-300"
+          >
+            Siguiente
+          </button>
+        </>
+      );
+    })()}
+  </div>
+)}
+</>
           )}
           </>
         )}

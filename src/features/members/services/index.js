@@ -4,7 +4,7 @@ import { handleAuthError } from '../../../shared/utils/authErrorHandler';
 export const memberService = {
     async fetchMembers({
         page = 1,
-        limit = 10,
+        limit = 50,
         orderBy = 'name',
         order = 'asc',
         active = true,
