@@ -26,6 +26,9 @@ const AccountStatementForm = () => {
     job => job.status === 'PROCESSING' || job.status === 'PENDING'
   ) || false;
 
+  const MAX_ZIP_SIZE_KB = 21800; // ≈21.8 MB
+  const MAX_ZIP_SIZE_BYTES = MAX_ZIP_SIZE_KB * 1024;
+
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -35,6 +38,20 @@ const AccountStatementForm = () => {
       addToast('Error: Por favor sube un archivo ZIP válido', 'error');
       return;
     }
+
+    if (file.size > MAX_ZIP_SIZE_BYTES) {
+      const sizeKb = Math.round(file.size / 1024).toLocaleString();
+      addLog(
+        `Error: El ZIP pesa ${sizeKb} KB y el límite es ${MAX_ZIP_SIZE_KB.toLocaleString()} KB`,
+      );
+      addToast(
+        `El ZIP supera el límite de ${MAX_ZIP_SIZE_KB.toLocaleString()} KB. Divide la carga.`,
+        'error',
+      );
+      e.target.value = '';
+      return;
+    }
+
     setSelectedFile(file);
     addLog(`Archivo ZIP seleccionado: ${file.name}`);
   };
@@ -105,7 +122,7 @@ const AccountStatementForm = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">   
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Archivo ZIP
+            Archivo ZIP <span className="text-gray-400 font-normal">(máx. 22 MB ≈ 250 PDFs)</span>
           </label>
           <div className="flex items-center">
             <input
