@@ -145,5 +145,79 @@ export const accountStatementService = {
     const successful = results.filter(r => r.status === 'Asociado exitosamente').length;
 
     return Promise.resolve();
-  }
+  },
+
+  /**
+   * Get bulk upload job status by ID
+   * @param {string} jobId - The job ID to check
+   * @returns {Promise<Object>} Job status data
+   */
+  getJobStatus: async (jobId) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/account-statements/bulk-status/${jobId}`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          handleAuthError();
+          throw new Error('No autorizado: Sesión expirada');
+        }
+        throw new Error(`Error HTTP ${response.status}`);
+      }
+
+      const payload = await response.json();
+      return payload?.data ?? payload;
+    } catch (error) {
+      console.error('Error getting job status:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get recent bulk upload jobs
+   * @returns {Promise<Object>} List of recent jobs
+   */
+  getRecentJobs: async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/account-statements/bulk-jobs/recent`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          handleAuthError();
+          throw new Error('No autorizado: Sesión expirada');
+        }
+        throw new Error(`Error HTTP ${response.status}`);
+      }
+
+      const payload = await response.json();
+
+      if (!payload?.data?.jobs) {
+        console.warn('Respuesta inesperada de recent jobs:', payload);
+      }
+
+      return payload?.data ?? payload;
+    } catch (error) {
+      console.error('Error getting recent jobs:', error);
+      throw error;
+    }
+  },
 };
