@@ -23,6 +23,7 @@ import TemporaryPassesContainer from './features/temporary-passes';
 import ValidationsDashboard from './features/validations';
 import DocumentCatalog from './features/document-catalog';
 import VerifyAccess from './pages/VerifyAccess';
+import DependentsValidation from './pages/DependentsValidation';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -58,6 +59,7 @@ function AppContent() {
         <Route path="socios" element={<MembersContainer />} />
         <Route path="socios/nuevo" element={<IndividualMemberForm />} />
         <Route path="socios/carga-masiva" element={<BulkMemberUpload />} />
+        <Route path="dependientes" element={<DependentsValidation />} />
         <Route path="validaciones" element={<ValidationsDashboard />} />
         <Route path="catalogo-documentos" element={<DocumentCatalog />} />
         <Route path="pases-temporales" element={<TemporaryPassesContainer />} />

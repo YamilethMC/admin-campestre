@@ -13,7 +13,8 @@ import {
   EventsIcon,
   HelpCenterIcon,
   BannerIcon,
-  TemporaryPassesIcon
+  TemporaryPassesIcon,
+  DependentsIcon
 } from '../shared/components/icons/icons';
 
 const Navigation = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
@@ -23,6 +24,7 @@ const Navigation = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const menuItems = [
     { path: '/', label: 'Inicio', icon: HomeIcon, exact: true },
     { path: '/socios', label: 'Socios', icon: MemberListIcon },
+    { path: '/dependientes', label: 'Dependientes', icon: DependentsIcon },
     { path: '/validaciones', label: 'Validaciones', icon: AccountStatementIcon },
     { path: '/catalogo-documentos', label: 'Catálogo de documentos', icon: FileUploadIcon },
     { path: '/pases-temporales', label: 'Pases temporales', icon: TemporaryPassesIcon },

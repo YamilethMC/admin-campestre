@@ -107,6 +107,7 @@ export const AppProvider = ({ children }) => {
       setIsAuthenticated,
       currentUser,
       setCurrentUser,
+      authToken,
       login,
       logout
     }}>

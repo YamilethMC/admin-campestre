@@ -17,6 +17,7 @@ const MemberList = () => {
   const [editingMember, setEditingMember] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [isAddingDependent, setIsAddingDependent] = useState(false);
+  const [showDependents, setShowDependents] = useState(false);
   const [showBulkForm, setShowBulkForm] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [modalAction, setModalAction] = useState(null);
@@ -85,9 +86,15 @@ const MemberList = () => {
 
   const handleAddDependent = (member) => {
     console.log('handleAddDependent called with member:', member);
-    setEditingMember(member); // Pasamos el socio principal para tener su ID
-    setIsAddingDependent(true); // Indicamos que estamos agregando un dependiente
+    setEditingMember(member);
+    setIsAddingDependent(true);
     setShowForm(true);
+    setDropdownOpen(null);
+  };
+
+  const handleViewDependents = (member) => {
+    setEditingMember(member);
+    setShowDependents(true);
     setDropdownOpen(null);
   };
 
@@ -184,9 +191,22 @@ const MemberList = () => {
   const handleBack = () => {
     setShowForm(false);
     setShowBulkForm(false);
+    setShowDependents(false);
     setEditingMember(null);
     setIsAddingDependent(false);
   };
+
+  if (showDependents) {
+    const AdminDependentsList = require('../../../dependents/AdminDependentsList').default;
+    return (
+      <AdminDependentsList
+        memberId={editingMember?.id}
+        memberName={editingMember ? `${editingMember.user?.name || ''} ${editingMember.user?.lastName || ''}`.trim() : ''}
+        memberCode={editingMember?.memberCode}
+        onBack={handleBack}
+      />
+    );
+  }
 
   if (showForm === 'documents') {
     return (
@@ -345,13 +365,6 @@ const MemberList = () => {
                                     role="menuitem"
                                   >
                                     Editar
-                                  </button>
-                                  <button
-                                    onClick={() => handleAddDependent(member)}
-                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                                    role="menuitem"
-                                  >
-                                    Agregar dependiente
                                   </button>
                                   <button
                                     onClick={() => {
