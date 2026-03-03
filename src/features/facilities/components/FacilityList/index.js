@@ -170,7 +170,7 @@ const FacilityList = ({
         </div>
       )}
 
-      {meta && meta.totalPages > 1 && (
+      {/*{meta && meta.totalPages > 1 && (*/} {meta && (
         <div className="flex justify-center items-center gap-3 mt-6">
           {/* Calculate total pages and set up sliding window */}
           {(() => {

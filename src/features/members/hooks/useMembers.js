@@ -11,7 +11,7 @@ export function useMembers() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const loadMembers = async ({page = 1, limit = 10, active: activeParam = active, search: searchParam = search  } = {})=> {
+  const loadMembers = async ({page = 1, limit = 50, active: activeParam = active, search: searchParam = search  } = {})=> {
     setLoading(true);
     const data = await memberService.fetchMembers({ page, limit, active: activeParam, search: searchParam });
     if (data.success) {
