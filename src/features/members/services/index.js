@@ -8,7 +8,8 @@ export const memberService = {
         orderBy = 'name',
         order = 'asc',
         active = true,
-        search = ''
+        search = '',
+        signal = null
     } = {}) {
         const params = new URLSearchParams({
             page,
@@ -19,7 +20,7 @@ export const memberService = {
             active
         });
 
-        const response = await api.get(`/club-members?${params.toString()}`);
+        const response = await api.get(`/club-members?${params.toString()}`, { signal });
 
         if (!response.ok) {
             // Verificar si es un error de autenticación

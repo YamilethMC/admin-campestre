@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { surveyService } from '../services';
-import { useContext } from 'react';
 import { AppContext } from '../../../shared/context/AppContext';
+import { useDebounce } from '../../../shared/hooks/useDebounce';
 
 export const useSurvey = () => {
   const { addLog, addToast } = useContext(AppContext);
@@ -13,6 +13,7 @@ export const useSurvey = () => {
   const [category, setCategory] = useState('TODAS'); // 👈 Estado para categoría
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 2000);
 
   const [surveyCategoryOptions, setSurveyCategoryOptions] = useState([]);
   const [surveyPriorityOptions, setSurveyPriorityOptions] = useState([]);
@@ -84,7 +85,7 @@ export const useSurvey = () => {
     loadSurveyCategoryOptions();
     loadSurveyPriorityOptions();
     loadSurveyData();
-  }, [addLog, addToast, status, page, category, search]);
+  }, [status, page, category, debouncedSearch]);
 
   useEffect(() => {
     const autoRefreshInterval = setInterval(() => {
@@ -92,7 +93,7 @@ export const useSurvey = () => {
     }, 1800000); // 30 minutos
 
     return () => clearInterval(autoRefreshInterval);
-  }, [page, status, category, search]);
+  }, [page, status, category, debouncedSearch]);
 
   // Toggle survey status
   const toggleSurveyStatus = async (id) => {

@@ -117,21 +117,22 @@ export const memberService = {
 
   updateMember: async (id, memberData) => {
     const updatePayload = {
-      email: memberData.email,
-      name: memberData.name,
-      lastName: memberData.lastName,
-      address: memberData.address,
-      phone: memberData.phone,
-      birthDate: memberData.birthDate,
-      gender: memberData.gender,
-      RFC: memberData.RFC,
-      title: memberData.title,
-      profession: memberData.profession,
-      paymentMethod: memberData.paymentMethod,
-      dateOfAdmission: memberData.dateOfAdmission,
-      memberCode: memberData.memberCode,
-      ...(memberData.invitedById && { invitedById: memberData.invitedById }),
-      ...(memberData.relationship && { relationship: memberData.relationship })
+      ...(memberData.email !== undefined && { email: memberData.email }),
+      ...(memberData.name !== undefined && { name: memberData.name }),
+      ...(memberData.lastName !== undefined && { lastName: memberData.lastName }),
+      ...(memberData.address !== undefined && { address: memberData.address }),
+      ...(memberData.phone !== undefined && { phone: memberData.phone }),
+      ...(memberData.birthDate !== undefined && { birthDate: memberData.birthDate }),
+      ...(memberData.gender !== undefined && { gender: memberData.gender }),
+      ...(memberData.RFC !== undefined && { RFC: memberData.RFC }),
+      ...(memberData.title !== undefined && { title: memberData.title }),
+      ...(memberData.profession !== undefined && { profession: memberData.profession }),
+      ...(memberData.paymentMethod !== undefined && { paymentMethod: memberData.paymentMethod }),
+      ...(memberData.dateOfAdmission !== undefined && { dateOfAdmission: memberData.dateOfAdmission }),
+      ...(memberData.memberCode !== undefined && { memberCode: memberData.memberCode }),
+      ...(memberData.invitedById !== undefined && { invitedById: memberData.invitedById }),
+      ...(memberData.relationship !== undefined && { relationship: memberData.relationship }),
+      ...(memberData.active !== undefined && { active: memberData.active }),
     };
 
     const response = await api.patch(`/users/${id}`, updatePayload);

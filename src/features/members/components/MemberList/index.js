@@ -1,13 +1,12 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import MemberFilters from '../MemberFilters';
 import IndividualMember from '../../../individual-members';
 import MemberDocuments from '../../../member-documents';
 import { useMembers } from '../../hooks/useMembers';
 import { memberService } from '../../services';
+import { memberService as individualMemberService } from '../../../individual-members/services';
 import BulkMemberUploadContainer from '../../../bulk-upload';
 import { AppContext } from '../../../../shared/context/AppContext';
-import validationService from '../../../validations/services';
-import { useValidation } from '../../../validations/hooks/useValidation';
 
 const MemberList = () => {
   const [filters, setFilters] = useState({
@@ -22,43 +21,58 @@ const MemberList = () => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
-  const [memberValidations, setMemberValidations] = useState({});
   const { addToast } = useContext(AppContext);
 
-  const { members, meta, page, setPage, loadMembers, setActive, search, setSearch, loading } = useMembers();
-  const { formatStatus, getStatusBadge } = useValidation();
+  const { members, setMembers, meta, page, setPage, loadMembers, setActive, search, setSearch, loading } = useMembers();
 
-  useEffect(() => {
-    loadMembers({ active: filters.active, search: filters.search });
-  }, [filters.active, filters.search]);
+  const handleToggleActive = async (member) => {
+    const newActive = !filters.active;
+    const payload = { active: newActive };
 
-  // Cargar datos de validación para todos los miembros
-  useEffect(() => {
-    const loadMemberValidations = async () => {
-      if (members.length === 0) return;
+    setMembers(prev =>
+      prev.map(m =>
+        m.id === member.id
+          ? { ...m, user: { ...m.user, active: newActive } }
+          : m
+      )
+    );
 
-      const validationsMap = {};
-      for (const member of members) {
-        try {
-          const validationData = await validationService.getMemberValidationData(member.id);
-          validationsMap[member.id] = validationData;
-        } catch (error) {
-          // Si no hay datos de validación, asignar estado por defecto
-          validationsMap[member.id] = {
-            status: 'NOT_STARTED',
-            documentsUploaded: 0,
-            totalDocuments: 0
-          };
-        }
+    try {
+      const result = await individualMemberService.updateMember(member.user.id, payload);
+
+      if (!result.success) {
+        setMembers(prev =>
+          prev.map(m =>
+            m.id === member.id
+              ? { ...m, user: { ...m.user, active: !newActive } }
+              : m
+          )
+        );
+        addToast(result.error || 'Error al actualizar estatus del socio', 'error');
+        return;
       }
-      setMemberValidations(validationsMap);
-    };
 
-    loadMemberValidations();
-  }, [members]);
+      addToast(
+        newActive ? 'Socio activado correctamente' : 'Socio desactivado correctamente',
+        'success',
+      );
+      loadMembers();
+    } catch (error) {
+      setMembers(prev =>
+        prev.map(m =>
+          m.id === member.id
+            ? { ...m, user: { ...m.user, active: !newActive } }
+            : m
+        )
+      );
+      addToast('Error al actualizar estatus del socio', 'error');
+    } finally {
+      setDropdownOpen(null);
+      setShowConfirmationModal(false);
+    }
+  };
 
   const filteredMembers = members;
-
 
   const updateFilters = (newFilters) => {
     setFilters(prev => ({
@@ -66,10 +80,9 @@ const MemberList = () => {
       ...newFilters
     }));
     if (newFilters.search !== undefined) {
-      setSearch(newFilters.search); // 👈 ACTUALIZA SETSEARCH
+      setSearch(newFilters.search);
       setPage(1);
     }
-
     if (newFilters.active !== undefined) {
       setActive(newFilters.active);
       setPage(1);
@@ -106,60 +119,31 @@ const MemberList = () => {
     setDropdownOpen(null);
   };
 
-  const getValidationStatusDisplay = (member) => {
-    if (member.documentStats) {
-      const statusKey = member.validationStatus || 'NOT_STARTED';
-      return {
-        status: formatStatus(statusKey),
-        badge: getStatusBadge(statusKey),
-        progress: `${member.documentStats.uploaded}/${member.documentStats.total}`
-      };
-    }
-
-    const validation = memberValidations[member.id];
-    if (!validation) {
-      return {
-        status: 'No iniciado',
-        badge: 'bg-gray-100 text-gray-800',
-        progress: `0/0`
-      };
-    }
-
-    const status = formatStatus(validation.status || 'NOT_STARTED');
-    const badge = getStatusBadge(validation.status || 'NOT_STARTED');
-    const progress = `${validation.documentsUploaded || 0}/${validation.totalDocuments || 0}`;
-
-    return { status, badge, progress };
-  };
-
   const handleBulkMember = () => {
     setShowBulkForm(true);
     setDropdownOpen(null);
   };
 
   const handleDeleteMember = async (memberId) => {
+    const prevMembers = members;
+    setMembers(prev => prev.filter(m => m.id !== memberId));
+
     const result = await memberService.deleteMember(memberId);
     if (!result.success) {
+      setMembers(prevMembers);
       addToast(result.error || 'Error al eliminar miembro', 'error');
       return;
     }
 
-    if (members.length === 1 && page > 1) {
+    addToast('Socio eliminado correctamente', 'success');
+    if (prevMembers.length === 1 && page > 1) {
       setPage(page - 1);
-    } else {
-      loadMembers();
     }
     setDropdownOpen(null);
   };
 
-  const handleSaveMember = (memberData) => {
-    if (editingMember) {
-      // Update existing member
-      loadMembers();
-    } else {
-      // Add new member - this would be for creating new members
-      // For now, we're only handling edits
-    }
+  const handleSaveMember = () => {
+    loadMembers();
     setShowForm(false);
     setEditingMember(null);
   };
@@ -177,6 +161,8 @@ const MemberList = () => {
         setEditingMember(null);
       } else if (modalAction.action === 'delete') {
         handleDeleteMember(modalAction.data);
+      } else if (modalAction.action === 'toggleActive') {
+        handleToggleActive(modalAction.data);
       }
     }
     setShowConfirmationModal(false);
@@ -322,9 +308,15 @@ const MemberList = () => {
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody 
+                    className="bg-white divide-y divide-gray-200"
+                  >
                     {filteredMembers.map((member, index) => (
-                      <tr key={member.id} className={member.id % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                      <tr
+                        key={member.id}
+                        className={member.id % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+                        // onClick={() => handleFormMember(member)}
+                      >
                         <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{member.memberCode}</td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.user.name}</td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{member.user.lastName}</td>
@@ -366,6 +358,17 @@ const MemberList = () => {
                                   >
                                     Editar
                                   </button>
+
+                                  <button
+                                    onClick={() => {
+                                      confirmAction('toggleActive', member);
+                                    }}
+                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                                    role="menuitem"
+                                  >
+                                    {filters.active ? 'Desactivar' : 'Activar'}
+                                  </button>
+
                                   <button
                                     onClick={() => {
                                       confirmAction('delete', member.id);
@@ -389,60 +392,6 @@ const MemberList = () => {
                 </div>
               </div>
 
-              {/*{meta && (
-                <div className="flex justify-center items-center gap-3 mt-4">
-                  {(() => {
-                    const totalPages = meta.totalPages;
-                    const maxVisiblePages = 5;
-                    let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2));
-                    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-                    if (endPage - startPage + 1 < maxVisiblePages) {
-                      startPage = Math.max(1, endPage - maxVisiblePages + 1);
-                    }
-
-                    return (
-                      <>
-                        <button
-                          disabled={page === 1}
-                          onClick={() => setPage(page - 1)}
-                          className={`px-3 py-1 rounded border text-sm ${
-                            page === 1 ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
-                          }`}
-                        >
-                          Anterior
-                        </button>
-
-                        {Array.from({ length: endPage - startPage + 1 }, (_, i) => {
-                          const pageNum = startPage + i;
-                          return (
-                            <button
-                              key={`page-${pageNum}`}
-                              onClick={() => setPage(pageNum)}
-                              className={`px-3 py-1 rounded border text-sm ${
-                                page === pageNum ? 'bg-primary text-white border-primary' : 'border-gray-300 text-gray-700'
-                              }`}
-                            >
-                              {pageNum}
-                            </button>
-                          );
-                        })}
-
-                        <button
-                          disabled={page === totalPages}
-                          onClick={() => setPage(page + 1)}
-                          className={`px-3 py-1 rounded border text-sm ${
-                            page === totalPages ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
-                          }`}
-                        >
-                          Siguiente
-                        </button>
-                      </>
-                    );
-                  })()}
-                </div>
-                
-          )}*/}
           {meta && (
   <div className="flex justify-center items-center gap-2 mt-4 flex-wrap">
     {(() => {
@@ -533,19 +482,17 @@ const MemberList = () => {
           )}
           </>
         )}
-
-      {/*<div className="mt-4 text-sm text-gray-600">
-        Total de socios: {filteredMembers.length} de {members.length}
-      </div>*/}
-
       {/* Confirmation Modal */}
       {showConfirmationModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-96">
             <h3 className="text-lg font-medium text-gray-900 mb-2">Confirmar acción</h3>
             <p className="text-gray-600 mb-4">
-              ¿Estás seguro que deseas {modalAction?.action === 'delete' ? 'eliminar' : modalAction?.action === 'back' ? 'regresar' : 'cancelar'}?
-              {modalAction?.action !== 'delete' && ' Los cambios no guardados se perderán.'}
+              {modalAction?.action === 'delete' && '¿Estás seguro que deseas eliminar este socio?'}
+              {modalAction?.action === 'toggleActive' &&
+                `¿Estás seguro que deseas ${modalAction?.data?.user?.active ? 'desactivar' : 'activar'} este socio?`}
+              {modalAction?.action !== 'delete' && modalAction?.action !== 'toggleActive' &&
+                ' Los cambios no guardados se perderán.'}
             </p>
             <div className="flex justify-end space-x-3">
               <button

@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { fileUploadService } from '../services';
 import { AppContext } from '../../../shared/context/AppContext';
+import { useDebounce } from '../../../shared/hooks/useDebounce';
 
 export const useFileUpload = () => {
   const { addToast } = useContext(AppContext);
@@ -11,6 +12,7 @@ export const useFileUpload = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [uploading, setUploading] = useState(false);
+  const debouncedSearch = useDebounce(search, 2000);
 
   const loadFiles = async (params = {}) => {
     setLoading(true);
@@ -122,7 +124,7 @@ export const useFileUpload = () => {
   // Load files when page, search, or other params change
   useEffect(() => {
     loadFiles();
-  }, [page, search]);
+  }, [page, debouncedSearch]);
 
   return {
     files,

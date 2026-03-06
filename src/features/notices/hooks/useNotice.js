@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { noticeService } from '../services';
 import { AppContext } from '../../../shared/context/AppContext';
+import { useDebounce } from '../../../shared/hooks/useDebounce';
 
 export const useNotice = () => {
   const { addToast } = useContext(AppContext);
@@ -11,6 +12,7 @@ export const useNotice = () => {
   const [status, setStatus] = useState('activas'); // Default to active
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const debouncedSearch = useDebounce(search, 2000);
 
   // Load notices with pagination, search, and filters
   const loadNotices = async (params = {}) => {
@@ -146,7 +148,7 @@ export const useNotice = () => {
     }, 1800000);
     loadNotices();
     return () => clearInterval(autoRefreshInterval);
-  }, [page, status, search]);
+  }, [page, status, debouncedSearch]);
 
   return {
     notices,

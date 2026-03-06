@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { eventService } from '../services';
 import { EventTypes } from '../interfaces';
 import { AppContext } from '../../../shared/context/AppContext';
+import { useDebounce } from '../../../shared/hooks/useDebounce';
 
 export const useEvents = () => {
   const { addLog, addToast } = useContext(AppContext);
@@ -12,6 +13,7 @@ export const useEvents = () => {
   const [type, setType] = useState(EventTypes.ALL);
   const [date, setDate] = useState(new Date().toISOString().slice(0, 7)); // Current year-month
 
+  const debouncedSearch = useDebounce(search, 2000);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -48,17 +50,17 @@ export const useEvents = () => {
   // Set up auto-refresh every 30 minutes (1800000 ms)
   useEffect(() => {
     const autoRefreshInterval = setInterval(() => {
-      loadEvents({page, search, type, date});
+      loadEvents({page, search: debouncedSearch, type, date});
     }, 1800000); // 30 minutes = 1800000 ms
 
     // Initial load
-    loadEvents({page, search, type, date});
+    loadEvents({page, search: debouncedSearch, type, date});
 
     // Cleanup interval on unmount
     return () => {
       clearInterval(autoRefreshInterval);
     };
-  }, [addLog, addToast, page, search, type, date]);
+  }, [page, debouncedSearch, type, date]);
 
   // Create new event
   const createEvent = async (eventData) => {

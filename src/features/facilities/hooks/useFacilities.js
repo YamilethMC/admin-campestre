@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
 import { facilityService } from '../services';
 import { AppContext } from '../../../shared/context/AppContext';
+import { useDebounce } from '../../../shared/hooks/useDebounce';
 
 export function useFacilities(initialFilters = {}) {
   const { addToast } = useContext(AppContext);
@@ -12,6 +13,7 @@ export function useFacilities(initialFilters = {}) {
   const [status, setStatus] = useState('ACTIVE');
   const [type, setType] = useState('');
   const [date, setDate] = useState('');
+  const debouncedSearch = useDebounce(search, 2000);
 
   const loadFacilities = async (filters = {}) => {
     setLoading(true);
@@ -41,8 +43,8 @@ export function useFacilities(initialFilters = {}) {
   };
 
   useEffect(() => {
-    loadFacilities({ page, search, status, type, date });
-  }, [page, search, status, type, date]);
+    loadFacilities({ page, search: debouncedSearch, status, type, date });
+  }, [page, debouncedSearch, status, type, date]);
 
   // Reset filters to default values
   const resetFilters = () => {

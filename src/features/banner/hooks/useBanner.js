@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { bannerService } from '../services';
 import { AppContext } from '../../../shared/context/AppContext';
+import { useDebounce } from '../../../shared/hooks/useDebounce';
 
 export const useBanner = () => {
   const { addToast } = useContext(AppContext);
@@ -11,6 +12,7 @@ export const useBanner = () => {
   const [status, setStatus] = useState('activas'); // Default to active
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const debouncedSearch = useDebounce(search, 2000);
 
   // Load banners with pagination, search, and filters
   const loadBanners = async (params = {}) => {
@@ -158,7 +160,7 @@ export const useBanner = () => {
     return () => {
       clearInterval(autoRefreshInterval);
     };
-  }, [page, status, search]);
+  }, [page, status, debouncedSearch]);
 
   return {
     banners,

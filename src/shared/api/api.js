@@ -27,7 +27,7 @@ const handleResponse = async (response) => {
 };
 
 const request = async (path, options = {}) => {
-  const { method = 'GET', headers = {}, body } = options;
+  const { method = 'GET', headers = {}, body, signal } = options;
   const response = await fetch(buildUrl(path), {
     method,
     headers: {
@@ -36,6 +36,7 @@ const request = async (path, options = {}) => {
       ...headers,
     },
     body: body ? JSON.stringify(body) : undefined,
+    signal,
   });
 
   return handleResponse(response);
