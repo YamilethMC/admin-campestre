@@ -21,7 +21,7 @@ export const useAuth = () => {
     if (result.success) {
       const userRole = result.user?.role;
       const roleName = typeof userRole === 'string' ? userRole : userRole?.name;
-      const allowedRoles = ['ADMIN', 'STAFF'];
+      const allowedRoles = ['ADMINISTRADOR', 'STAFF'];
 
       if (!allowedRoles.includes(roleName)) {
         const message = 'Solo los usuarios administradores pueden acceder al panel';
