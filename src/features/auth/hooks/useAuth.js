@@ -19,11 +19,11 @@ export const useAuth = () => {
 
     const result = await authService.validateCredentials({ email: username, password });
     if (result.success) {
-      const userRole = result.user?.role;
-      const roleName = typeof userRole === 'string' ? userRole : userRole?.name;
+      const userType = result.user?.type;
+      const normalizedType = typeof userType === 'string' ? userType : userType?.name;
       const allowedRoles = ['ADMINISTRADOR', 'STAFF'];
 
-      if (!allowedRoles.includes(roleName)) {
+      if (!allowedRoles.includes(normalizedType)) {
         const message = 'Solo los usuarios administradores pueden acceder al panel';
         setError(message);
         addToast(message, 'error');

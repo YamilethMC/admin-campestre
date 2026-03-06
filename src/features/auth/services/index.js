@@ -27,15 +27,18 @@ export const authService = {
         };
       }
 
+      const userPayload = response.data.data.user || {};
+
       return {
         success: true,
         user: {
-          id: response.data.data.user.id,
-          username: response.data.data.user.email,
-          name: response.data.data.user.name,
-          lastName: response.data.data.user.lastName,
-          role: response.data.data.user.role,
-          permissions: response.data.data.user.permissions,
+          id: userPayload.id,
+          username: userPayload.email,
+          name: userPayload.name,
+          lastName: userPayload.lastName,
+          type: userPayload.type,
+          role: userPayload.role,
+          permissions: userPayload.permissions,
           accessToken: response.data.data.access_token,
         },
         accessToken: response.data.data.access_token,
