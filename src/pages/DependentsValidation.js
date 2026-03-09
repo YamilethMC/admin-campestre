@@ -19,6 +19,7 @@ const DependentsValidation = () => {
   const [selectedDependentId, setSelectedDependentId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [meta, setMeta] = useState({});
 
   const getToken = () => authToken || localStorage.getItem('authToken');
 
@@ -48,6 +49,7 @@ const DependentsValidation = () => {
       const apiData = payload?.data ?? payload ?? {};
       setDependents(apiData.dependents || []);
       setTotalPages(apiData.meta?.totalPages || 1);
+      setMeta(apiData.meta || {});
     } catch (err) {
       setError(err.message || 'Error inesperado al cargar dependientes');
     } finally {
@@ -219,27 +221,60 @@ const DependentsValidation = () => {
             </div>
 
             {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
-                <button
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Anterior
-                </button>
-                <span className="text-sm text-gray-600">
-                  Página {currentPage} de {totalPages}
-                </span>
-                <button
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Siguiente
-                </button>
+            {/*{totalPages > 1 && ( */}
+            {meta && (
+              <div className="flex justify-center items-center gap-3 mt-4">
+                {(() => {
+                  const totalPages = meta.totalPages;
+                  const maxVisiblePages = 5;
+                  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                  let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+                  // Adjust start if range exceeds total pages
+                  if (endPage - startPage + 1 < maxVisiblePages) {
+                    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                  }
+
+                  return (
+                    <>
+                      <button
+                        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        className={`px-3 py-1 rounded border text-sm ${
+                            currentPage === 1 ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
+                          }`}
+                        >
+                        Anterior
+                      </button>
+                      {Array.from({ length: endPage - startPage + 1 }, (_, i) => {
+                        const pageNum = startPage + i;
+                        return (
+                          <button
+                            key={`page-${pageNum}`}
+                            onClick={() => setCurrentPage(pageNum)}
+                            className={`px-3 py-1 rounded border text-sm ${
+                              currentPage === pageNum ? 'bg-primary text-white border-primary' : 'border-gray-300 text-gray-700'
+                            }`}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      })}
+                      <button
+                        onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                        className={`px-3 py-1 rounded border text-sm ${
+                            currentPage === totalPages ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
+                          }`}
+                        >
+                        Siguiente
+                      </button>
+                    </>
+                  );
+                })()}
               </div>
             )}
+            {/*})} */}
           </>
         )}
       </div>
