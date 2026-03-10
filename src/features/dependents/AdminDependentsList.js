@@ -1,5 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import AdminDependentDetail from './AdminDependentDetail';
+import { AppContext } from '../../shared/context/AppContext';
+import { handleAuthError } from '../../shared/utils/authErrorHandler';
+import { useDebounce } from '../../shared/hooks/useDebounce';
 
 const RELATIONSHIP_LABELS = {
   SPOUSE: 'Cónyuge',
@@ -12,39 +15,69 @@ const RELATIONSHIP_LABELS = {
 
 const AdminDependentsList = ({ memberId, memberName, memberCode, onBack }) => {
   const [dependents, setDependents] = useState([]);
+  const [meta, setMeta] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedDependentId, setSelectedDependentId] = useState(null);
+  const { addToast } = useContext(AppContext);
+  const debouncedSearch = useDebounce(search, 1000);
 
-  const getToken = () => localStorage.getItem('token');
-
+  const getToken = () => localStorage.getItem('authToken');
   const fetchDependents = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
       const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/dependents/member/${memberId}`,
+        `${process.env.REACT_APP_API_URL}/dependents/member/${memberId}?page=${currentPage}&limit=20&search=${search}`,
         { headers: { Authorization: `Bearer ${getToken()}` } }
       );
 
       if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.message || `Error ${res.status} al cargar dependientes`);
+        if (res.status === 401) {
+          // Llamar a la función global para manejar el error de autenticación
+          handleAuthError();
+          return {
+            success: false,
+            error: 'No autorizado: Sesión expirada',
+            status: res.status
+          };
+        }
+        let errorMessage = "Error al obtener dependientes";
+        switch (res.status) {
+          case 400:
+            errorMessage = 'Datos de entrada inválidos';
+            break;
+          case 404:
+            errorMessage = 'No se encontraron dependientes para este socio';
+            break;
+          case 500:
+            errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
+            break;
+          default:
+            errorMessage = res.data?.message || "Error al obtener dependientes";
+        }
+
+        addToast(errorMessage, 'error');
       }
 
       const data = await res.json();
-      setDependents(data.dependents || []);
+      setDependents(data.data.dependents || []);
+      setMeta(data.data.meta || {});
+      setTotalPages(data.data.meta?.totalPages || 1);
     } catch (err) {
       setError(err.message || 'Error inesperado al cargar dependientes');
     } finally {
       setLoading(false);
     }
-  }, [memberId]);
+  }, [memberId, currentPage, search]);
 
   useEffect(() => {
     if (memberId) fetchDependents();
-  }, [memberId, fetchDependents]);
+  }, [memberId, currentPage, debouncedSearch]);
 
   const handleDependentApproved = () => {
     setSelectedDependentId(null);
@@ -54,6 +87,11 @@ const AdminDependentsList = ({ memberId, memberName, memberCode, onBack }) => {
   const handleDependentRejected = () => {
     setSelectedDependentId(null);
     fetchDependents();
+  };
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setCurrentPage(1);
   };
 
   if (selectedDependentId) {
@@ -99,6 +137,16 @@ const AdminDependentsList = ({ memberId, memberName, memberCode, onBack }) => {
           )}
         </div>
       </div>
+      
+      {/*<div className="flex justify-end mb-4">
+        <input
+          type="text"
+          placeholder="Buscar dependientes..."
+          value={search || ''}
+          onChange={handleSearchChange}
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+        />
+      </div>*/}
 
       {/* Content */}
       <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4">
@@ -220,6 +268,60 @@ const AdminDependentsList = ({ memberId, memberName, memberCode, onBack }) => {
           </div>
         )}
       </div>
+      {/* Pagination */}
+      {/*{totalPages > 1 && ( */}
+      {meta && (
+        <div className="flex justify-center items-center gap-3 mt-4">
+          {(() => {
+            const totalPages = meta.totalPages;
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+            // Adjust start if range exceeds total pages
+            if (endPage - startPage + 1 < maxVisiblePages) {
+              startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+
+            return (
+              <>
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className={`px-3 py-1 rounded border text-sm ${
+                      currentPage === 1 ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
+                    }`}
+                  >
+                  Anterior
+                </button>
+                {Array.from({ length: endPage - startPage + 1 }, (_, i) => {
+                  const pageNum = startPage + i;
+                  return (
+                    <button
+                      key={`page-${pageNum}`}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`px-3 py-1 rounded border text-sm ${
+                        currentPage === pageNum ? 'bg-primary text-white border-primary' : 'border-gray-300 text-gray-700'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+                <button
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className={`px-3 py-1 rounded border text-sm ${
+                      currentPage === totalPages ? 'text-gray-300 border-gray-200' : 'text-primary border-primary'
+                    }`}
+                  >
+                  Siguiente
+                </button>
+              </>
+            );
+          })()}
+        </div>
+      )}
     </div>
   );
 };
