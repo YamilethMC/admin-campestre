@@ -24,6 +24,9 @@ const AdminDependentsList = ({ memberId, memberName, memberCode, onBack }) => {
   const [selectedDependentId, setSelectedDependentId] = useState(null);
   const { addToast } = useContext(AppContext);
   const debouncedSearch = useDebounce(search, 1000);
+  const [modalAction, setModalAction] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(null);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   const getToken = () => localStorage.getItem('authToken');
   const fetchDependents = useCallback(async () => {
@@ -92,6 +95,71 @@ const AdminDependentsList = ({ memberId, memberName, memberCode, onBack }) => {
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
     setCurrentPage(1);
+  };
+
+  const confirmAction = (action, data = null) => {
+    setModalAction({ action, data });
+    setShowConfirmationModal(true);
+  };
+
+  const handleCancel = () => {
+    setShowConfirmationModal(false);
+    setModalAction(null);
+  };
+
+  const handleConfirm = () => {
+    if (modalAction) {
+      if (modalAction.action === 'delete') {
+        handleDeleteDependent(modalAction.data);
+      }
+    }
+    setShowConfirmationModal(false);
+    setModalAction(null);
+  };
+
+  const handleDeleteDependent = async (depId) => {
+    const prevDependents = dependents;
+    setDependents(prev => prev.filter(d => d.id !== depId));
+
+    const result = await fetch(
+      `${process.env.REACT_APP_API_URL}/dependents/${depId}`,
+      { 
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${getToken()}` } 
+      }
+    );
+    if (!result.ok) {
+      setDependents(prevDependents);
+      if (result.status === 401) {
+        // Llamar a la función global para manejar el error de autenticación
+        handleAuthError();
+        return {
+          success: false,
+          error: 'No autorizado: Sesión expirada',
+          status: result.status
+        };
+      }
+      let errorMessage = "Error al eliminar dependiente";
+      switch (result.status) {
+        case 400:
+          errorMessage = 'Datos de entrada inválidos';
+          break;
+        case 404:
+          errorMessage = 'Dependiente no encontrado';
+          break;
+        case 500:
+          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
+          break;
+        default:
+          errorMessage = result.data?.message || "Error al eliminar dependiente";
+      }
+      addToast(errorMessage, 'error');
+    }
+
+    if (prevDependents.length === 1 && currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+    setDropdownOpen(null);
   };
 
   if (selectedDependentId) {
@@ -174,7 +242,7 @@ const AdminDependentsList = ({ memberId, memberName, memberCode, onBack }) => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full divide-y divide-gray-200 mb-6 mt-6">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
@@ -188,7 +256,7 @@ const AdminDependentsList = ({ memberId, memberName, memberCode, onBack }) => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {dependents.map((dep) => (
+                {dependents.map((dep, index) => (
                   <tr
                     key={dep.id}
                     className={!dep.memberCode ? 'bg-yellow-50' : 'bg-white'}
@@ -254,12 +322,42 @@ const AdminDependentsList = ({ memberId, memberName, memberCode, onBack }) => {
                       )}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <button
-                        onClick={() => setSelectedDependentId(dep.id)}
-                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                      >
-                        Ver detalle
-                      </button>
+                      <div className="relative inline-block text-left">
+                        <button
+                          onClick={() => setDropdownOpen(dropdownOpen === dep.id ? null : dep.id)}
+                          className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                        >
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                          </svg>
+                        </button>
+                        {dropdownOpen === dep.id && (
+                          <div className={`origin-top-right absolute right-0 ${index === 0 ? 'top-full mt-2' : 'bottom-full mb-2'} w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50 max-h-60 overflow-y-auto`}>
+                            <div className="py-1" role="menu">
+                              <button
+                                onClick={() => {
+                                  setSelectedDependentId(dep.id);
+                                  setDropdownOpen(null);
+                                }}
+                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                                role="menuitem"
+                              >
+                                Ver detalle
+                              </button>
+                              <button
+                                onClick={() => {
+                                  confirmAction('delete', dep.id);
+                                  setDropdownOpen(null);
+                                }}
+                                className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
+                                role="menuitem"
+                              >
+                                Eliminar
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -320,6 +418,34 @@ const AdminDependentsList = ({ memberId, memberName, memberCode, onBack }) => {
               </>
             );
           })()}
+        </div>
+      )}
+
+
+      {showConfirmationModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Confirmar acción</h3>
+            <p className="text-gray-600 mb-4">
+              {modalAction?.action === 'delete' && '¿Estás seguro que deseas eliminar este dependiente?'}
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                type="button"
+                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
+                onClick={handleCancel}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none"
+                onClick={handleConfirm}
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
