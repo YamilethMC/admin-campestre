@@ -13,9 +13,7 @@ export const noticeService = {
   } = {}) => {
     const params = new URLSearchParams({ page, limit, search, order, orderBy });
     if (active !== false) params.append("active", active);
-
     const response = await api.get(`/notify?${params}`);
-
     if (!response.ok) {
       // Verificar si es un error de autenticación
       if (response.status === 401) {

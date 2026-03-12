@@ -1,4 +1,5 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
+
 import { bannerService } from '../services';
 import { AppContext } from '../../../shared/context/AppContext';
 import { useDebounce } from '../../../shared/hooks/useDebounce';
@@ -13,12 +14,10 @@ export const useBanner = () => {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const debouncedSearch = useDebounce(search, 2000);
+  const pendingRequestKey = useRef(null);
 
   // Load banners with pagination, search, and filters
   const loadBanners = async (params = {}) => {
-    setLoading(true);
-    setError(null);
-
     // Use provided params or current state
     const currentParams = {
       page: params.page || page,
@@ -29,6 +28,15 @@ export const useBanner = () => {
       orderBy: 'createdAt' // Fixed as requested
     };
 
+    const requestKey = JSON.stringify(currentParams);
+    if (pendingRequestKey.current === requestKey) {
+      return;
+    }
+
+    pendingRequestKey.current = requestKey;
+    setLoading(true);
+    setError(null);
+
     const response = await bannerService.fetchBanners(currentParams);
 
     if (response.success) {
@@ -37,12 +45,15 @@ export const useBanner = () => {
     } else {
       if (response.status === 401) {
         // No mostramos alerta aquí porque el servicio ya la maneja
+        pendingRequestKey.current = null;
+        setLoading(false);
         return;
       }
       addToast(response.error || 'Error al cargar banners', 'error');
       console.error('Error loading banners:', response.error);
     }
 
+    pendingRequestKey.current = null;
     setLoading(false);
   };
 

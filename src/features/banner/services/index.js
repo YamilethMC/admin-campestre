@@ -5,9 +5,7 @@ export const bannerService = {
   fetchBanners: async ({ page = 1, limit = 10, orderBy = 'createdAt', order = 'asc', active = true, search = '' } = {}) => {
     const params = new URLSearchParams({ page, limit, search, order, orderBy });
     if (typeof active === 'boolean') params.append("active", active);
-
     const response = await api.get(`/banner?${params}`);
-
     if (!response.ok) {
       if (response.status === 401) {
         // Llamar a la función global para manejar el error de autenticación
@@ -23,7 +21,6 @@ export const bannerService = {
 
       return { success: false, error: errorMessage, status: response.status };
     }
-
     return {
       success: true,
       data: {
