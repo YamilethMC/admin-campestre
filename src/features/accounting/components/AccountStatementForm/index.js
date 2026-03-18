@@ -124,7 +124,7 @@ const AccountStatementForm = () => {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Archivo ZIP 
-            {/* <span className="text-gray-400 font-normal">(máx. 22 MB ≈ 250 PDFs)</span> */}
+            <span className="text-gray-400 font-normal">(máx. 32 MB)</span>
           </label>
           <div className="flex items-center">
             <input
