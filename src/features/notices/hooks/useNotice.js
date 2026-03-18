@@ -1,4 +1,5 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
+
 import { noticeService } from '../services';
 import { AppContext } from '../../../shared/context/AppContext';
 import { useDebounce } from '../../../shared/hooks/useDebounce';
@@ -13,12 +14,10 @@ export const useNotice = () => {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const debouncedSearch = useDebounce(search, 2000);
+  const pendingRequestKey = useRef(null);
 
   // Load notices with pagination, search, and filters
   const loadNotices = async (params = {}) => {
-    setLoading(true);
-    setError(null);
-
     // Use provided params or current state
     const currentParams = {
       page: params.page || page,
@@ -28,6 +27,17 @@ export const useNotice = () => {
       order: 'asc', // Fixed as requested
       orderBy: 'title' // Fixed as requested
     };
+
+    const requestKey = JSON.stringify(currentParams);
+    if (pendingRequestKey.current === requestKey) {
+      // Ignore duplicate in-flight request with identical parameters
+      return;
+    }
+
+    pendingRequestKey.current = requestKey;
+    setLoading(true);
+    setError(null);
+
     const response = await noticeService.fetchNotices(currentParams);
 
     if (response.success) {
@@ -37,12 +47,15 @@ export const useNotice = () => {
       // Verificar si es un error de autenticación
       if (response.status === 401) {
         // No mostramos alerta aquí porque el servicio ya la maneja
+        pendingRequestKey.current = null;
+        setLoading(false);
         return;
       }
       addToast(response.error || 'Error al cargar avisos', 'error');
       console.error('Error loading notices:', response.error);
     }
 
+    pendingRequestKey.current = null;
     setLoading(false);
   };
 

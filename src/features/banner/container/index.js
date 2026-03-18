@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
+
 import BannerHeader from '../components/BannerHeader';
 import BannerFilters from '../components/BannerFilters';
 import BannerList from '../components/BannerList';
@@ -29,16 +30,23 @@ const BannerContainer = () => {
   } = useBanner();
 
   // Update filters
-  const updateFilters = (newFilters) => {
-    if (newFilters.status !== undefined) {
+  const updateFilters = useCallback((newFilters) => {
+    let shouldResetPage = false;
+
+    if (newFilters.status !== undefined && newFilters.status !== status) {
       setStatus(newFilters.status);
-      setPage(1);
+      shouldResetPage = true;
     }
-    if (newFilters.search !== undefined) {
+
+    if (newFilters.search !== undefined && newFilters.search !== search) {
       setSearch(newFilters.search);
+      shouldResetPage = true;
+    }
+
+    if (shouldResetPage) {
       setPage(1);
     }
-  };
+  }, [status, search, setStatus, setSearch]);
 
   // Handle adding a new banner
   const handleAddBanner = () => {

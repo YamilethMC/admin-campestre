@@ -1,5 +1,5 @@
 import React from 'react';
-import logoImg from '../assets/images/logo-cct.jpeg';
+import logoImg from '../assets/images/SELLO.jpeg';
 
 const Dashboard = () => {
   return (
@@ -7,7 +7,7 @@ const Dashboard = () => {
       <img
         src={logoImg}
         alt="Logo"
-        className="w-100 h-100 object-contain"
+        className="w-96 h-96 object-contain flex-shrink-0"
       />
     </div>
   );

@@ -352,6 +352,13 @@ const MemberList = () => {
                               <div className={`origin-top-right absolute right-0 ${index === 0 ? 'top-full mt-2' : 'bottom-full mb-2'} w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50 max-h-60 overflow-y-auto`}>
                                 <div className="py-1" role="menu">
                                   <button
+                                    onClick={() => handleViewDependents(member)}
+                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                                    role="menuitem"
+                                  >
+                                    Ver dependientes
+                                  </button>
+                                  <button
                                     onClick={() => handleFormMember(member)}
                                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                                     role="menuitem"

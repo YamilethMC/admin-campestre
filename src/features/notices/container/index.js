@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
+
 import NoticeHeader from '../components/NoticeHeader';
 import NoticeFilters from '../components/NoticeFilters';
 import NoticeList from '../components/NoticeList';
@@ -29,16 +30,23 @@ const NoticesContainer = () => {
   } = useNotice();
 
   // Update filters
-  const updateFilters = (newFilters) => {
-    if (newFilters.status !== undefined) {
+  const updateFilters = useCallback((newFilters) => {
+    let shouldResetPage = false;
+
+    if (newFilters.status !== undefined && newFilters.status !== status) {
       setStatus(newFilters.status);
-      setPage(1);
+      shouldResetPage = true;
     }
-    if (newFilters.search !== undefined) {
+
+    if (newFilters.search !== undefined && newFilters.search !== search) {
       setSearch(newFilters.search);
+      shouldResetPage = true;
+    }
+
+    if (shouldResetPage) {
       setPage(1);
     }
-  };
+  }, [status, search, setStatus, setSearch]);
 
   // Handle adding a new notice
   const handleAddNotice = () => {

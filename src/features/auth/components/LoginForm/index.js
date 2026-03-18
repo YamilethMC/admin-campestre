@@ -3,7 +3,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { AppContext } from '../../../../shared/context/AppContext';
 import { UserIcon, LockIcon, RefreshIcon } from '../../../../shared/components/icons/icons';
 import Toast from '../../../../shared/components/toast/Toast';
-import logo from '../../../../assets/images/logo-cct.jpeg';
+import logo from '../../../../assets/images/SELLO.jpeg';
 
 const LoginForm = () => {
   const {
@@ -45,7 +45,7 @@ const LoginForm = () => {
             <img
               src={logo}
               alt="Logo"
-              className="h-32 w-32 object-contain"
+              className="h-36 w-36 object-contain"
             />
           </div>
           <h2 className="mt-2 text-2xl font-bold text-gray-900">
