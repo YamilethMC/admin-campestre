@@ -26,8 +26,8 @@ const AccountStatementForm = () => {
     job => job.status === 'PROCESSING' || job.status === 'PENDING'
   ) || false;
 
-  // const MAX_ZIP_SIZE_KB = 21800; // ≈21.8 MB
-  // const MAX_ZIP_SIZE_BYTES = MAX_ZIP_SIZE_KB * 1024;
+  const MAX_ZIP_SIZE_KB = 32000; // Cloud Run admite ~32 MB por request
+  const MAX_ZIP_SIZE_BYTES = MAX_ZIP_SIZE_KB * 1024;
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -39,18 +39,19 @@ const AccountStatementForm = () => {
       return;
     }
 
-    // if (file.size > MAX_ZIP_SIZE_BYTES) {
-    //   const sizeKb = Math.round(file.size / 1024).toLocaleString();
-    //   addLog(
-    //     `Error: El ZIP pesa ${sizeKb} KB y el límite es ${MAX_ZIP_SIZE_KB.toLocaleString()} KB`,
-    //   );
-    //   addToast(
-    //     `El ZIP supera el límite de ${MAX_ZIP_SIZE_KB.toLocaleString()} KB. Divide la carga.`,
-    //     'error',
-    //   );
-    //   e.target.value = '';
-    //   return;
-    // }
+    if (file.size > MAX_ZIP_SIZE_BYTES) {
+      const sizeKb = Math.round(file.size / 1024).toLocaleString();
+      addLog(
+        `Error: El ZIP pesa ${sizeKb} KB y el límite efectivo es ${MAX_ZIP_SIZE_KB.toLocaleString()} KB (≈32 MB)`,
+      );
+      addToast(
+        `El ZIP supera el límite de ${MAX_ZIP_SIZE_KB.toLocaleString()} KB (≈32 MB). Divide la carga en lotes más pequeños.`,
+        'error',
+      );
+      e.target.value = '';
+      setFile(null);
+      return;
+    }
 
     setSelectedFile(file);
     addLog(`Archivo ZIP seleccionado: ${file.name}`);
