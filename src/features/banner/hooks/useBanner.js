@@ -25,7 +25,7 @@ export const useBanner = () => {
       search: params.search || search,
       active: params.status || status === 'activas', // Convert status to boolean
       order: 'asc', // Fixed as requested
-      orderBy: 'createdAt' // Fixed as requested
+      orderBy: 'displayOrder' // Order by display order
     };
 
     const requestKey = JSON.stringify(currentParams);
@@ -136,6 +136,21 @@ export const useBanner = () => {
     }
   };
 
+  // Reorder banners
+  const reorderBanners = async (orderedBanners) => {
+    const items = orderedBanners.map((b, index) => ({ id: b.id, displayOrder: index }));
+    const result = await bannerService.reorderBanners(items);
+
+    if (result.success) {
+      // Update local state immediately for responsiveness
+      setBanners(orderedBanners.map((b, index) => ({ ...b, displayOrder: index })));
+    } else {
+      if (result.status === 401) return;
+      addToast(result.error || 'Error al reordenar banners', 'error');
+    }
+    return result;
+  };
+
   // Toggle banner status
     const toggleBannerStatus = async (id, active) => {
       try {
@@ -189,6 +204,7 @@ export const useBanner = () => {
     updateBanner,
     getBannerById,
     deleteBanner,
-    toggleBannerStatus
+    toggleBannerStatus,
+    reorderBanners
   };
 };

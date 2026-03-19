@@ -146,6 +146,22 @@ export const bannerService = {
     return { success: true, message: 'Banner eliminado exitosamente', status: response.status };
   },
 
+  reorderBanners: async (items) => {
+    const response = await api.patch('/banner/reorder', { items });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        handleAuthError();
+        return { success: false, error: 'No autorizado: Sesión expirada', status: response.status };
+      }
+      let errorMessage = response.data?.message || 'Error al reordenar banners';
+      if (response.status === 500) errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
+      return { success: false, error: errorMessage, status: response.status };
+    }
+
+    return { success: true, message: 'Banners reordenados exitosamente', status: response.status };
+  },
+
   toggleBannerStatus: async (id, active) => {
     const formattedData = {
       active: active

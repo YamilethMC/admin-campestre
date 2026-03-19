@@ -7,6 +7,7 @@ export interface Banner {
   startDate: string; // ISO date string
   endDate: string; // ISO date string
   typeActionId: number;
+  displayOrder: number;
   createdAt: string;
   updatedAt: string;
 }

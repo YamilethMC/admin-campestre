@@ -11,8 +11,23 @@ const BannerList = ({
   onEdit,
   onDelete,
   onAddBanner,
-  onToggleStatus
+  onToggleStatus,
+  onReorder
 }) => {
+  const handleMoveUp = (index) => {
+    if (index === 0) return;
+    const reordered = [...banners];
+    [reordered[index - 1], reordered[index]] = [reordered[index], reordered[index - 1]];
+    onReorder(reordered);
+  };
+
+  const handleMoveDown = (index) => {
+    if (index === banners.length - 1) return;
+    const reordered = [...banners];
+    [reordered[index], reordered[index + 1]] = [reordered[index + 1], reordered[index]];
+    onReorder(reordered);
+  };
+
   if (loading && banners.length === 0) {
     // Show a skeleton loading state when loading and no banners are displayed yet
     return (
@@ -68,14 +83,39 @@ const BannerList = ({
             </div>
           ) : (
             <div className="space-y-4">
-              {banners && Array.isArray(banners) && banners.map(banner => (
-                <BannerCard
-                  key={banner.id}
-                  banner={banner}
-                  onEdit={onEdit}
-                  onDelete={onDelete}
-                  onToggleStatus={onToggleStatus}
-                />
+              {banners && Array.isArray(banners) && banners.map((banner, index) => (
+                <div key={banner.id} className="flex items-center gap-2">
+                  <div className="flex flex-col gap-1">
+                    <button
+                      onClick={() => handleMoveUp(index)}
+                      disabled={index === 0}
+                      className={`p-1 rounded ${index === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-200'}`}
+                      title="Subir"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => handleMoveDown(index)}
+                      disabled={index === banners.length - 1}
+                      className={`p-1 rounded ${index === banners.length - 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-200'}`}
+                      title="Bajar"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="flex-1">
+                    <BannerCard
+                      banner={banner}
+                      onEdit={onEdit}
+                      onDelete={onDelete}
+                      onToggleStatus={onToggleStatus}
+                    />
+                  </div>
+                </div>
               ))}
 
               {/* Pagination controls */}

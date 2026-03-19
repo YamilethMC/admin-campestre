@@ -26,7 +26,8 @@ const BannerContainer = () => {
     updateBanner,
     getBannerById,
     deleteBanner,
-    toggleBannerStatus
+    toggleBannerStatus,
+    reorderBanners
   } = useBanner();
 
   // Update filters
@@ -139,6 +140,7 @@ const BannerContainer = () => {
         onDelete={handleDeleteBanner}
         onAddBanner={handleAddBanner}
         onToggleStatus={toggleBannerStatus}
+        onReorder={reorderBanners}
       />
     </div>
   );
