@@ -9,9 +9,10 @@ export const noticeService = {
     orderBy = 'title',
     order = 'asc',
     active = true,
-    search = ''
+    search = '',
+    audience = 'general'
   } = {}) => {
-    const params = new URLSearchParams({ page, limit, search, order, orderBy });
+    const params = new URLSearchParams({ page, limit, search, order, orderBy, audience });
     if (active !== false) params.append("active", active);
     const response = await api.get(`/notify?${params}`);
     if (!response.ok) {

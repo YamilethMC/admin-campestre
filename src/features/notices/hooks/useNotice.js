@@ -25,7 +25,8 @@ export const useNotice = () => {
       search: params.search || search,
       active: params.status || status === 'activas', // Convert status to boolean
       order: 'asc', // Fixed as requested
-      orderBy: 'title' // Fixed as requested
+      orderBy: 'title', // Fixed as requested
+      audience: 'general',
     };
 
     const requestKey = JSON.stringify(currentParams);
