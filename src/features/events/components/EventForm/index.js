@@ -10,6 +10,7 @@ const EventForm = ({ event, onSave, onCancel }) => {
     image: '',
     inscritedShow: true,  // Changed from showInscribedCount
     progressShow: true,   // Changed from showProgress
+    isInformative: false, // New switch for informative events
     date: '',
     totalSpots: 0,
     location: ''
@@ -36,6 +37,7 @@ const EventForm = ({ event, onSave, onCancel }) => {
         image: event.image || '',
         inscritedShow: event.inscritedShow !== undefined ? event.inscritedShow : true,
         progressShow: event.progressShow !== undefined ? event.progressShow : true,
+        isInformative: event.isInformative !== undefined ? event.isInformative : false,
         date: formattedDate,
         totalSpots: event.totalSpots || 0,
         location: event.location || ''
@@ -48,6 +50,7 @@ const EventForm = ({ event, onSave, onCancel }) => {
         image: '',
         inscritedShow: true,
         progressShow: true,
+        isInformative: false,
         date: '',
         totalSpots: 0,
         location: ''
@@ -93,9 +96,9 @@ const EventForm = ({ event, onSave, onCancel }) => {
     if (!formData.type) newErrors.type = 'Tipo de evento es requerido';
     if (!formData.name.trim()) newErrors.name = 'Nombre es requerido';
     if (!formData.description.trim()) newErrors.description = 'Descripción es requerida';
-    if (!formData.date) newErrors.date = 'Fecha es requerida';
-    if (formData.totalSpots <= 0) newErrors.totalSpots = 'Número de lugares debe ser mayor a 0';
-    if (!formData.location.trim()) newErrors.location = 'Lugar es requerido';
+    //if (!formData.date) newErrors.date = 'Fecha es requerida';
+    //if (!formData.isInformative && formData.totalSpots <= 0) newErrors.totalSpots = 'Número de lugares debe ser mayor a 0';
+    //if (!formData.location.trim()) newErrors.location = 'Lugar es requerido';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -116,7 +119,7 @@ const EventForm = ({ event, onSave, onCancel }) => {
     // Prepare the data for submission
     let adjustedData = {
       ...formData,
-      date: toUTC(formData.date)
+      ...(formData.date && { date: toUTC(formData.date) })
     };
 
     // Only include image in adjustedData if it has been changed
@@ -246,11 +249,45 @@ const EventForm = ({ event, onSave, onCancel }) => {
           </label>
         </div>
 
+        {/* Informative Event Switch */}
+        <div className="md:col-span-2">
+          <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div>
+              <p className="text-sm font-medium text-gray-900">Evento informativo</p>
+              <p className="text-sm text-gray-500">Marca el evento como solo informativo (sin inscripciones)</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                const newValue = !formData.isInformative;
+                setFormData(prev => ({
+                  ...prev,
+                  isInformative: newValue,
+                  inscritedShow: newValue ? false : prev.inscritedShow,
+                  progressShow: newValue ? false : prev.progressShow
+                }));
+              }}
+              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+                formData.isInformative ? 'bg-blue-600' : 'bg-gray-200'
+              }`}
+              role="switch"
+              aria-checked={formData.isInformative}
+            >
+              <span
+                aria-hidden="true"
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                  formData.isInformative ? 'translate-x-5' : 'translate-x-0'
+                }`}
+              />
+            </button>
+          </div>
+        </div>
+
         {/* Switches for showing inscribed count and progress */}
         <div className="md:col-span-2">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Show Inscribed Count Toggle */}
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div className={`flex items-center justify-between p-4 rounded-lg border ${formData.isInformative ? 'bg-gray-100 border-gray-300 opacity-60' : 'bg-gray-50 border-gray-200'}`}>
               <div>
                 <p className="text-sm font-medium text-gray-900">Mostrar contador de inscritos</p>
                 <p className="text-sm text-gray-500">Habilita el contador de personas inscritas</p>
@@ -258,9 +295,10 @@ const EventForm = ({ event, onSave, onCancel }) => {
               <button
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, inscritedShow: !prev.inscritedShow }))}
+                disabled={formData.isInformative}
                 className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
                   formData.inscritedShow ? 'bg-primary' : 'bg-gray-200'
-                }`}
+                } ${formData.isInformative ? 'cursor-not-allowed' : ''}`}
                 role="switch"
                 aria-checked={formData.inscritedShow}
               >
@@ -274,7 +312,7 @@ const EventForm = ({ event, onSave, onCancel }) => {
             </div>
 
             {/* Show Progress Toggle */}
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div className={`flex items-center justify-between p-4 rounded-lg border ${formData.isInformative ? 'bg-gray-100 border-gray-300 opacity-60' : 'bg-gray-50 border-gray-200'}`}>
               <div>
                 <p className="text-sm font-medium text-gray-900">Mostrar progreso</p>
                 <p className="text-sm text-gray-500">Habilita la barra de progreso del evento</p>
@@ -282,9 +320,10 @@ const EventForm = ({ event, onSave, onCancel }) => {
               <button
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, progressShow: !prev.progressShow }))}
+                disabled={formData.isInformative}
                 className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
                   formData.progressShow ? 'bg-primary' : 'bg-gray-200'
-                }`}
+                } ${formData.isInformative ? 'cursor-not-allowed' : ''}`}
                 role="switch"
                 aria-checked={formData.progressShow}
               >
@@ -324,7 +363,7 @@ const EventForm = ({ event, onSave, onCancel }) => {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Número de lugares <span className="text-red-500">*</span>
+            Número de lugares {/*<span className="text-red-500">*</span>*/}
           </label>
           <input
             type="number"
@@ -332,9 +371,10 @@ const EventForm = ({ event, onSave, onCancel }) => {
             value={formData.totalSpots}
             onChange={handleChange}
             min="1"
+            disabled={formData.isInformative}
             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${
               errors.totalSpots ? 'border-red-500' : 'border-gray-300'
-            }`}
+            } ${formData.isInformative ? 'bg-gray-100 opacity-60 cursor-not-allowed' : ''}`}
             placeholder="Número de lugares disponibles"
           />
           {errors.totalSpots && <p className="mt-1 text-sm text-red-600">{errors.totalSpots}</p>}
@@ -343,7 +383,7 @@ const EventForm = ({ event, onSave, onCancel }) => {
         {/* Location and Date - Two per line */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Lugar <span className="text-red-500">*</span>
+            Lugar {/*<span className="text-red-500">*</span>*/}
           </label>
           <input
             type="text"
@@ -360,7 +400,7 @@ const EventForm = ({ event, onSave, onCancel }) => {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Fecha <span className="text-red-500">*</span>
+            Fecha {/*<span className="text-red-500">*</span>*/}
           </label>
           <input
             type="datetime-local"
