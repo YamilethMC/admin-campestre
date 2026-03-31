@@ -75,12 +75,22 @@ export const useEvents = () => {
       } else {
         if (result.status === 401) {
           // No mostramos alerta aquí porque el servicio ya la maneja
-          return;
+          return null;
         }
-        addToast(result.error, 'error');
+        
+        // Handle multiple error messages from API
+        if (Array.isArray(result.error)) {
+          result.error.forEach(errorMessage => {
+            addToast(errorMessage, 'error');
+          });
+        } else {
+          addToast(result.error, 'error');
+        }
+        return null;
       }
     } catch (err) {
       addToast(err.message || 'Error desconocido', 'error');
+      return null;
     } finally {
       setLoading(false);
     }
@@ -99,12 +109,22 @@ export const useEvents = () => {
       } else {
         if (result.status === 401) {
           // No mostramos alerta aquí porque el servicio ya la maneja
-          return;
+          return null;
         }
-        addToast(result.error, 'error');
+        
+        // Handle multiple error messages from API
+        if (Array.isArray(result.error)) {
+          result.error.forEach(errorMessage => {
+            addToast(errorMessage, 'error');
+          });
+        } else {
+          addToast(result.error, 'error');
+        }
+        return null;
       }
     } catch (err) {
       addToast(err.message || 'Error desconocido', 'error');
+      return null;
     } finally {
       setLoading(false);
     }

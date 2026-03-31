@@ -35,7 +35,7 @@ export const AppProvider = ({ children }) => {
 
     setTimeout(() => {
       setToasts(prev => prev.filter(toast => toast.id !== id));
-    }, 5000);
+    }, 8000); // Increased duration to 8 seconds for multiple messages
   };
 
   const [currentUser, setCurrentUser] = useState(null);

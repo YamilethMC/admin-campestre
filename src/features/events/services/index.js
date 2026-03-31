@@ -76,24 +76,12 @@ export const eventService = {
           status: response.status
         };
       }
-      let errorMessage = "Error al crear evento";
-      switch (response.status) {
-        case 400:
-          errorMessage = 'Datos de entrada inválidos';
-          break;
-        case 409:
-          errorMessage = 'El evento ya existe';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = response.data?.message || "Error al crear evento";
-      }
-
+      
+      // Return the actual API error messages instead of generic ones
+      const apiMessage = response.data?.message;
       return {
         success: false,
-        error: errorMessage,
+        error: apiMessage || "Error al crear evento",
         status: response.status
       };
     }
@@ -119,24 +107,12 @@ export const eventService = {
           status: response.status
         };
       }
-      let errorMessage = "Error al actualizar evento";
-      switch (response.status) {
-        case 400:
-          errorMessage = 'Datos de entrada inválidos';
-          break;
-        case 404:
-          errorMessage = 'No se encontró el evento';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = response.data?.message || "Error al actualizar evento";
-      }
-
+      
+      // Return the actual API error messages instead of generic ones
+      const apiMessage = response.data?.message;
       return {
         success: false,
-        error: errorMessage,
+        error: apiMessage || "Error al actualizar evento",
         status: response.status
       };
     }

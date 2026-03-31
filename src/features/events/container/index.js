@@ -100,16 +100,21 @@ const EventsContainer = () => {
   // Handle saving an event (create or update)
   const handleSaveEvent = async (eventData) => {
     try {
+      let result;
       if (currentEvent) {
         // Update existing event
-        await updateEvent(currentEvent.id, eventData);
+        result = await updateEvent(currentEvent.id, eventData);
       } else {
         // Create new event
-        await createEvent(eventData);
+        result = await createEvent(eventData);
       }
-      setView('list');
-      // Reload events to ensure latest data is shown
-      loadEvents();
+      
+      // Only navigate back to list if save was successful
+      if (result) {
+        setView('list');
+        // Reload events to ensure latest data is shown
+        loadEvents();
+      }
     } catch (err) {
       // Error is handled in the create/update functions, form remains open
       console.error('Error saving event:', err);

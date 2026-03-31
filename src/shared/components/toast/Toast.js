@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { XIcon, CheckIcon, WarningIcon, InfoIcon } from '../icons/icons';
 
-const Toast = ({ message, type, onClose, duration = 5000 }) => {
+const Toast = ({ message, type, onClose, duration = 8000 }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();
@@ -27,7 +27,7 @@ const Toast = ({ message, type, onClose, duration = 5000 }) => {
         : InfoIcon;
 
   return (
-    <div className={`fixed top-4 right-4 bg-white text-gray-800 px-4 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-300 max-w-md border-l-4 ${borderColor}`}>
+    <div className={`bg-white text-gray-800 px-4 py-3 rounded-lg shadow-lg transition-opacity duration-300 max-w-md border-l-4 ${borderColor} mb-2`}>
       <div className="flex items-start justify-between">
         <div className="flex items-start space-x-3">
           <IconComponent className={`h-5 w-5 flex-shrink-0 mt-0.5 ${type === 'error' ? 'text-error' : type === 'success' ? 'text-success' : type === 'warning' ? 'text-warning' : 'text-info'}`} />
