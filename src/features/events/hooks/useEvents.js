@@ -172,7 +172,14 @@ export const useEvents = () => {
           // No mostramos alerta aquí porque el servicio ya la maneja
           return;
         }
-        addToast(result.error, 'error');
+        // Handle multiple error messages from API
+        if (Array.isArray(result.error)) {
+          result.error.forEach(errorMessage => {
+            addToast(errorMessage, 'error');
+          });
+        } else {
+          addToast(result.error, 'error');
+        }
         return false;
       }
     } catch (err) {
@@ -195,7 +202,14 @@ export const useEvents = () => {
         // No mostramos alerta aquí porque el servicio ya la maneja
         return;
       }
-        addToast(result.error, 'error');
+        // Handle multiple error messages from API
+        if (Array.isArray(result.error)) {
+          result.error.forEach(errorMessage => {
+            addToast(errorMessage, 'error');
+          });
+        } else {
+          addToast(result.error, 'error');
+        }
         return null;
       }
     } catch (err) {
@@ -218,7 +232,14 @@ export const useEvents = () => {
           // No mostramos alerta aquí porque el servicio ya la maneja
           return;
         }
-        addToast(result.error, 'error');
+        // Handle multiple error messages from API
+        if (Array.isArray(result.error)) {
+          result.error.forEach(errorMessage => {
+            addToast(errorMessage, 'error');
+          });
+        } else {
+          addToast(result.error, 'error');
+        }
         return null;
       }
     } catch (err) {
@@ -241,7 +262,14 @@ export const useEvents = () => {
           // No mostramos alerta aquí porque el servicio ya la maneja
           return;
         }
-        addToast(result.error, 'error');
+        // Handle multiple error messages from API
+        if (Array.isArray(result.error)) {
+          result.error.forEach(errorMessage => {
+            addToast(errorMessage, 'error');
+          });
+        } else {
+          addToast(result.error, 'error');
+        }
         return null;
       }
     } catch (err) {
@@ -264,7 +292,14 @@ export const useEvents = () => {
           // No mostramos alerta aquí porque el servicio ya la maneja
           return;
         }
-        addToast(result.error, 'error');
+        // Handle multiple error messages from API
+        if (Array.isArray(result.error)) {
+          result.error.forEach(errorMessage => {
+            addToast(errorMessage, 'error');
+          });
+        } else {
+          addToast(result.error, 'error');
+        }
         return null;
       }
     } catch (err) {
@@ -288,7 +323,14 @@ export const useEvents = () => {
           // No mostramos alerta aquí porque el servicio ya la maneja
           return;
         }
-        addToast(result.error, 'error');
+        // Handle multiple error messages from API
+        if (Array.isArray(result.error)) {
+          result.error.forEach(errorMessage => {
+            addToast(errorMessage, 'error');
+          });
+        } else {
+          addToast(result.error, 'error');
+        }
         return [];
       }
     } catch (error) {

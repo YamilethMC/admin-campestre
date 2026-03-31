@@ -34,24 +34,12 @@ export const eventService = {
           status: response.status
         };
       }
-      let errorMessage = "Error al obtener eventos";
-      switch (response.status) {
-        case 400:
-          errorMessage = 'Datos de entrada inválidos';
-          break;
-        case 404:
-          errorMessage = 'No se encontraron eventos';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = response.data?.message || "Error al obtener eventos";
-      }
-
+      
+      // Return the actual API error messages instead of generic ones
+      const apiMessage = response.data?.message;
       return {
         success: false,
-        error: errorMessage,
+        error: apiMessage || "Error al obtener eventos",
         status: response.status
       };
     }
@@ -89,7 +77,7 @@ export const eventService = {
     return {
       success: true,
       data: response.data.data,
-      message: 'Evento creado exitosamente',
+      message: response.data.data?.message || 'Evento creado exitosamente',
       status: response.status
     };
   },
@@ -120,7 +108,7 @@ export const eventService = {
     return {
       success: true,
       data: response.data.data,
-      message: 'Evento actualizado exitosamente',
+      message: response.data.data?.message || 'Evento actualizado exitosamente',
       status: response.status
     };
   },
@@ -138,24 +126,12 @@ export const eventService = {
           status: response.status
         };
       }
-      let errorMessage = "Error al obtener evento";
-      switch (response.status) {
-        case 400:
-          errorMessage = 'Datos de entrada inválidos';
-          break;
-        case 404:
-          errorMessage = 'No se encontró el evento';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = response.data?.message || "Error al obtener evento";
-      }
-
+      
+      // Return the actual API error messages instead of generic ones
+      const apiMessage = response.data?.message;
       return {
         success: false,
-        error: errorMessage,
+        error: apiMessage || "Error al obtener evento",
         status: response.status
       };
     }
@@ -180,28 +156,19 @@ export const eventService = {
           status: response.status
         };
       }
-      let errorMessage = "Error al eliminar evento";
-      switch (response.status) {
-        case 404:
-          errorMessage = 'No se encontró el evento';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = response.data?.message || "Error al eliminar evento";
-      }
-
+      
+      // Return the actual API error messages instead of generic ones
+      const apiMessage = response.data?.message;
       return {
         success: false,
-        error: errorMessage,
+        error: apiMessage || "Error al eliminar evento",
         status: response.status
       };
     }
 
     return {
       success: true,
-      message: 'Evento eliminado exitosamente',
+      message: response.data.data?.message || 'Evento eliminado exitosamente',
       status: response.status
     };
   },
@@ -219,24 +186,12 @@ export const eventService = {
           status: response.status
         };
       }
-      let errorMessage = "Error al actualizar registro";
-      switch (response.status) {
-        case 404:
-          errorMessage = 'Registro no encontrado';
-          break;
-        case 409:
-          errorMessage = 'No hay suficientes espacios disponibles';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = response.data?.message || "Error al actualizar registro";
-      }
-
+      
+      // Return the actual API error messages instead of generic ones
+      const apiMessage = response.data?.message;
       return {
         success: false,
-        error: errorMessage,
+        error: apiMessage || "Error al actualizar registro",
         status: response.status
       };
     }
@@ -262,21 +217,12 @@ export const eventService = {
           status: response.status
         };
       }
-      let errorMessage = "Error al cancelar registro";
-      switch (response.status) {
-        case 404:
-          errorMessage = 'Registro no encontrado';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = response.data?.message || "Error al cancelar registro";
-      }
-
+      
+      // Return the actual API error messages instead of generic ones
+      const apiMessage = response.data?.message;
       return {
         success: false,
-        error: errorMessage,
+        error: apiMessage || "Error al cancelar registro",
         status: response.status
       };
     }
@@ -302,27 +248,12 @@ export const eventService = {
           status: response.status
         };
       }
-      let errorMessage = "Error al crear registro";
-      switch (response.status) {
-        case 400:
-          errorMessage = 'Datos de entrada inválidos';
-          break;
-        case 404:
-          errorMessage = 'Evento o Miembro no encontrado';
-          break;
-        case 409:
-          errorMessage = 'El evento está lleno o el socio ya está registrado';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = response.data?.message || "Error al crear registro";
-      }
-
+      
+      // Return the actual API error messages instead of generic ones
+      const apiMessage = response.data?.message;
       return {
         success: false,
-        error: errorMessage,
+        error: apiMessage || "Error al crear registro",
         status: response.status
       };
     }
@@ -348,21 +279,12 @@ export const eventService = {
           status: response.status
         };
       }
-      let errorMessage = "Error al obtener miembro";
-      switch (response.status) {
-        case 404:
-          errorMessage = 'Miembro no encontrado';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = response.data?.message || "Error al obtener miembro";
-      }
-
+      
+      // Return the actual API error messages instead of generic ones
+      const apiMessage = response.data?.message;
       return {
         success: false,
-        error: errorMessage,
+        error: apiMessage || "Error al obtener miembro",
         status: response.status
       };
     }
@@ -395,16 +317,12 @@ export const eventService = {
           status: response.status
         };
       }
-      let errorMessage = "Error al obtener miembros";
-      if (response.status === 500) {
-        errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-      } else {
-        errorMessage = response.data?.message || "Error al obtener miembros";
-      }
-
+      
+      // Return the actual API error messages instead of generic ones
+      const apiMessage = response.data?.message;
       return {
         success: false,
-        error: errorMessage,
+        error: apiMessage || "Error al obtener miembros",
         status: response.status
       };
     }
