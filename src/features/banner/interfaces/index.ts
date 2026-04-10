@@ -6,7 +6,8 @@ export interface Banner {
   active: boolean;
   startDate: string; // ISO date string
   endDate: string; // ISO date string
-  typeActionId: number;
+  actionType: 'MODAL' | 'EXTERNAL_LINK';
+  destination?: string;
   displayOrder: number;
   createdAt: string;
   updatedAt: string;

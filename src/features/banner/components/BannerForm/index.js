@@ -12,15 +12,6 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
 
   const [originalData, setOriginalData] = useState(null);
 
-  // Define action types
-  const actionTypes = [
-    { id: 1, name: "Enlace externo", description: "Abrir página en navegación móvil" },
-    { id: 2, name: "Enlace interno", description: "Abrir página en aplicación" },
-    { id: 3, name: "Abrir modal", description: "Mostrar modal con información, formulario u otro contenido" },
-    { id: 4, name: "Abrir documento", description: "Abrir documento con URL de almacenamiento" },
-    { id: 5, name: "Compartir", description: "Compartir banner en redes sociales" }
-  ];
-
   const [formData, setFormData] = useState({
     title: banner?.title || '',
     description: banner?.description || '',
@@ -28,7 +19,8 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
     active: banner ? banner.active : true,
     startDate: banner ? formatDateForInput(banner.startDate) : '',
     endDate: banner ? formatDateForInput(banner.endDate) : '',
-    typeActionId: banner?.typeActionId || 1
+    actionType: banner?.actionType || 'MODAL',
+    destination: banner?.destination || '',
   });
   
   const [imageFile, setImageFile] = useState(null);
@@ -59,10 +51,10 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
         active: banner.active,
         startDate: banner ? formatDateForInput(banner.startDate) : '',
         endDate: banner ? formatDateForInput(banner.endDate) : '',
-        typeActionId: banner.typeActionId
+        actionType: banner.actionType || 'MODAL',
+        destination: banner.destination || '',
       });
     } else {
-      // For create mode - set original data to default values
       setOriginalData({
         title: '',
         description: '',
@@ -70,7 +62,8 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
         active: true,
         startDate: '',
         endDate: '',
-        typeActionId: 1
+        actionType: 'MODAL',
+        destination: '',
       });
     }
   }, [banner]);
@@ -110,14 +103,12 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
   const validateForm = () => {
     const newErrors = {};
 
-    // Validate title (required)
     if (!formData.title.trim()) {
       newErrors.title = 'Título es requerido';
     }
 
-    // Validate typeActionId (required)
-    if (!formData.typeActionId) {
-      newErrors.typeActionId = 'Tipo de acción es requerido';
+    if (formData.actionType === 'EXTERNAL_LINK' && !formData.destination?.trim()) {
+      newErrors.destination = 'URL de destino es requerida para enlace externo';
     }
 
     setErrors(newErrors);
@@ -293,10 +284,14 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
                 Descripción
               </label>
               <textarea
-                value={formData.description}
+                value={formData.actionType === 'EXTERNAL_LINK' ? '' : formData.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
                 rows="3"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                disabled={formData.actionType === 'EXTERNAL_LINK'}
+                placeholder={formData.actionType === 'EXTERNAL_LINK' ? 'No aplica para enlace externo' : ''}
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${
+                  formData.actionType === 'EXTERNAL_LINK' ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : ''
+                }`}
               ></textarea>
             </div>
           </div>
@@ -381,25 +376,45 @@ const BannerForm = ({ banner = null, onSave, onCancel }) => {
                 Tipo de acción <span className="text-red-500">*</span>
               </label>
               <select
-                value={formData.typeActionId}
+                value={formData.actionType}
                 onChange={(e) => {
-                  handleInputChange('typeActionId', parseInt(e.target.value));
-                  if (errors.typeActionId) {
-                    setErrors(prev => ({ ...prev, typeActionId: '' }));
-                  }
+                  const newType = e.target.value;
+                  setFormData(prev => ({
+                    ...prev,
+                    actionType: newType,
+                    description: newType === 'EXTERNAL_LINK' ? '' : prev.description,
+                  }));
                 }}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${
-                  errors.typeActionId ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               >
-                {actionTypes.map(action => (
-                  <option key={action.id} value={action.id}>
-                    {action.name}
-                  </option>
-                ))}
+                <option value="MODAL">Modal (muestra información en ventana)</option>
+                <option value="EXTERNAL_LINK">Enlace externo (abre URL en navegador)</option>
               </select>
-              {errors.typeActionId && <p className="mt-1 text-sm text-red-600">{errors.typeActionId}</p>}
             </div>
+
+            {formData.actionType === 'EXTERNAL_LINK' && (
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  URL de destino <span className="text-red-500">*</span>
+                </label>
+                <p className="text-xs text-gray-500 mb-1">
+                  Este banner no muestra descripción. Al tocar el banner en la app se abrirá esta URL en el navegador.
+                </p>
+                <input
+                  type="url"
+                  value={formData.destination}
+                  onChange={(e) => {
+                    handleInputChange('destination', e.target.value);
+                    if (errors.destination) setErrors(prev => ({ ...prev, destination: '' }));
+                  }}
+                  placeholder="https://ejemplo.com"
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${
+                    errors.destination ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                />
+                {errors.destination && <p className="mt-1 text-sm text-red-600">{errors.destination}</p>}
+              </div>
+            )}
           </div>
         </div>
 

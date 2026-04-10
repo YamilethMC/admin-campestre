@@ -41,27 +41,12 @@ const BannerCard = ({ banner, onEdit, onDelete, onToggleStatus }) => {
       : 'bg-red-100 text-red-800';
   };
 
-  const getActionTypeLabel = (typeActionId) => {
-    const actionTypes = [
-      "External link",
-      "Internal link", 
-      "Open modal",
-      "Open document",
-      "Shared"
-    ];
-    
-    const spanishLabels = [
-      "Enlace externo",
-      "Enlace interno",
-      "Abrir modal",
-      "Abrir documento",
-      "Compartir"
-    ];
-    
-    if (typeActionId && typeActionId >= 1 && typeActionId <= 5) {
-      return spanishLabels[typeActionId - 1];
+  const getActionTypeLabel = (actionType) => {
+    switch (actionType) {
+      case 'MODAL': return 'Modal';
+      case 'EXTERNAL_LINK': return 'Enlace externo';
+      default: return actionType || 'Desconocido';
     }
-    return actionTypes[typeActionId - 1] || "Desconocido";
   };
 
   // Toggle active status
@@ -128,7 +113,7 @@ const BannerCard = ({ banner, onEdit, onDelete, onToggleStatus }) => {
                 {banner.active ? 'Activo' : 'Inactivo'}
               </span>
               <span className="px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded">
-                {getActionTypeLabel(banner.typeActionId)}
+                {getActionTypeLabel(banner.actionType)}
               </span>
             </div>
           </div>
