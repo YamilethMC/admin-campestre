@@ -190,7 +190,7 @@ const EventList = ({
                         Informativo
                       </span>
                     )}
-                    {event.totalSpots && event.availableSpots !== undefined && (
+                    {!event.isInformative && (
                       <div className="flex gap-1">
                         <span className="text-xs text-gray-500">Total: </span>
                         <span className="text-xs font-medium text-gray-700">{event.totalSpots}</span>
