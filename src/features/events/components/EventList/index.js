@@ -156,7 +156,7 @@ const EventList = ({
                     <div>
                       <h3 className="text-lg font-medium text-gray-900">{event.name}</h3>
                       {event.description && (
-                        <p className="text-gray-600 text-sm mb-1">{event.description}</p>
+                        <p className="text-gray-600 text-sm mb-1 max-h-20 overflow-y-auto scrollbar-hide">{event.description}</p>
                       )}
                     </div>
                   </div>
@@ -187,7 +187,7 @@ const EventList = ({
                     </span>
                     {event.isInformative && (
                       <span className="px-3 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800">
-                        INFORMATIVO
+                        Informativo
                       </span>
                     )}
                     {event.totalSpots && event.availableSpots !== undefined && (
