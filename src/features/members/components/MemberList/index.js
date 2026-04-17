@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import MemberFilters from '../MemberFilters';
 import IndividualMember from '../../../individual-members';
 import MemberDocuments from '../../../member-documents';
@@ -21,9 +21,24 @@ const MemberList = () => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0 });
   const { addToast } = useContext(AppContext);
 
   const { members, setMembers, meta, page, setPage, loadMembers, setActive, search, setSearch, loading } = useMembers();
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      if (dropdownOpen) {
+        setDropdownOpen(null);
+      }
+    };
+
+    if (dropdownOpen) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [dropdownOpen]);
 
   const handleToggleActive = async (member) => {
     const newActive = !filters.active;
@@ -338,10 +353,16 @@ const MemberList = () => {
                             return `${day}-${month}-${year}`;
                           })() : ''}
                         </td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 relative">
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 relative ">
                           <div className="relative inline-block text-left">
                             <button
-                              onClick={() => setDropdownOpen(dropdownOpen === member.id ? null : member.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const rect = e.target.getBoundingClientRect();
+                                const top = Math.min(window.innerHeight - 200, rect.bottom + window.scrollY);
+                                setDropdownPosition({ top });
+                                setDropdownOpen(dropdownOpen === member.id ? null : member.id);
+                              }}
                               className="text-gray-500 hover:text-gray-700 focus:outline-none"
                             >
                               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -349,17 +370,28 @@ const MemberList = () => {
                               </svg>
                             </button>
                             {dropdownOpen === member.id && (
-                              <div className={`origin-top-right absolute right-0 ${index === 0 ? 'top-full mt-2' : 'bottom-full mb-2'} w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50 max-h-60 overflow-y-auto`}>
+                              <div 
+                                className="origin-top-right fixed right-4 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50 max-h-60 overflow-y-auto"
+                                style={{
+                                  top: `${dropdownPosition.top}px`
+                                }}
+                              >
                                 <div className="py-1" role="menu">
                                   <button
-                                    onClick={() => handleViewDependents(member)}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleViewDependents(member);
+                                    }}
                                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                                     role="menuitem"
                                   >
                                     Ver dependientes
                                   </button>
                                   <button
-                                    onClick={() => handleFormMember(member)}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleFormMember(member);
+                                    }}
                                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                                     role="menuitem"
                                   >
@@ -367,7 +399,8 @@ const MemberList = () => {
                                   </button>
 
                                   <button
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                      e.stopPropagation();
                                       confirmAction('toggleActive', member);
                                     }}
                                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
@@ -377,7 +410,8 @@ const MemberList = () => {
                                   </button>
 
                                   <button
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                      e.stopPropagation();
                                       confirmAction('delete', member.id);
                                       setDropdownOpen(null);
                                     }}
