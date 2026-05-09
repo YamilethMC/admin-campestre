@@ -358,9 +358,12 @@ const MemberList = () => {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                const rect = e.target.getBoundingClientRect();
-                                const top = Math.min(window.innerHeight - 200, rect.bottom + window.scrollY);
-                                setDropdownPosition({ top });
+                                const rect = e.currentTarget.getBoundingClientRect();
+                                //const top = Math.min(window.innerHeight - 200, rect.bottom + window.scrollY);
+                                setDropdownPosition({ 
+                                  top: rect.bottom + window.scrollY,
+                                  left: rect.left
+                                 });
                                 setDropdownOpen(dropdownOpen === member.id ? null : member.id);
                               }}
                               className="text-gray-500 hover:text-gray-700 focus:outline-none"
@@ -371,9 +374,10 @@ const MemberList = () => {
                             </button>
                             {dropdownOpen === member.id && (
                               <div 
-                                className="origin-top-right fixed right-4 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50 max-h-60 overflow-y-auto"
+                                className="fixed w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50 max-h-60 overflow-y-auto"
                                 style={{
-                                  top: `${dropdownPosition.top}px`
+                                  top: `${dropdownPosition.top}px`,
+                                  left: `${dropdownPosition.left}px`
                                 }}
                               >
                                 <div className="py-1" role="menu">

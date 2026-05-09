@@ -133,7 +133,7 @@ const IndividualMemberForm = ({ onCancel, loadMembers, initialData = null, membe
     };
 
     fetchMemberData();
-  }, [initialData, memberId, isDependent, setFormData, addToast]);
+  }, [initialData, memberId, isDependent/*, setFormData, addToast*/]);
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
