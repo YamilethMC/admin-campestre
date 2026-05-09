@@ -43,21 +43,7 @@ export const memberService = {
           status: response.status
         };
       }
-      let errorMessage = response.data?.message || 'Error al registrar socio';
-
-      switch (response.status) {
-        case 400:
-          errorMessage = 'Solicitud incorrecta: Verifica los datos proporcionados';
-          break;
-        case 409:
-          errorMessage = 'Conflicto: Ya existe un socio con ese correo';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor: Por favor intenta más tarde';
-          break;
-        default:
-          errorMessage = response.data?.message || 'Error al registrar socio';
-      }
+      let errorMessage = response.data.message || 'Error al registrar socio';
 
       return {
         success: false,
