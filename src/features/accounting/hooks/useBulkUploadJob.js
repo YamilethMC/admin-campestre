@@ -67,6 +67,18 @@ export const useRecentBulkJobs = () => {
 };
 
 /**
+ * Hook to track multiple parallel batch jobs
+ * @param {Array<{jobId: string, fileCount: number, finalStatus: string}>} batchJobs
+ * @returns {{ allDone: boolean, totalProcessed: number, totalFiles: number, anyFailed: boolean }}
+ */
+export const useMultiBatchJobs = (batchJobs = []) => {
+  const allDone = batchJobs.every(b => b.finalStatus === 'COMPLETED' || b.finalStatus === 'FAILED');
+  const anyFailed = batchJobs.some(b => b.finalStatus === 'FAILED');
+
+  return { allDone, anyFailed };
+};
+
+/**
  * Hook to upload account statements and track job
  * @returns {Object} Upload mutation and job tracking
  */

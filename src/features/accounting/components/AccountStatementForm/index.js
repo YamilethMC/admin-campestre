@@ -1,105 +1,137 @@
-import React, { useState, useContext } from 'react';
-import { useBulkUploadJobStatus, useBulkUploadMutation, useRecentBulkJobs } from '../../hooks/useBulkUploadJob';
+import React, { useState, useCallback, useContext, useEffect, useRef } from 'react';
+import { useBulkUploadMutation, useRecentBulkJobs } from '../../hooks/useBulkUploadJob';
 import { AppContext } from '../../../../shared/context/AppContext';
-import BulkUploadProgress from '../BulkUploadProgress';
+import MultiBatchProgress from '../MultiBatchProgress';
+import { splitZipIntoBatches } from '../../utils/splitZipIntoBatches';
+import { accountStatementService } from '../../services';
 
 const AccountStatementForm = () => {
   const { addLog, addToast } = useContext(AppContext);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [currentJobId, setCurrentJobId] = useState(null);
+  const [batchPreview, setBatchPreview] = useState(null); // { totalFiles, batchCount }
+  const [analyzing, setAnalyzing] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [batchJobs, setBatchJobs] = useState([]); // [{ jobId, fileCount, finalStatus }]
+  const pollingRefs = useRef({});
 
   const uploadMutation = useBulkUploadMutation();
-  const jobStatus = useBulkUploadJobStatus(currentJobId);
   const recentJobs = useRecentBulkJobs();
 
-  // Debug logging
-  console.log('Recent jobs query:', {
-    isLoading: recentJobs.isLoading,
-    isError: recentJobs.isError,
-    error: recentJobs.error,
-    data: recentJobs.data,
-    jobsCount: recentJobs.data?.jobs?.length
-  });
-
-  // Check if any job is currently processing
   const hasProcessingJob = recentJobs.data?.jobs?.some(
     job => job.status === 'PROCESSING' || job.status === 'PENDING'
   ) || false;
 
-  const MAX_ZIP_SIZE_KB = 32000; // Cloud Run admite ~32 MB por request
-  const MAX_ZIP_SIZE_BYTES = MAX_ZIP_SIZE_KB * 1024;
-
-  const handleFileUpload = (e) => {
+  const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     if (!file.name.toLowerCase().endsWith('.zip')) {
-      addLog('Error: Por favor sube un archivo ZIP válido');
       addToast('Error: Por favor sube un archivo ZIP válido', 'error');
       return;
     }
 
-    if (file.size > MAX_ZIP_SIZE_BYTES) {
-      const sizeKb = Math.round(file.size / 1024).toLocaleString();
-      addLog(
-        `Error: El ZIP pesa ${sizeKb} KB y el límite efectivo es ${MAX_ZIP_SIZE_KB.toLocaleString()} KB (≈32 MB)`,
-      );
-      addToast(
-        `El ZIP supera el límite de ${MAX_ZIP_SIZE_KB.toLocaleString()} KB (≈32 MB). Divide la carga en lotes más pequeños.`,
-        'error',
-      );
-      e.target.value = '';
-      setFile(null);
-      return;
-    }
-
     setSelectedFile(file);
-    addLog(`Archivo ZIP seleccionado: ${file.name}`);
-  };
-
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      addLog('Error: Por favor selecciona un archivo ZIP primero');
-      addToast('Error: Por favor selecciona un archivo ZIP primero', 'error');
-      return;
-    }
+    setBatchPreview(null);
+    setAnalyzing(true);
+    addLog(`Archivo ZIP seleccionado: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB)`);
 
     try {
-      const result = await uploadMutation.mutateAsync(selectedFile);
+      const { totalFiles, batchSizes } = await splitZipIntoBatches(file);
+      setBatchPreview({ totalFiles, batchCount: batchSizes.length, batchSizes });
+      addLog(`Análisis: ${totalFiles} PDFs → ${batchSizes.length} batch(es) de [${batchSizes.join(', ')}] archivos`);
+    } catch (err) {
+      addToast(`Error analizando ZIP: ${err.message}`, 'error');
+      setSelectedFile(null);
+      e.target.value = '';
+    } finally {
+      setAnalyzing(false);
+    }
+  };
 
-      if (result.success) {
-        const jobId = result.data?.jobId;
-        if (jobId) {
-          setCurrentJobId(jobId);
-          addLog(`Procesamiento iniciado. Job ID: ${jobId}`);
-          addToast('Archivo recibido. El procesamiento ha comenzado.', 'success');
-          
-          // Clear file input
-          setSelectedFile(null);
-          const fileInput = document.getElementById('file-input-account-statement');
-          if (fileInput) fileInput.value = '';
-        } else {
-          addLog('Archivo subido pero no se recibió jobId');
-          addToast('Archivo subido correctamente', 'success');
+  const pollJobUntilDone = useCallback((jobId, batchIndex) => {
+    const interval = setInterval(async () => {
+      try {
+        const status = await accountStatementService.getJobStatus(jobId);
+        if (status.status === 'COMPLETED' || status.status === 'FAILED') {
+          clearInterval(interval);
+          delete pollingRefs.current[jobId];
+          setBatchJobs(prev =>
+            prev.map(b => b.jobId === jobId ? { ...b, finalStatus: status.status } : b)
+          );
+          addLog(`Batch ${batchIndex + 1} ${status.status === 'COMPLETED' ? 'completado' : 'falló'}: ${status.processed}/${status.totalFiles} archivos`);
         }
-      } else {
-        const errorMessage = result.error || 'Error al subir el archivo';
-        addLog(`Error: ${errorMessage}`);
-        addToast(errorMessage, 'error');
+      } catch (_) {}
+    }, 3000);
+    pollingRefs.current[jobId] = interval;
+  }, [addLog]);
+
+  useEffect(() => {
+    return () => {
+      Object.values(pollingRefs.current).forEach(clearInterval);
+    };
+  }, []);
+
+  const handleUpload = async () => {
+    if (!selectedFile) return;
+
+    setUploading(true);
+    setBatchJobs([]);
+    addLog('Dividiendo ZIP en batches...');
+
+    try {
+      const { batches, totalFiles, batchSizes } = await splitZipIntoBatches(selectedFile);
+      addLog(`${batches.length} batch(es) listos para subir en paralelo`);
+
+      const uploadResults = await Promise.allSettled(
+        batches.map((batchFile, index) =>
+          accountStatementService.uploadAccountStatements(batchFile).then(result => ({ result, index }))
+        )
+      );
+
+      const jobs = [];
+      for (const settled of uploadResults) {
+        if (settled.status === 'fulfilled') {
+          const { result, index } = settled.value;
+          if (result.success && result.data?.jobId) {
+            jobs.push({ jobId: result.data.jobId, fileCount: batchSizes[index], finalStatus: null });
+            addLog(`Batch ${index + 1} subido → Job ID: ${result.data.jobId}`);
+          } else {
+            addLog(`Error en batch ${settled.value.index + 1}: ${result.error || 'Error desconocido'}`);
+          }
+        } else {
+          addLog(`Error al subir un batch: ${settled.reason?.message}`);
+        }
       }
+
+      if (jobs.length === 0) {
+        addToast('No se pudo iniciar ningún job de procesamiento', 'error');
+        return;
+      }
+
+      setBatchJobs(jobs);
+      addToast(`${jobs.length} batch(es) en proceso. Puedes ver el progreso abajo.`, 'success');
+
+      jobs.forEach((job, index) => pollJobUntilDone(job.jobId, index));
+
+      setSelectedFile(null);
+      setBatchPreview(null);
+      const fileInput = document.getElementById('file-input-account-statement');
+      if (fileInput) fileInput.value = '';
     } catch (error) {
       addLog(`Error: ${error.message}`);
-      addToast(error.message || 'Error al subir el archivo', 'error');
+      addToast(error.message || 'Error al procesar el archivo', 'error');
+    } finally {
+      setUploading(false);
     }
   };
 
   const handleCloseProgress = () => {
-    setCurrentJobId(null);
+    Object.values(pollingRefs.current).forEach(clearInterval);
+    pollingRefs.current = {};
+    setBatchJobs([]);
   };
 
-  const isUploading = uploadMutation.isPending;
-  const hasActiveJob = jobStatus.isActive;
-  const uploadDisabled = isUploading || hasActiveJob || hasProcessingJob;
+  const uploadDisabled = uploading || analyzing || hasProcessingJob;
 
   return (
     <div>
@@ -119,97 +151,95 @@ const AccountStatementForm = () => {
       </div>
 
       <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">   
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Archivo ZIP 
-            <span className="text-gray-400 font-normal">(máx. 32 MB)</span>
-          </label>
-          <div className="flex items-center">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Archivo ZIP
+              <span className="text-gray-400 font-normal ml-1">(se divide automáticamente en lotes)</span>
+            </label>
             <input
               id="file-input-account-statement"
               type="file"
               accept=".zip"
               onChange={handleFileUpload}
-              /*onChange={(e) => {
-                // Clear the input first to ensure change event fires even if same file is selected
-                if (e.target.value) {
-                  handleFileUpload(e);
-                  e.target.value = null; // Reset the input value
-                }
-              }}*/
+              disabled={uploading || analyzing}
               className="block w-full text-sm text-gray-500
                 file:mr-4 file:py-2 file:px-4
                 file:rounded-md file:border-0
                 file:text-sm file:font-semibold
                 file:bg-primary/10 file:text-primary
-                hover:file:bg-primary/20"
+                hover:file:bg-primary/20
+                disabled:opacity-50"
             />
-            {/*{selectedFile ? (
-              <span className="ml-2 text-sm text-gray-600 truncate max-w-[150px]" title={selectedFile.name}>
-                {selectedFile.name}
+          </div>
+        </div>
+
+        {analyzing && (
+          <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
+            <svg className="animate-spin h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+            Analizando ZIP...
+          </div>
+        )}
+
+        {selectedFile && batchPreview && !analyzing && (
+          <div className="mb-4">
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg mb-3">
+              <p className="text-sm text-blue-800 font-medium">
+                📦 {batchPreview.totalFiles} PDFs detectados
+                → se procesarán en <strong>{batchPreview.batchCount} batch{batchPreview.batchCount > 1 ? 'es' : ''}</strong> en paralelo
+              </p>
+              <p className="text-xs text-blue-600 mt-1">
+                Distribución: [{batchPreview.batchSizes.join(', ')}] archivos por batch
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-600">
+                <strong>{selectedFile.name}</strong> ({(selectedFile.size / 1024 / 1024).toFixed(1)} MB)
               </span>
-            ) : (
-              <span className="ml-2 text-sm text-gray-400">Ningún archivo seleccionado</span>
-            )}*/}
+              <button
+                onClick={handleUpload}
+                disabled={uploadDisabled}
+                className={`px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                  uploadDisabled
+                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                    : 'bg-primary text-white hover:bg-primary-dark focus:ring-primary'
+                }`}
+              >
+                {uploading ? (
+                  <span className="flex items-center">
+                    <svg className="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Subiendo batches...
+                  </span>
+                ) : (
+                  `Cargar ${batchPreview.batchCount} batch${batchPreview.batchCount > 1 ? 'es' : ''}`
+                )}
+              </button>
+            </div>
+            {hasProcessingJob && !uploading && (
+              <p className="text-sm text-yellow-600 mt-2">
+                ⚠️ Hay un job en proceso. Espera a que termine antes de subir otro archivo.
+              </p>
+            )}
           </div>
-        </div>
+        )}
       </div>
 
-      {selectedFile && (
-        <div className="mb-4">
-          <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-600">
-              Archivo seleccionado: <strong>{selectedFile.name}</strong>
-            </span>
-            <button
-              onClick={handleUpload}
-              disabled={uploadDisabled}
-              className={`px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                uploadDisabled
-                  ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                  : 'bg-primary text-white hover:bg-primary-dark focus:ring-primary'
-              }`}
-            >
-              {isUploading ? (
-                <span className="flex items-center">
-                  <svg className="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  Subiendo...
-                </span>
-              ) : (
-                'Cargar'
-              )}
-            </button>
-          </div>
-          {hasProcessingJob && !isUploading && (
-            <p className="text-sm text-yellow-600 mt-2">
-              ⚠️ Hay un job en proceso. Espera a que termine antes de subir otro archivo.
-            </p>
-          )}
-        </div>
-      )}
-      </div>
-
-      {currentJobId && (
-        <BulkUploadProgress
-          status={jobStatus.status}
-          totalFiles={jobStatus.totalFiles}
-          processed={jobStatus.processed}
-          failed={jobStatus.failed}
-          progressPercent={jobStatus.progressPercent}
-          errors={jobStatus.errors}
-          isActive={jobStatus.isActive}
+      {batchJobs.length > 0 && (
+        <MultiBatchProgress
+          batchJobs={batchJobs}
           onClose={handleCloseProgress}
         />
       )}
 
       <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200 mt-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Jobs recientes</h3>
-        
+
         {recentJobs.isLoading && (
           <div className="flex items-center justify-center py-8">
             <svg className="animate-spin h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24">
@@ -236,15 +266,10 @@ const AccountStatementForm = () => {
 
         {!recentJobs.isLoading && !recentJobs.isError && recentJobs.data?.jobs?.length > 0 && (
           <div className="space-y-3">
-            {recentJobs.data.jobs.slice(0, 5).map((job) => (
+            {recentJobs.data.jobs.slice(0, 10).map((job) => (
               <div
                 key={job.jobId}
-                className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
-                  currentJobId === job.jobId 
-                    ? 'bg-blue-100 border-2 border-blue-500' 
-                    : 'bg-gray-50 hover:bg-gray-100'
-                }`}
-                onClick={() => setCurrentJobId(job.jobId)}
+                className="flex items-center justify-between p-3 rounded-lg bg-gray-50"
               >
                 <div className="flex items-center gap-3">
                   <span className={`px-2 py-1 rounded text-xs font-medium text-white ${
