@@ -320,6 +320,7 @@ const MemberList = () => {
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profesión</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Método pago</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha admisión</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Último ingreso</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                     </tr>
                   </thead>
@@ -352,6 +353,31 @@ const MemberList = () => {
 
                             return `${day}-${month}-${year}`;
                           })() : ''}
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                          {member.user?.lastLogin ? (
+                            <div className="flex flex-col">
+                              <span className="text-gray-900">
+                                {(() => {
+                                  const date = new Date(member.user.lastLogin);
+                                  if (isNaN(date.getTime())) return '';
+                                  const day = String(date.getDate()).padStart(2, '0');
+                                  const month = String(date.getMonth() + 1).padStart(2, '0');
+                                  const year = date.getFullYear();
+                                  const hours = String(date.getHours()).padStart(2, '0');
+                                  const minutes = String(date.getMinutes()).padStart(2, '0');
+                                  return `${day}-${month}-${year} ${hours}:${minutes}`;
+                                })()}
+                              </span>
+                              <span className="text-xs text-gray-400">
+                                {member.user.loginCount || 0} {member.user.loginCount === 1 ? 'ingreso' : 'ingresos'}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+                              Nunca ha ingresado
+                            </span>
+                          )}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 relative ">
                           <div className="relative inline-block text-left">
