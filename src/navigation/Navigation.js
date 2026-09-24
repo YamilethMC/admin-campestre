@@ -35,6 +35,7 @@ const Navigation = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
     { path: '/banner', label: 'Banner', icon: BannerIcon },
     { path: '/archivos', label: 'Carga de archivos', icon: FileUploadIcon },
     { path: '/instalaciones', label: 'Instalaciones', icon: FacilitiesIcon },
+    { path: '/clases', label: 'Clases', icon: EventsIcon },
     { path: '/ayuda', label: 'Centro de ayuda', icon: HelpCenterIcon },
   ];
 

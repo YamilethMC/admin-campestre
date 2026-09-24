@@ -16,6 +16,7 @@ import SurveysContainer from './features/surveys';
 import FileUploadContainer from './features/files-upload';
 import NoticesContainer from './features/notices';
 import FacilitiesContainer from './features/facilities';
+import { ClassesAdmin } from './features/classes';
 import EventsContainer from './features/events/container';
 import HelpCenterContainer from './features/help-center/container';
 import BannerContainer from './features/banner/container';
@@ -70,6 +71,7 @@ function AppContent() {
         <Route path="banner" element={<BannerContainer />} />
         <Route path="archivos" element={<FileUploadContainer />} />
         <Route path="instalaciones" element={<FacilitiesContainer />} />
+        <Route path="clases" element={<ClassesAdmin />} />
         <Route path="ayuda" element={<HelpCenterContainer />} />
         <Route path="logs" element={<LogPanel />} />
         <Route path="404" element={<NotFound />} />
