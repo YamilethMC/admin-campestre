@@ -197,6 +197,40 @@ export const usePolicies = () => {
   return { policies, loading, saving, error, load, save, remove };
 };
 
+/**
+ * Los adeudos y sus movimientos.
+ *
+ * Tras cobrar o condonar se recarga la lista: el cargo sale del filtro actual
+ * —ya no está pendiente— y quedarse con la fila en pantalla invitaría a
+ * intentar moverlo otra vez.
+ */
+export const useCharges = () => {
+  const [charges, setCharges] = useState([]);
+  const [filtro, setFiltro] = useState('PENDING');
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+
+  const load = useCallback(async (status = 'PENDING') => {
+    setLoading(true);
+    setFiltro(status);
+    const response = await classesService.getCharges(status);
+    if (notify(setError, response)) setCharges(response.data || []);
+    setLoading(false);
+  }, []);
+
+  const resolve = useCallback(async (chargeId, accion, note) => {
+    setSaving(true);
+    const response = await classesService.resolveCharge(chargeId, accion, note);
+    const ok = notify(setError, response);
+    if (ok) await load(filtro);
+    setSaving(false);
+    return ok;
+  }, [filtro, load]);
+
+  return { charges, filtro, loading, saving, error, load, resolve };
+};
+
 export const useAgenda = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);

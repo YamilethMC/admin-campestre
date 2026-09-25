@@ -69,6 +69,18 @@ export const classesService = {
   updateProfessional: (id, payload) =>
     request(() => api.patch(`${BASE}/professionals/${id}`, payload), 'Error al actualizar el profesional'),
 
+  // Adeudos (§4)
+  getCharges: (status) =>
+    request(() => api.get(`${BASE}/charges?status=${status}`), 'Error al cargar los adeudos'),
+
+  resolveCharge: (chargeId, accion, note) => {
+    const ruta = { PAID: 'pay', WAIVED: 'waive', CANCELLED: 'cancel' }[accion];
+    return request(
+      () => api.patch(`${BASE}/charges/${chargeId}/${ruta}`, { note }),
+      'No se pudo registrar el movimiento',
+    );
+  },
+
   // Políticas de operación (§5)
   getPolicies: () =>
     request(() => api.get(`${BASE}/policies`), 'Error al cargar las reglas'),

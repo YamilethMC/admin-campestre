@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import AccessModal from '../../components/AccessModal';
 import AgendaTable from '../../components/AgendaTable';
+import ChargesTable from '../../components/ChargesTable';
 import ExceptionsPanel from '../../components/ExceptionsPanel';
 import PoliciesForm from '../../components/PoliciesForm';
 import PricesForm from '../../components/PricesForm';
@@ -12,6 +13,7 @@ import {
   useAgenda,
   useDisciplines,
   useExceptions,
+  useCharges,
   usePolicies,
   usePrices,
   useProfessionals,
@@ -23,6 +25,7 @@ const TABS = [
   { id: 'professionals', label: 'Profesionales' },
   { id: 'prices', label: 'Precios' },
   { id: 'policies', label: 'Reglas' },
+  { id: 'charges', label: 'Adeudos' },
   { id: 'agenda', label: 'Agenda' },
 ];
 
@@ -53,6 +56,7 @@ const ClassesAdmin = () => {
   const pricesState = usePrices();
   const agendaState = useAgenda();
   const policiesState = usePolicies();
+  const chargesState = useCharges();
 
   useEffect(() => {
     loadDisciplines();
@@ -62,6 +66,7 @@ const ClassesAdmin = () => {
   useEffect(() => {
     if (tab === 'prices') pricesState.load();
     if (tab === 'policies') policiesState.load();
+    if (tab === 'charges') chargesState.load();
   }, [tab]);
 
   const handleManageSchedule = async (professional) => {
@@ -109,7 +114,8 @@ const ClassesAdmin = () => {
     scheduleState.error ||
     exceptionsState.error ||
     pricesState.error ||
-    policiesState.error;
+    policiesState.error ||
+    chargesState.error;
 
   // Vista de un profesional concreto: su horario y sus bloqueos.
   if (managing) {
@@ -224,6 +230,17 @@ const ClassesAdmin = () => {
           saving={policiesState.saving}
           onSave={policiesState.save}
           onRemove={policiesState.remove}
+        />
+      )}
+
+      {tab === 'charges' && (
+        <ChargesTable
+          charges={chargesState.charges}
+          loading={chargesState.loading}
+          saving={chargesState.saving}
+          filtro={chargesState.filtro}
+          onFiltrar={chargesState.load}
+          onResolver={chargesState.resolve}
         />
       )}
 
