@@ -54,6 +54,24 @@ export const classesProService = {
     const params = new URLSearchParams({ from, to });
     return request(() => api.get(`${BASE}/agenda?${params.toString()}`), 'Error al cargar tu agenda');
   },
+
+  markAttendance: (bookingId, attended, notes) =>
+    request(
+      () => api.patch(`${BASE}/bookings/${bookingId}/attendance`, { attended, notes }),
+      'No se pudo reportar la asistencia',
+    ),
+
+  markPayment: (bookingId, paid, notes) =>
+    request(
+      () => api.patch(`${BASE}/bookings/${bookingId}/payment`, { paid, notes }),
+      'No se pudo reportar el pago',
+    ),
+
+  weatherCancel: (bookingId, notes) =>
+    request(
+      () => api.post(`${BASE}/bookings/${bookingId}/weather-cancel`, { notes }),
+      'No se pudo cancelar la clase',
+    ),
 };
 
 export default classesProService;

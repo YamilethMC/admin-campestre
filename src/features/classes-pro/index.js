@@ -1,6 +1,7 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 
 import { AppContext } from '../../shared/context/AppContext';
+import ClaseFila from './components/ClaseFila';
 import { classesProService } from './services';
 
 /** 'YYYY-MM-DD' de hoy, sin pasar por new Date() para no cruzar el huso. */
@@ -62,6 +63,15 @@ const MisClases = () => {
     }
     setCargando(false);
   }, []);
+
+  // Tras reportar algo se recarga el rango que está a la vista, en vez de
+  // parchar la clase en memoria: el backend decide el status final y no vale
+  // la pena duplicar aquí esa lógica.
+  const reportar = async (llamada) => {
+    const resultado = await llamada();
+    if (resultado.success) await buscar(rango.from, rango.to);
+    else setError(resultado.error);
+  };
 
   useEffect(() => {
     buscar(rango.from, rango.to);
@@ -143,26 +153,19 @@ const MisClases = () => {
               </h2>
               <div className="border border-gray-200 rounded-lg divide-y divide-gray-100">
                 {porDia[dia].map((clase) => (
-                  <div key={clase.id} className="px-4 py-3 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-4 min-w-0">
-                      <span className="text-base font-semibold text-gray-800 tabular-nums">
-                        {clase.startsAt.substring(11, 16)}
-                      </span>
-                      <div className="min-w-0">
-                        <p className="text-sm text-gray-800 truncate">
-                          {clase.clubMember?.user?.name} {clase.clubMember?.user?.lastName}
-                          <span className="text-gray-400"> · #{clase.clubMember?.memberCode}</span>
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {clase.discipline?.name} · {clase.partySize}{' '}
-                          {clase.partySize === 1 ? 'persona' : 'personas'}
-                        </p>
-                      </div>
-                    </div>
-                    <span className="text-sm font-medium text-gray-800 whitespace-nowrap">
-                      ${clase.priceSnapshot}
-                    </span>
-                  </div>
+                  <ClaseFila
+                    key={clase.id}
+                    clase={clase}
+                    onAsistencia={(c, vino) =>
+                      reportar(() => classesProService.markAttendance(c.id, vino))
+                    }
+                    onPago={(c, pagada) =>
+                      reportar(() => classesProService.markPayment(c.id, pagada))
+                    }
+                    onClima={(c, nota) =>
+                      reportar(() => classesProService.weatherCancel(c.id, nota))
+                    }
+                  />
                 ))}
               </div>
             </div>

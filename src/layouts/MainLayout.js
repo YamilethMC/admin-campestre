@@ -1,11 +1,15 @@
 import React, { useContext, useRef, useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { AppContext } from '../shared/context/AppContext';
+import { TIPOS } from '../shared/auth/acceso';
 import Navigation from '../navigation/Navigation';
 import Toast from '../shared/components/toast/Toast';
 
 const MainLayout = () => {
   const { logout, currentUser, toasts, setToasts } = useContext(AppContext);
+  // El profesor no administra socios: enseñarle "Gestión de Socios" en la
+  // cabecera le dice que está en la pantalla equivocada.
+  const esProfesor = currentUser?.type === TIPOS.PROFESOR;
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
@@ -91,8 +95,8 @@ const MainLayout = () => {
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
-                <span className="hidden sm:inline">Gestión de Socios</span>
-                <span className="sm:hidden">Socios</span>
+                <span className="hidden sm:inline">{esProfesor ? 'Clases del Club' : 'Gestión de Socios'}</span>
+                <span className="sm:hidden">{esProfesor ? 'Clases' : 'Socios'}</span>
               </h1>
             </div>
 
