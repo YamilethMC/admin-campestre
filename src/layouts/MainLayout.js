@@ -68,8 +68,11 @@ const MainLayout = () => {
         />
       )}
 
-      {/* Contenedor del contenido principal con margen automático cuando el menú está abierto */}
-      <div className={`flex flex-1 flex-col min-w-0 transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'ml-64' : 'ml-0'} lg:ml-64`}>
+      {/* Contenedor del contenido principal con margen automático cuando el menú está abierto.
+          En pantalla grande el menú es `lg:static`, o sea que ya ocupa su lugar en
+          este flex: no lleva margen. El `ml-64` es sólo para móvil, donde el menú
+          se sale del flujo (`fixed`) y se desliza encima. */}
+      <div className={`flex flex-1 flex-col min-w-0 transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'ml-64' : 'ml-0'}`}>
         
         {/* Header: Ahora vive DENTRO de la columna derecha */}
         {/* Quitamos 'sticky' porque flexbox ya lo mantiene arriba */}

@@ -73,10 +73,6 @@ const ExceptionsPanel = ({ professional, exceptions, loading, lastAffected, onDi
         </div>
       )}
 
-      {/* Se usa flex y no una rejilla responsive a propósito: este panel importa
-          un output.css de Tailwind ya compilado que sólo trae las variantes que
-          existían cuando se generó, y pisa a las nuevas. Con flex el acomodo no
-          depende de una variante que pueda faltar. */}
       <form onSubmit={handleSubmit} className="bg-gray-50 rounded-lg p-4 flex flex-wrap items-end gap-3">
         <div className="flex-1 min-w-[150px]">
           <label className="block text-xs font-medium text-gray-600 mb-1">Acción</label>
