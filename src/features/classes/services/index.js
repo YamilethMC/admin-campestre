@@ -69,6 +69,22 @@ export const classesService = {
   updateProfessional: (id, payload) =>
     request(() => api.patch(`${BASE}/professionals/${id}`, payload), 'Error al actualizar el profesional'),
 
+  // Políticas de operación (§5)
+  getPolicies: () =>
+    request(() => api.get(`${BASE}/policies`), 'Error al cargar las reglas'),
+
+  saveGeneralPolicy: (payload) =>
+    request(() => api.request(`${BASE}/policies`, { method: 'PUT', body: payload }),
+      'Error al guardar las reglas'),
+
+  saveDisciplinePolicy: (disciplineId, payload) =>
+    request(() => api.request(`${BASE}/disciplines/${disciplineId}/policy`, { method: 'PUT', body: payload }),
+      'Error al guardar las reglas de la disciplina'),
+
+  removeDisciplinePolicy: (disciplineId) =>
+    request(() => api.del(`${BASE}/disciplines/${disciplineId}/policy`),
+      'Error al quitar las reglas de la disciplina'),
+
   // Acceso del profesor al panel
   grantAccess: (professionalId, payload) =>
     request(

@@ -153,6 +153,50 @@ export const usePrices = () => {
   return { prices, loading, saving, error, load, save };
 };
 
+/**
+ * Las reglas de operación: la general y las que cada disciplina tenga propias.
+ *
+ * Tras guardar o quitar se recarga la lista entera en vez de parchar en
+ * memoria: el backend decide si una disciplina acaba con reglas propias o
+ * heredando las generales, y duplicar aquí esa decisión sería pedir que un día
+ * se despeguen.
+ */
+export const usePolicies = () => {
+  const [policies, setPolicies] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const response = await classesService.getPolicies();
+    if (notify(setError, response)) setPolicies(response.data || []);
+    setLoading(false);
+  }, []);
+
+  const save = useCallback(async (disciplineId, payload) => {
+    setSaving(true);
+    const response = disciplineId
+      ? await classesService.saveDisciplinePolicy(disciplineId, payload)
+      : await classesService.saveGeneralPolicy(payload);
+    const ok = notify(setError, response);
+    if (ok) await load();
+    setSaving(false);
+    return ok;
+  }, [load]);
+
+  const remove = useCallback(async (disciplineId) => {
+    setSaving(true);
+    const response = await classesService.removeDisciplinePolicy(disciplineId);
+    const ok = notify(setError, response);
+    if (ok) await load();
+    setSaving(false);
+    return ok;
+  }, [load]);
+
+  return { policies, loading, saving, error, load, save, remove };
+};
+
 export const useAgenda = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);

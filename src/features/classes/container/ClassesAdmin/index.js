@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import AccessModal from '../../components/AccessModal';
 import AgendaTable from '../../components/AgendaTable';
 import ExceptionsPanel from '../../components/ExceptionsPanel';
+import PoliciesForm from '../../components/PoliciesForm';
 import PricesForm from '../../components/PricesForm';
 import ProfessionalFormModal from '../../components/ProfessionalFormModal';
 import ProfessionalsTable from '../../components/ProfessionalsTable';
@@ -11,6 +12,7 @@ import {
   useAgenda,
   useDisciplines,
   useExceptions,
+  usePolicies,
   usePrices,
   useProfessionals,
   useSchedule,
@@ -20,6 +22,7 @@ import { classesService } from '../../services';
 const TABS = [
   { id: 'professionals', label: 'Profesionales' },
   { id: 'prices', label: 'Precios' },
+  { id: 'policies', label: 'Reglas' },
   { id: 'agenda', label: 'Agenda' },
 ];
 
@@ -49,6 +52,7 @@ const ClassesAdmin = () => {
   const exceptionsState = useExceptions();
   const pricesState = usePrices();
   const agendaState = useAgenda();
+  const policiesState = usePolicies();
 
   useEffect(() => {
     loadDisciplines();
@@ -57,6 +61,7 @@ const ClassesAdmin = () => {
 
   useEffect(() => {
     if (tab === 'prices') pricesState.load();
+    if (tab === 'policies') policiesState.load();
   }, [tab]);
 
   const handleManageSchedule = async (professional) => {
@@ -100,7 +105,11 @@ const ClassesAdmin = () => {
   };
 
   const error =
-    professionalsState.error || scheduleState.error || exceptionsState.error || pricesState.error;
+    professionalsState.error ||
+    scheduleState.error ||
+    exceptionsState.error ||
+    pricesState.error ||
+    policiesState.error;
 
   // Vista de un profesional concreto: su horario y sus bloqueos.
   if (managing) {
@@ -204,6 +213,17 @@ const ClassesAdmin = () => {
           loading={pricesState.loading}
           saving={pricesState.saving}
           onSave={pricesState.save}
+        />
+      )}
+
+      {tab === 'policies' && (
+        <PoliciesForm
+          policies={policiesState.policies}
+          disciplines={disciplines}
+          loading={policiesState.loading}
+          saving={policiesState.saving}
+          onSave={policiesState.save}
+          onRemove={policiesState.remove}
         />
       )}
 
