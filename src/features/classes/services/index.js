@@ -69,6 +69,44 @@ export const classesService = {
   updateProfessional: (id, payload) =>
     request(() => api.patch(`${BASE}/professionals/${id}`, payload), 'Error al actualizar el profesional'),
 
+  // Fotografía del profesional (§5)
+  //
+  // No pasa por el envoltorio `api` porque éste fuerza Content-Type JSON, y un
+  // multipart necesita que el navegador ponga su propio boundary.
+  uploadPhoto: async (professionalId, file) => {
+    const datos = new FormData();
+    datos.append('file', file);
+    try {
+      const respuesta = await fetch(
+        `${process.env.REACT_APP_API_URL}${BASE}/professionals/${professionalId}/photo`,
+        {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` },
+          body: datos,
+        },
+      );
+      const cuerpo = await respuesta.json().catch(() => null);
+      if (!respuesta.ok) {
+        if (respuesta.status === 401) {
+          handleAuthError();
+          return { success: false, error: 'No autorizado: sesión expirada', status: 401 };
+        }
+        const bruto = cuerpo?.message;
+        return {
+          success: false,
+          error: (Array.isArray(bruto) ? bruto[0] : bruto) || 'No se pudo subir la foto',
+          status: respuesta.status,
+        };
+      }
+      return { success: true, data: cuerpo?.data ?? cuerpo };
+    } catch {
+      return { success: false, error: 'No se pudo conectar con el servidor' };
+    }
+  },
+
+  removePhoto: (professionalId) =>
+    request(() => api.del(`${BASE}/professionals/${professionalId}/photo`), 'No se pudo quitar la foto'),
+
   // Adeudos (§4)
   getCharges: (status) =>
     request(() => api.get(`${BASE}/charges?status=${status}`), 'Error al cargar los adeudos'),

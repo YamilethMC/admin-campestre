@@ -13,6 +13,7 @@ const ProfessionalsTable = ({
   onToggleActive,
   onManageSchedule,
   onManageAccess,
+  onManagePhoto,
 }) => {
   if (loading) {
     return <div className="py-10 text-center text-gray-500">Cargando profesionales...</div>;
@@ -55,12 +56,46 @@ const ProfessionalsTable = ({
           {professionals.map((professional) => (
             <tr key={professional.id} className={professional.active ? '' : 'bg-gray-50'}>
               <td className="px-6 py-4">
-                <div className={`font-medium ${professional.active ? 'text-gray-900' : 'text-gray-400'}`}>
-                  {professional.displayName}
+                <div className="flex items-center gap-3">
+                  {/* La app muestra iniciales mientras no haya foto (§5). Aquí se
+                      ve igual, para que el Club sepa qué está viendo el socio. */}
+                  <button
+                    onClick={() => onManagePhoto(professional)}
+                    className="shrink-0 w-10 h-10 rounded-full overflow-hidden border border-gray-200 bg-gray-100 flex items-center justify-center text-xs font-semibold text-gray-500 hover:border-primary"
+                    title={professional.photoUrl ? 'Cambiar la foto' : 'Subir una foto'}
+                  >
+                    {professional.photoUrl ? (
+                      <img
+                        src={professional.photoUrl}
+                        alt={professional.displayName}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      professional.displayName
+                        .split(' ')
+                        .filter(Boolean)
+                        .slice(0, 2)
+                        .map((p) => p.charAt(0).toUpperCase())
+                        .join('')
+                    )}
+                  </button>
+                  <div className="min-w-0">
+                    <div className={`font-medium ${professional.active ? 'text-gray-900' : 'text-gray-400'}`}>
+                      {professional.displayName}
+                      {professional.isDemo && (
+                        <span
+                          className="ml-2 px-2 py-0.5 text-xs rounded-full bg-amber-100 text-amber-800 align-middle"
+                          title="Datos de muestra. Se apaga solo al editar la ficha"
+                        >
+                          Demostrativo
+                        </span>
+                      )}
+                    </div>
+                    {professional.shortBio && (
+                      <div className="text-sm text-gray-500">{professional.shortBio}</div>
+                    )}
+                  </div>
                 </div>
-                {professional.shortBio && (
-                  <div className="text-sm text-gray-500">{professional.shortBio}</div>
-                )}
               </td>
               <td className="px-6 py-4 text-sm text-gray-600">{professional.discipline?.name}</td>
               <td className="px-6 py-4 text-sm text-gray-600">

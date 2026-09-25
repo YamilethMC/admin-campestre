@@ -4,6 +4,7 @@ import AccessModal from '../../components/AccessModal';
 import AgendaTable from '../../components/AgendaTable';
 import ChargesTable from '../../components/ChargesTable';
 import ExceptionsPanel from '../../components/ExceptionsPanel';
+import PhotoModal from '../../components/PhotoModal';
 import PoliciesForm from '../../components/PoliciesForm';
 import PricesForm from '../../components/PricesForm';
 import ProfessionalFormModal from '../../components/ProfessionalFormModal';
@@ -48,6 +49,8 @@ const ClassesAdmin = () => {
   const [managing, setManaging] = useState(null);
   // Profesional al que se le está dando o quitando el acceso al panel.
   const [access, setAccess] = useState(null);
+  // Profesional al que se le está poniendo o quitando la foto.
+  const [photo, setPhoto] = useState(null);
 
   const { disciplines, load: loadDisciplines } = useDisciplines();
   const professionalsState = useProfessionals();
@@ -90,6 +93,18 @@ const ClassesAdmin = () => {
   const handleToggleActive = async (professional) => {
     const ok = await professionalsState.toggleActive(professional);
     if (ok) professionalsState.load();
+  };
+
+  const handleUploadPhoto = async (professional, file) => {
+    const response = await classesService.uploadPhoto(professional.id, file);
+    if (response.success) professionalsState.load();
+    return response;
+  };
+
+  const handleRemovePhoto = async (professional) => {
+    const response = await classesService.removePhoto(professional.id);
+    if (response.success) professionalsState.load();
+    return response;
   };
 
   const handleGrantAccess = async (professional, payload) => {
@@ -200,6 +215,16 @@ const ClassesAdmin = () => {
           onToggleActive={handleToggleActive}
           onManageSchedule={handleManageSchedule}
           onManageAccess={(professional, modo) => setAccess({ professional, modo })}
+          onManagePhoto={(professional) => setPhoto(professional)}
+        />
+      )}
+
+      {photo && (
+        <PhotoModal
+          professional={photo}
+          onClose={() => setPhoto(null)}
+          onUpload={handleUploadPhoto}
+          onRemove={handleRemovePhoto}
         />
       )}
 

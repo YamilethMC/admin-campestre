@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from 'react';
 
-const EMPTY = { disciplineId: '', displayName: '', shortBio: '', phone: '', email: '', photoUrl: '' };
+const EMPTY = {
+  disciplineId: '',
+  displayName: '',
+  shortBio: '',
+  phone: '',
+  email: '',
+  photoUrl: '',
+  isDemo: false,
+};
 
 /**
  * Alta y edición de un profesional.
@@ -22,6 +30,7 @@ const ProfessionalFormModal = ({ open, professional, disciplines, saving, onClos
             disciplineId: String(professional.discipline?.id ?? professional.disciplineId ?? ''),
             displayName: professional.displayName ?? '',
             shortBio: professional.shortBio ?? '',
+            isDemo: professional.isDemo ?? false,
             phone: professional.phone ?? '',
             email: professional.email ?? '',
             photoUrl: professional.photoUrl ?? '',
@@ -59,6 +68,10 @@ const ProfessionalFormModal = ({ open, professional, disciplines, saving, onClos
     ['shortBio', 'phone', 'email', 'photoUrl'].forEach((field) => {
       if (form[field]?.trim()) payload[field] = form[field].trim();
     });
+
+    // Sólo se manda al crear. Al editar, el backend la apaga solo: si el Club
+    // acaba de escribir los datos reales, la ficha dejó de ser un ejemplo.
+    if (!professional?.id) payload.isDemo = Boolean(form.isDemo);
 
     onSubmit(payload, professional?.id);
   };
@@ -113,6 +126,25 @@ const ProfessionalFormModal = ({ open, professional, disciplines, saving, onClos
               className="w-full border border-gray-300 rounded-md px-3 py-2"
             />
           </div>
+
+          {!professional?.id && (
+            <label className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-md px-3 py-2.5 cursor-pointer">
+              <input
+                type="checkbox"
+                name="isDemo"
+                checked={Boolean(form.isDemo)}
+                onChange={(e) => handleChange({ target: { name: 'isDemo', value: e.target.checked } })}
+                className="mt-0.5"
+              />
+              <span className="text-sm text-amber-900">
+                Son datos de muestra
+                <span className="block text-xs text-amber-700 mt-0.5">
+                  Para ver el módulo funcionando mientras llegan los reales. Queda marcada como
+                  demostrativa y el aviso se quita solo en cuanto edites la ficha.
+                </span>
+              </span>
+            </label>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <div>
