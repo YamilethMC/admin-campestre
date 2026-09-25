@@ -6,7 +6,14 @@ import React from 'react';
  * Muestra también los inactivos, en gris: el Club necesita poder reactivarlos, y
  * un profesional nunca se borra porque su historial de clases se conserva (§11).
  */
-const ProfessionalsTable = ({ professionals, loading, onEdit, onToggleActive, onManageSchedule }) => {
+const ProfessionalsTable = ({
+  professionals,
+  loading,
+  onEdit,
+  onToggleActive,
+  onManageSchedule,
+  onManageAccess,
+}) => {
   if (loading) {
     return <div className="py-10 text-center text-gray-500">Cargando profesionales...</div>;
   }
@@ -35,6 +42,9 @@ const ProfessionalsTable = ({ professionals, loading, onEdit, onToggleActive, on
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Estado
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Acceso al panel
             </th>
             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
               Acciones
@@ -66,6 +76,24 @@ const ProfessionalsTable = ({ professionals, loading, onEdit, onToggleActive, on
                 >
                   {professional.active ? 'Activo' : 'Inactivo'}
                 </span>
+              </td>
+              <td className="px-6 py-4 text-sm">
+                {professional.userId ? (
+                  <button
+                    onClick={() => onManageAccess(professional, 'revoke')}
+                    className="text-green-700 hover:text-green-900"
+                    title="Tiene cuenta para ver su agenda. Click para quitársela."
+                  >
+                    Con acceso
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => onManageAccess(professional, 'grant')}
+                    className="text-gray-500 hover:text-primary"
+                  >
+                    Dar acceso
+                  </button>
+                )}
               </td>
               <td className="px-6 py-4 text-right text-sm space-x-3 whitespace-nowrap">
                 <button

@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services';
 import { AppContext } from '../../../shared/context/AppContext';
+import { TIPOS_CON_PANEL, rutaInicial } from '../../../shared/auth/acceso';
 
 export const useAuth = () => {
   const [username, setUsername] = useState('');
@@ -21,17 +22,17 @@ export const useAuth = () => {
     if (result.success) {
       const userType = result.user?.type;
       const normalizedType = typeof userType === 'string' ? userType : userType?.name;
-      const allowedRoles = ['ADMINISTRADOR', 'STAFF'];
-
-      if (!allowedRoles.includes(normalizedType)) {
-        const message = 'Solo los usuarios administradores pueden acceder al panel';
+      if (!TIPOS_CON_PANEL.includes(normalizedType)) {
+        const message = 'Tu cuenta no tiene acceso al panel';
         setError(message);
         addToast(message, 'error');
         setLoading(false);
         return;
       }
 
-      contextLogin(result.user, result.accessToken, navigate);
+      // El profesor no tiene Inicio: entra directo a su agenda.
+      const destino = rutaInicial(normalizedType);
+      contextLogin(result.user, result.accessToken, (ruta) => navigate(destino || ruta));
     } else {
       addToast(result.error || 'Error de autenticación', 'error');
     }

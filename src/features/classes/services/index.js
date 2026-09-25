@@ -69,6 +69,19 @@ export const classesService = {
   updateProfessional: (id, payload) =>
     request(() => api.patch(`${BASE}/professionals/${id}`, payload), 'Error al actualizar el profesional'),
 
+  // Acceso del profesor al panel
+  grantAccess: (professionalId, payload) =>
+    request(
+      () => api.post(`${BASE}/professionals/${professionalId}/access`, payload),
+      'Error al dar el acceso',
+    ),
+
+  revokeAccess: (professionalId) =>
+    request(
+      () => api.del(`${BASE}/professionals/${professionalId}/access`),
+      'Error al quitar el acceso',
+    ),
+
   // Horario semanal
   getSchedule: (professionalId) =>
     request(() => api.get(`${BASE}/professionals/${professionalId}/schedule`), 'Error al cargar el horario'),

@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { AppContext } from '../shared/context/AppContext';
+import { menuPara } from '../shared/auth/acceso';
 import { 
   AccountStatementIcon, 
   MemberListIcon, 
@@ -18,10 +19,10 @@ import {
 } from '../shared/components/icons/icons';
 
 const Navigation = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
-  const { logout } = useContext(AppContext);
+  const { logout, currentUser } = useContext(AppContext);
   const location = useLocation();
   
-  const menuItems = [
+  const todasLasEntradas = [
     { path: '/', label: 'Inicio', icon: HomeIcon, exact: true },
     { path: '/socios', label: 'Socios', icon: MemberListIcon },
     { path: '/dependientes', label: 'Dependientes', icon: DependentsIcon },
@@ -37,7 +38,12 @@ const Navigation = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
     { path: '/instalaciones', label: 'Instalaciones', icon: FacilitiesIcon },
     { path: '/clases', label: 'Clases', icon: EventsIcon },
     { path: '/ayuda', label: 'Centro de ayuda', icon: HelpCenterIcon },
+    { path: '/mis-clases', label: 'Mis clases', icon: EventsIcon },
   ];
+
+  // El menú se arma según quién entró. La misma lista manda en las rutas
+  // (ver shared/auth/acceso.js), para que no puedan discrepar.
+  const menuItems = menuPara(currentUser?.type, todasLasEntradas);
 
   const handleNavClick = () => {
     if (isMobileMenuOpen) {

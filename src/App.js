@@ -25,6 +25,8 @@ import ValidationsDashboard from './features/validations';
 import DocumentCatalog from './features/document-catalog';
 import VerifyAccess from './pages/VerifyAccess';
 import DependentsValidation from './pages/DependentsValidation';
+import RutaPermitida from './shared/auth/RutaPermitida';
+import MisClases from './features/classes-pro';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -55,7 +57,7 @@ function AppContent() {
   return (
     <Routes>
       <Route path="/verify-access" element={<VerifyAccess />} />
-      <Route path="/" element={<MainLayout />}>
+      <Route path="/" element={<RutaPermitida><MainLayout /></RutaPermitida>}>
         <Route index element={<Dashboard />} />
         <Route path="socios" element={<MembersContainer />} />
         <Route path="socios/nuevo" element={<IndividualMemberForm />} />
@@ -72,6 +74,7 @@ function AppContent() {
         <Route path="archivos" element={<FileUploadContainer />} />
         <Route path="instalaciones" element={<FacilitiesContainer />} />
         <Route path="clases" element={<ClassesAdmin />} />
+        <Route path="mis-clases" element={<MisClases />} />
         <Route path="ayuda" element={<HelpCenterContainer />} />
         <Route path="logs" element={<LogPanel />} />
         <Route path="404" element={<NotFound />} />

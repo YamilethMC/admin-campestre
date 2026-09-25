@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
+import AccessModal from '../../components/AccessModal';
 import AgendaTable from '../../components/AgendaTable';
 import ExceptionsPanel from '../../components/ExceptionsPanel';
 import PricesForm from '../../components/PricesForm';
@@ -14,6 +15,7 @@ import {
   useProfessionals,
   useSchedule,
 } from '../../hooks/useClassesAdmin';
+import { classesService } from '../../services';
 
 const TABS = [
   { id: 'professionals', label: 'Profesionales' },
@@ -38,6 +40,8 @@ const ClassesAdmin = () => {
   const [showForm, setShowForm] = useState(false);
   /** Profesional cuyo horario y bloqueos se están editando. */
   const [managing, setManaging] = useState(null);
+  // Profesional al que se le está dando o quitando el acceso al panel.
+  const [access, setAccess] = useState(null);
 
   const { disciplines, load: loadDisciplines } = useDisciplines();
   const professionalsState = useProfessionals();
@@ -76,6 +80,18 @@ const ClassesAdmin = () => {
   const handleToggleActive = async (professional) => {
     const ok = await professionalsState.toggleActive(professional);
     if (ok) professionalsState.load();
+  };
+
+  const handleGrantAccess = async (professional, payload) => {
+    const response = await classesService.grantAccess(professional.id, payload);
+    if (response.success) professionalsState.load();
+    return response;
+  };
+
+  const handleRevokeAccess = async (professional) => {
+    const response = await classesService.revokeAccess(professional.id);
+    if (response.success) professionalsState.load();
+    return response;
   };
 
   const handleSaveSchedule = async (blocks) => {
@@ -168,6 +184,17 @@ const ClassesAdmin = () => {
           }}
           onToggleActive={handleToggleActive}
           onManageSchedule={handleManageSchedule}
+          onManageAccess={(professional, modo) => setAccess({ professional, modo })}
+        />
+      )}
+
+      {access && (
+        <AccessModal
+          professional={access.professional}
+          modo={access.modo}
+          onClose={() => setAccess(null)}
+          onGrant={handleGrantAccess}
+          onRevoke={handleRevokeAccess}
         />
       )}
 
