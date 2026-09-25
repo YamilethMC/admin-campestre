@@ -18,12 +18,17 @@ import React, { useState } from 'react';
  * no del profesor. El cobro sí se puede deshacer, porque se marca con las manos
  * ocupadas y el error de dedo es esperable.
  */
-const ClaseFila = ({ clase, onAsistencia, onPago, onClima, onImpago }) => {
+const ClaseFila = ({ clase, onAsistencia, onPago, onClima, onImpago, onHorariosLibres }) => {
   const [ocupado, setOcupado] = useState('');
   // Confirmación en línea, no window.prompt: es el único diálogo nativo que
   // habría en todo el panel, y el resto resuelve esto con interfaz propia.
   const [preguntandoClima, setPreguntandoClima] = useState(false);
   const [notaClima, setNotaClima] = useState('Campo cerrado por lluvia');
+  // El horario que le propone al socio. Opcional: puede cancelar sin proponer.
+  const [fechaOferta, setFechaOferta] = useState(clase.startsAt.substring(0, 10));
+  const [horariosLibres, setHorariosLibres] = useState(null);
+  const [horaOferta, setHoraOferta] = useState('');
+  const [buscando, setBuscando] = useState(false);
 
   const yaEmpezo = new Date(clase.startsAt.replace('Z', '')) <= new Date();
   const cancelada = clase.status === 'CANCELLED';
@@ -39,8 +44,21 @@ const ClaseFila = ({ clase, onAsistencia, onPago, onClima, onImpago }) => {
   };
 
   const confirmarClima = async () => {
-    await correr('clima', () => onClima(clase, notaClima.trim()));
+    await correr('clima', () => onClima(clase, notaClima.trim(), fechaOferta, horaOferta));
     setPreguntandoClima(false);
+    setHoraOferta('');
+    setHorariosLibres(null);
+  };
+
+  const buscarHorarios = async (fecha) => {
+    setFechaOferta(fecha);
+    setHoraOferta('');
+    setHorariosLibres(null);
+    if (!fecha || !onHorariosLibres) return;
+    setBuscando(true);
+    const libres = await onHorariosLibres(clase, fecha);
+    setHorariosLibres(libres);
+    setBuscando(false);
   };
 
   return (
@@ -160,6 +178,45 @@ const ClaseFila = ({ clase, onAsistencia, onPago, onClima, onImpago }) => {
           <p className="text-xs text-amber-900 mb-2">
             La clase se cancela sin penalización para el socio y el horario queda libre.
           </p>
+
+          {/* §2: "ofrecer una reprogramación". Se le propone un hueco propio y se
+              le aparta mientras decide. Si no se propone nada, sólo se cancela y
+              el socio reserva cuando quiera, igual sin costo. */}
+          {onHorariosLibres && (
+            <div className="mb-3 border-t border-amber-200 pt-3">
+              <p className="text-xs font-medium text-amber-900 mb-2">
+                ¿Le propones otro horario? <span className="font-normal">(opcional)</span>
+              </p>
+              <input
+                type="date"
+                value={fechaOferta}
+                onChange={(e) => buscarHorarios(e.target.value)}
+                className="border border-amber-300 rounded-md px-2 py-1.5 text-sm mb-2"
+              />
+              {buscando && <p className="text-xs text-amber-700">Buscando tus horarios...</p>}
+              {horariosLibres && horariosLibres.length === 0 && (
+                <p className="text-xs text-amber-700">Ese día no tienes horarios libres.</p>
+              )}
+              {horariosLibres && horariosLibres.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {horariosLibres.map((h) => (
+                    <button
+                      key={h}
+                      onClick={() => setHoraOferta(horaOferta === h ? '' : h)}
+                      className={`px-2.5 py-1 text-xs rounded-md border ${
+                        horaOferta === h
+                          ? 'bg-amber-600 text-white border-amber-600'
+                          : 'border-amber-300 text-amber-900'
+                      }`}
+                    >
+                      {h}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="flex flex-wrap gap-2">
             <input
               type="text"
@@ -173,7 +230,11 @@ const ClaseFila = ({ clase, onAsistencia, onPago, onClima, onImpago }) => {
               onClick={confirmarClima}
               className="px-3 py-1.5 text-xs font-medium rounded-md bg-amber-600 text-white disabled:opacity-50"
             >
-              {ocupado === 'clima' ? 'Cancelando...' : 'Cancelar la clase'}
+              {ocupado === 'clima'
+                ? 'Cancelando...'
+                : horaOferta
+                  ? `Cancelar y proponer ${horaOferta}`
+                  : 'Cancelar la clase'}
             </button>
             <button
               onClick={() => setPreguntandoClima(false)}

@@ -73,9 +73,21 @@ export const classesProService = {
       'No se pudo reportar el impago',
     ),
 
-  weatherCancel: (bookingId, notes) =>
+  /** Los horarios libres del profesor un día, para proponerle uno al socio. */
+  getAvailability: (professionalId, date) =>
     request(
-      () => api.post(`${BASE}/bookings/${bookingId}/weather-cancel`, { notes }),
+      () => api.get(`/classes/professionals/${professionalId}/availability?date=${date}`),
+      'No se pudieron cargar tus horarios de ese día',
+    ),
+
+  weatherCancel: (bookingId, notes, offerDate, offerStartTime) =>
+    request(
+      () =>
+        api.post(`${BASE}/bookings/${bookingId}/weather-cancel`, {
+          notes,
+          offerDate,
+          offerStartTime,
+        }),
       'No se pudo cancelar la clase',
     ),
 };

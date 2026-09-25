@@ -162,9 +162,14 @@ const MisClases = () => {
                     onPago={(c, pagada) =>
                       reportar(() => classesProService.markPayment(c.id, pagada))
                     }
-                    onClima={(c, nota) =>
-                      reportar(() => classesProService.weatherCancel(c.id, nota))
+                    onClima={(c, nota, fecha, hora) =>
+                      reportar(() => classesProService.weatherCancel(c.id, nota, fecha, hora))
                     }
+                    onHorariosLibres={async (c, fecha) => {
+                      const r = await classesProService.getAvailability(c.professionalId, fecha);
+                      if (!r.success) return [];
+                      return (r.data?.slots || []).filter((s) => s.available).map((s) => s.startTime);
+                    }}
                     onImpago={(c) => reportar(() => classesProService.reportUnpaid(c.id))}
                   />
                 ))}
