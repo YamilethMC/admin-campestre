@@ -134,8 +134,9 @@ const MisClases = () => {
         <div className="space-y-5">
           {dias.map((dia) => (
             <div key={dia}>
-              <h2 className="text-sm font-semibold text-gray-700 mb-2 capitalize">
-                {nombreDelDia(dia)} {dia.substring(8, 10)}/{dia.substring(5, 7)}
+              <h2 className="text-sm font-semibold text-gray-700 mb-2">
+                <span className="capitalize">{nombreDelDia(dia)}</span>{' '}
+                {dia.substring(8, 10)}/{dia.substring(5, 7)}
                 <span className="ml-2 font-normal text-gray-400">
                   {porDia[dia].length} {porDia[dia].length === 1 ? 'clase' : 'clases'}
                 </span>
