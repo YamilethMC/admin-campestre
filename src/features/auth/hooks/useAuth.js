@@ -32,7 +32,12 @@ export const useAuth = () => {
 
       // El profesor no tiene Inicio: entra directo a su agenda.
       const destino = rutaInicial(normalizedType);
-      contextLogin(result.user, result.accessToken, (ruta) => navigate(destino || ruta));
+      contextLogin(
+        result.user,
+        result.accessToken,
+        (ruta) => navigate(destino || ruta),
+        result.refreshToken,
+      );
     } else {
       addToast(result.error || 'Error de autenticación', 'error');
     }

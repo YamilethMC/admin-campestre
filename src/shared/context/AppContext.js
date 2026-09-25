@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { authService } from '../../features/auth/services';
 import { registerGlobalContextFunctions } from '../utils/authErrorHandler';
+import { borrarSesion, guardarSesion } from '../api/sesion';
 
 export const AppContext = createContext();
 
@@ -58,12 +59,12 @@ export const AppProvider = ({ children }) => {
     registerGlobalContextFunctions(addToast, setIsAuthenticated, setCurrentUser, setAuthToken);
   }, []);
 
-  const login = (user, token, navigateFunction = null) => {
+  const login = (user, token, navigateFunction = null, refreshToken = null) => {
     setIsAuthenticated(true);
     setCurrentUser(user);
     setAuthToken(token);
 
-    localStorage.setItem('authToken', token);
+    guardarSesion({ accessToken: token, refreshToken });
     localStorage.setItem('currentUser', JSON.stringify(user));
 
     // Si se proporciona una función de navegación, redirigir al dashboard
@@ -91,8 +92,7 @@ export const AppProvider = ({ children }) => {
     setCurrentUser(null);
     setAuthToken(null);
 
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('currentUser');
+    borrarSesion();
   };
 
   return (
