@@ -18,7 +18,7 @@ import React, { useState } from 'react';
  * no del profesor. El cobro sí se puede deshacer, porque se marca con las manos
  * ocupadas y el error de dedo es esperable.
  */
-const ClaseFila = ({ clase, onAsistencia, onPago, onClima }) => {
+const ClaseFila = ({ clase, onAsistencia, onPago, onClima, onImpago }) => {
   const [ocupado, setOcupado] = useState('');
   // Confirmación en línea, no window.prompt: es el único diálogo nativo que
   // habría en todo el panel, y el resto resuelve esto con interfaz propia.
@@ -29,6 +29,8 @@ const ClaseFila = ({ clase, onAsistencia, onPago, onClima }) => {
   const cancelada = clase.status === 'CANCELLED';
   const reportada = Boolean(clase.attendanceAt);
   const pagada = Boolean(clase.paidAt);
+  // Si la clase ya dejó un adeudo, se enseña en vez de volver a ofrecer el botón.
+  const adeudo = clase.charge;
 
   const correr = async (etiqueta, accion) => {
     setOcupado(etiqueta);
@@ -61,6 +63,14 @@ const ClaseFila = ({ clase, onAsistencia, onPago, onClima }) => {
             {clase.discipline?.name} · {clase.partySize}{' '}
             {clase.partySize === 1 ? 'persona' : 'personas'} · ${clase.priceSnapshot}
           </p>
+          {clase.substituteName && (
+            /* §3: el socio manda a alguien en su lugar. El profesor necesita el
+               nombre y el teléfono para saber a quién recibe. */
+            <p className="text-xs text-amber-700 mt-0.5">
+              Viene en su lugar: <span className="font-medium">{clase.substituteName}</span>
+              {clase.substitutePhone ? ` · ${clase.substitutePhone}` : ''}
+            </p>
+          )}
         </div>
       </div>
 
@@ -100,6 +110,23 @@ const ClaseFila = ({ clase, onAsistencia, onPago, onClima }) => {
                   </button>
                 </>
               )
+            )}
+
+            {adeudo && (
+              <span className="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
+                Adeudo ${adeudo.amount}
+              </span>
+            )}
+
+            {!adeudo && reportada && clase.status === 'COMPLETED' && !pagada && onImpago && (
+              <button
+                disabled={Boolean(ocupado)}
+                onClick={() => correr('impago', () => onImpago(clase))}
+                className="px-3 py-1.5 text-xs rounded-md border border-red-300 text-red-700 disabled:opacity-50"
+                title="Se dio la clase y no pagaron. El adeudo queda a nombre del socio"
+              >
+                {ocupado === 'impago' ? '...' : 'No pagó'}
+              </button>
             )}
 
             <button

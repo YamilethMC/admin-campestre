@@ -67,6 +67,12 @@ export const classesProService = {
       'No se pudo reportar el pago',
     ),
 
+  reportUnpaid: (bookingId, notes) =>
+    request(
+      () => api.post(`${BASE}/bookings/${bookingId}/unpaid`, { notes }),
+      'No se pudo reportar el impago',
+    ),
+
   weatherCancel: (bookingId, notes) =>
     request(
       () => api.post(`${BASE}/bookings/${bookingId}/weather-cancel`, { notes }),

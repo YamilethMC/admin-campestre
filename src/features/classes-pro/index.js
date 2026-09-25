@@ -165,6 +165,7 @@ const MisClases = () => {
                     onClima={(c, nota) =>
                       reportar(() => classesProService.weatherCancel(c.id, nota))
                     }
+                    onImpago={(c) => reportar(() => classesProService.reportUnpaid(c.id))}
                   />
                 ))}
               </div>
