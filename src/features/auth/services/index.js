@@ -1,4 +1,5 @@
 import api from '../../../shared/api/api';
+import { leerRefresh } from '../../../shared/api/sesion';
 import { handleAuthError } from '../../../shared/utils/authErrorHandler';
 
 export const authService = {
@@ -42,6 +43,9 @@ export const authService = {
           accessToken: response.data.data.access_token,
         },
         accessToken: response.data.data.access_token,
+        // El refresh es lo que evita que el token muera a las 24 horas y saque
+        // al usuario al login a media captura. Antes llegaba y se tiraba.
+        refreshToken: response.data.data.refresh_token,
       };
     } catch (error) {
       console.error('Auth service error:', error);
@@ -55,7 +59,9 @@ export const authService = {
 
   async logout() {
     try {
-      const response = await api.post('/auth/logout', {});
+      // Sin el refresh, cerrar sesión deja viva la sesión de este dispositivo:
+      // con él se podría abrir otra enseguida.
+      const response = await api.post('/auth/logout', { refresh_token: leerRefresh() || undefined });
 
       if (!response.ok) {
         let errorMessage = response.data?.message || 'Error al cerrar sesión';

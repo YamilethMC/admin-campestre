@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import './shared/styles/output.css';
 import { AppProvider, AppContext } from './shared/context/AppContext';
 import Login from './features/auth';
 import MainLayout from './layouts/MainLayout';
@@ -16,6 +15,7 @@ import SurveysContainer from './features/surveys';
 import FileUploadContainer from './features/files-upload';
 import NoticesContainer from './features/notices';
 import FacilitiesContainer from './features/facilities';
+import { ClassesAdmin } from './features/classes';
 import EventsContainer from './features/events/container';
 import HelpCenterContainer from './features/help-center/container';
 import BannerContainer from './features/banner/container';
@@ -24,6 +24,8 @@ import ValidationsDashboard from './features/validations';
 import DocumentCatalog from './features/document-catalog';
 import VerifyAccess from './pages/VerifyAccess';
 import DependentsValidation from './pages/DependentsValidation';
+import RutaPermitida from './shared/auth/RutaPermitida';
+import MisClases from './features/classes-pro';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -54,7 +56,7 @@ function AppContent() {
   return (
     <Routes>
       <Route path="/verify-access" element={<VerifyAccess />} />
-      <Route path="/" element={<MainLayout />}>
+      <Route path="/" element={<RutaPermitida><MainLayout /></RutaPermitida>}>
         <Route index element={<Dashboard />} />
         <Route path="socios" element={<MembersContainer />} />
         <Route path="socios/nuevo" element={<IndividualMemberForm />} />
@@ -70,6 +72,8 @@ function AppContent() {
         <Route path="banner" element={<BannerContainer />} />
         <Route path="archivos" element={<FileUploadContainer />} />
         <Route path="instalaciones" element={<FacilitiesContainer />} />
+        <Route path="clases" element={<ClassesAdmin />} />
+        <Route path="mis-clases" element={<MisClases />} />
         <Route path="ayuda" element={<HelpCenterContainer />} />
         <Route path="logs" element={<LogPanel />} />
         <Route path="404" element={<NotFound />} />
