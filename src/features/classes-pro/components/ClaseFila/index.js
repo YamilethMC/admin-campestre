@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+import ConfirmacionChip from '../../../classes/components/ConfirmacionChip';
+
 /**
  * Una clase en la agenda del profesor, con lo que puede reportar sobre ella.
  *
@@ -99,6 +101,9 @@ const ClaseFila = ({ clase, onAsistencia, onPago, onClima, onImpago, onHorariosL
           </span>
         ) : (
           <>
+            {/* Antes de la clase: si el socio confirmó por WhatsApp. Después ya
+                manda lo que el profesor reporte (asistió / no vino). */}
+            {!yaEmpezo && <ConfirmacionChip reserva={clase} />}
             {reportada ? (
               <span
                 className={`px-2 py-1 text-xs rounded-full ${

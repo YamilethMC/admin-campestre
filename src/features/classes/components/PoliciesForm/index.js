@@ -54,6 +54,14 @@ const CAMPOS = [
     min: 0,
     max: 168,
   },
+  {
+    // Cuándo sale el WhatsApp que le pide al socio confirmar su clase.
+    clave: 'reminderHoursBefore',
+    etiqueta: 'Pedir confirmación por WhatsApp',
+    unidad: 'horas antes',
+    min: 1,
+    max: 168,
+  },
 ];
 
 const Bloque = ({ titulo, subtitulo, valores, guardando, onGuardar, onQuitar }) => {
