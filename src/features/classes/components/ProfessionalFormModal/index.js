@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+
+import { ACCEPT, iniciales, validarFoto } from '../../utils/fotoProfesional';
 
 const EMPTY = {
   disciplineId: '',
@@ -6,7 +8,6 @@ const EMPTY = {
   shortBio: '',
   phone: '',
   email: '',
-  photoUrl: '',
   isDemo: false,
 };
 
@@ -15,15 +16,28 @@ const EMPTY = {
  *
  * Los campos opcionales —foto, credencial, teléfono— siguen pendientes de que el
  * Club los entregue (§10), así que se dejan vacíos y no se inventan.
+ *
+ * La foto se sube como archivo, igual que la imagen de un banner: se elige con
+ * un clic o se arrastra al recuadro. No viaja con los datos de la ficha; quien
+ * abre el formulario la sube después de guardar, porque al dar de alta el
+ * profesional todavía no tiene id.
  */
 const ProfessionalFormModal = ({ open, professional, disciplines, saving, onClose, onSubmit }) => {
   const [form, setForm] = useState(EMPTY);
   const [formError, setFormError] = useState(null);
+  const entrada = useRef(null);
+  const [archivo, setArchivo] = useState(null);
+  const [previa, setPrevia] = useState(null);
+  const [fotoError, setFotoError] = useState(null);
+  const [arrastrando, setArrastrando] = useState(false);
 
   useEffect(() => {
     if (!open) return;
 
     setFormError(null);
+    setArchivo(null);
+    setPrevia(null);
+    setFotoError(null);
     setForm(
       professional
         ? {
@@ -33,11 +47,13 @@ const ProfessionalFormModal = ({ open, professional, disciplines, saving, onClos
             isDemo: professional.isDemo ?? false,
             phone: professional.phone ?? '',
             email: professional.email ?? '',
-            photoUrl: professional.photoUrl ?? '',
           }
         : EMPTY,
     );
   }, [open, professional]);
+
+  // La vista previa ocupa memoria del navegador hasta que se libera.
+  useEffect(() => () => previa && URL.revokeObjectURL(previa), [previa]);
 
   if (!open) return null;
 
@@ -45,6 +61,28 @@ const ProfessionalFormModal = ({ open, professional, disciplines, saving, onClos
     const { name, value } = event.target;
     setForm((previous) => ({ ...previous, [name]: value }));
   };
+
+  const elegirFoto = (elegido) => {
+    if (!elegido) return;
+
+    const motivo = validarFoto(elegido);
+    if (motivo) {
+      setFotoError(motivo);
+      return;
+    }
+
+    setFotoError(null);
+    setArchivo(elegido);
+    setPrevia(URL.createObjectURL(elegido));
+  };
+
+  const soltarFoto = (event) => {
+    event.preventDefault();
+    setArrastrando(false);
+    elegirFoto(event.dataTransfer.files?.[0]);
+  };
+
+  const fotoMostrada = previa || professional?.photoUrl || null;
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -65,7 +103,7 @@ const ProfessionalFormModal = ({ open, professional, disciplines, saving, onClos
       displayName: form.displayName.trim(),
     };
 
-    ['shortBio', 'phone', 'email', 'photoUrl'].forEach((field) => {
+    ['shortBio', 'phone', 'email'].forEach((field) => {
       if (form[field]?.trim()) payload[field] = form[field].trim();
     });
 
@@ -73,7 +111,7 @@ const ProfessionalFormModal = ({ open, professional, disciplines, saving, onClos
     // acaba de escribir los datos reales, la ficha dejó de ser un ejemplo.
     if (!professional?.id) payload.isDemo = Boolean(form.isDemo);
 
-    onSubmit(payload, professional?.id);
+    onSubmit(payload, professional?.id, archivo);
   };
 
   return (
@@ -172,19 +210,56 @@ const ProfessionalFormModal = ({ open, professional, disciplines, saving, onClos
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              URL de la foto <span className="text-gray-400">(opcional)</span>
-            </label>
+            <span className="block text-sm font-medium text-gray-700 mb-1">
+              Foto <span className="text-gray-400">(opcional)</span>
+            </span>
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => entrada.current?.click()}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  entrada.current?.click();
+                }
+              }}
+              onDragOver={(event) => {
+                event.preventDefault();
+                setArrastrando(true);
+              }}
+              onDragLeave={() => setArrastrando(false)}
+              onDrop={soltarFoto}
+              className={`flex items-center gap-4 px-4 py-4 border-2 border-dashed rounded-md cursor-pointer transition-colors ${
+                arrastrando ? 'border-emerald-500 bg-emerald-50' : 'border-gray-300 hover:border-emerald-500'
+              }`}
+            >
+              <div className="w-16 h-16 flex-none rounded-full overflow-hidden border border-gray-200 bg-gray-100 flex items-center justify-center">
+                {fotoMostrada ? (
+                  <img src={fotoMostrada} alt="Foto del profesional" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-lg font-semibold text-gray-400">
+                    {iniciales(form.displayName) || '?'}
+                  </span>
+                )}
+              </div>
+              <div className="min-w-0 text-sm">
+                <p className="font-medium text-emerald-700 truncate">
+                  {archivo ? archivo.name : 'Haz clic para subir o arrastra la foto aquí'}
+                </p>
+                <p className="text-xs text-gray-500">
+                  JPEG, PNG o WebP de hasta 5 MB. Sin foto, la app muestra las iniciales.
+                </p>
+              </div>
+            </div>
             <input
-              name="photoUrl"
-              value={form.photoUrl}
-              onChange={handleChange}
-              placeholder="https://..."
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              ref={entrada}
+              type="file"
+              accept={ACCEPT}
+              aria-label="Foto del profesional"
+              onChange={(event) => elegirFoto(event.target.files?.[0])}
+              className="hidden"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              Sin foto, la app muestra las iniciales del profesional.
-            </p>
+            {fotoError && <p className="text-sm text-red-600 mt-1">{fotoError}</p>}
           </div>
 
           {formError && <p className="text-sm text-red-600">{formError}</p>}

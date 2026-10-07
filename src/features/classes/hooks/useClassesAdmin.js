@@ -46,14 +46,17 @@ export const useProfessionals = () => {
     setLoading(false);
   }, []);
 
-  /** Crea o actualiza, según venga o no un id. */
+  /**
+   * Crea o actualiza, según venga o no un id. Devuelve el profesional guardado
+   * (o null si falló): al darlo de alta, su id es lo que permite subirle la foto.
+   */
   const save = useCallback(async (payload, id) => {
     setSaving(true);
     const response = id
       ? await classesService.updateProfessional(id, payload)
       : await classesService.createProfessional(payload);
     setSaving(false);
-    return notify(setError, response);
+    return notify(setError, response) ? response.data : null;
   }, []);
 
   /**
