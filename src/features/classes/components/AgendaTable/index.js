@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
+import ConfirmacionChip from '../ConfirmacionChip';
+
 /** 'YYYY-MM-DD' de hoy, sin pasar por new Date() para no cruzar el huso. */
 const today = () => {
   const now = new Date();
@@ -103,6 +105,7 @@ const AgendaTable = ({ professionals, bookings, loading, onSearch }) => {
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Socio</th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Personas</th>
                 <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Precio</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Asistencia</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">
@@ -119,6 +122,9 @@ const AgendaTable = ({ professionals, bookings, loading, onSearch }) => {
                   <td className="px-4 py-2 text-gray-600">{booking.partySize}</td>
                   <td className="px-4 py-2 text-right font-medium text-gray-800">
                     ${booking.priceSnapshot}
+                  </td>
+                  <td className="px-4 py-2">
+                    <ConfirmacionChip reserva={booking} />
                   </td>
                 </tr>
               ))}

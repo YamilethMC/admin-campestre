@@ -51,6 +51,10 @@ const ClassesAdmin = () => {
   const [access, setAccess] = useState(null);
   // Profesional al que se le está poniendo o quitando la foto.
   const [photo, setPhoto] = useState(null);
+  // Mientras se sube la foto que se eligió en el formulario.
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  // Se guardó la ficha pero no la foto: el formulario ya se cerró, así que se avisa aquí.
+  const [photoWarning, setPhotoWarning] = useState(null);
 
   const { disciplines, load: loadDisciplines } = useDisciplines();
   const professionalsState = useProfessionals();
@@ -80,14 +84,34 @@ const ClassesAdmin = () => {
     ]);
   };
 
-  const handleSaveProfessional = async (payload, id) => {
-    const ok = await professionalsState.save(payload, id);
+  /**
+   * Guarda la ficha y, si se eligió una, sube la foto.
+   *
+   * Si la ficha se guardó pero la foto falló, el formulario se cierra igual:
+   * dejarlo abierto invitaría a darle Guardar otra vez, y en un alta eso crea
+   * al mismo profesional dos veces. La foto se puede volver a subir desde la tabla.
+   */
+  const handleSaveProfessional = async (payload, id, photoFile) => {
+    setPhotoWarning(null);
+    const saved = await professionalsState.save(payload, id);
+    if (!saved) return;
 
-    if (ok) {
-      setShowForm(false);
-      setEditing(null);
-      professionalsState.load();
+    if (photoFile) {
+      setUploadingPhoto(true);
+      const upload = await classesService.uploadPhoto(saved.id, photoFile);
+      setUploadingPhoto(false);
+
+      if (!upload.success) {
+        setPhotoWarning(
+          `Se guardaron los datos de ${saved.displayName}, pero la foto no se subió: ${upload.error}. ` +
+            'Vuelve a subirla dando clic en su foto en la tabla.',
+        );
+      }
     }
+
+    setShowForm(false);
+    setEditing(null);
+    professionalsState.load();
   };
 
   const handleToggleActive = async (professional) => {
@@ -204,6 +228,15 @@ const ClassesAdmin = () => {
 
       {error && <div className="bg-red-50 text-red-700 rounded-lg px-4 py-3 text-sm mb-4">{error}</div>}
 
+      {photoWarning && (
+        <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg px-4 py-3 text-sm mb-4 flex justify-between gap-4">
+          <span>{photoWarning}</span>
+          <button type="button" onClick={() => setPhotoWarning(null)} className="text-amber-700 hover:text-amber-900">
+            Cerrar
+          </button>
+        </div>
+      )}
+
       {tab === 'professionals' && (
         <ProfessionalsTable
           professionals={professionalsState.professionals}
@@ -282,7 +315,7 @@ const ClassesAdmin = () => {
         open={showForm}
         professional={editing}
         disciplines={disciplines}
-        saving={professionalsState.saving}
+        saving={professionalsState.saving || uploadingPhoto}
         onClose={() => {
           setShowForm(false);
           setEditing(null);

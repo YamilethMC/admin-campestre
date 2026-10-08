@@ -1,5 +1,7 @@
 import React, { useRef, useState } from 'react';
 
+import { ACCEPT, iniciales as inicialesDe, validarFoto } from '../../utils/fotoProfesional';
+
 /**
  * La fotografía del profesional (§5: "fotografías" configurables por el Club).
  *
@@ -11,9 +13,6 @@ import React, { useRef, useState } from 'react';
  * fotografía real ya no es un ejemplo.
  */
 
-const MAXIMO_MB = 5;
-const TIPOS = ['image/jpeg', 'image/png', 'image/webp'];
-
 const PhotoModal = ({ professional, onClose, onUpload, onRemove }) => {
   const entrada = useRef(null);
   const [previa, setPrevia] = useState(null);
@@ -21,23 +20,15 @@ const PhotoModal = ({ professional, onClose, onUpload, onRemove }) => {
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState('');
 
-  const iniciales = professional.displayName
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p.charAt(0).toUpperCase())
-    .join('');
+  const iniciales = inicialesDe(professional.displayName);
 
   const elegir = (evento) => {
     const f = evento.target.files?.[0];
     if (!f) return;
 
-    if (!TIPOS.includes(f.type)) {
-      setError('La foto debe ser JPEG, PNG o WebP');
-      return;
-    }
-    if (f.size > MAXIMO_MB * 1024 * 1024) {
-      setError(`La foto no puede pesar más de ${MAXIMO_MB} MB`);
+    const motivo = validarFoto(f);
+    if (motivo) {
+      setError(motivo);
       return;
     }
 
@@ -93,7 +84,7 @@ const PhotoModal = ({ professional, onClose, onUpload, onRemove }) => {
           <input
             ref={entrada}
             type="file"
-            accept="image/jpeg,image/png,image/webp"
+            accept={ACCEPT}
             onChange={elegir}
             className="hidden"
           />
